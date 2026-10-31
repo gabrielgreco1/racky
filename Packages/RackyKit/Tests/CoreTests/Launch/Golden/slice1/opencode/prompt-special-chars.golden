@@ -1,0 +1,11 @@
+case: opencode/prompt-special-chars
+executable: ["/usr/local/bin/opencode"]
+identity: []
+profile: []
+injected: []
+prompt: ["--prompt","He said \"hi\" & 'bye'\nline2 $(rm -rf ~) `id` \\n ; | > emoji 👩🏽‍💻 日本語 *.swift"]
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: -
+warnings: 
+files: 

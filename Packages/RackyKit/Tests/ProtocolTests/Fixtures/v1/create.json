@@ -1,0 +1,1 @@
+{"argv":["/bin/zsh","-l"],"coldLog":true,"cols":120,"cwd":"/Users/dev/project","env":{"HOME":"/Users/dev","PATH":"/usr/bin:/bin"},"id":2,"label":"claude","op":"create","owner":{"runID":"R-1","terminalID":"T-1"},"ringBytes":4194304,"rows":40,"sessionID":"11111111-2222-4333-8444-555555555555","term":"xterm-256color"}

@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    name: macOS (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-15 = mínimo declarado (00 T3); macos-latest = o mais novo disponível (08 AR-815).
+        runner: [macos-15, macos-latest]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26.x
+        run: |
+          XC="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)"
+          [ -n "$XC" ] || { echo "Xcode 26.x não encontrado"; ls /Applications | grep -i xcode; exit 1; }
+          echo "DEVELOPER_DIR=$XC/Contents/Developer" >> "$GITHUB_ENV"
+
+      - name: Install ripgrep
+        run: command -v rg >/dev/null || brew install ripgrep
+
+      - name: Cache tools
+        uses: actions/cache@v4
+        with:
+          path: .tools
+          key: tools-${{ hashFiles('scripts/tool-versions.txt') }}
+
+      - name: Bootstrap
+        run: scripts/bootstrap.sh
+
+      - name: Lint (self-test + Swift 6 strict build + prohibitions)
+        run: |
+          scripts/lint.sh --self-test
+          scripts/lint.sh
+          scripts/lint-ui.sh --self-test
+          scripts/lint-ui.sh
+
+      - name: Unit tests (RackyKit)
+        run: swift test --package-path Packages/RackyKit -Xswiftc -warnings-as-errors
+
+      # Sem a identidade "Racky Local Signing" no runner, o build assina ad-hoc (aviso esperado).
+      - name: Build, sign and verify app
+        run: scripts/build.sh
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ matrix.runner }}
+          path: build/Racky/xcodebuild.log
+          if-no-files-found: ignore

@@ -1,0 +1,14 @@
+{
+  "comment": "Manifesto da imagem do runtime (07 §2.3, P24: UMA imagem, um container por computador). `digest` e `ghcr` ficam nulos até a primeira publicação (decisão 12 de 09 §7: GHCR público); enquanto isso o app só faz o build local do contexto embutido (CS-121).",
+  "images": [
+    {
+      "name": "racky-computer",
+      "context": "runtime/computer",
+      "dockerfile": "Dockerfile",
+      "base": "mcr.microsoft.com/playwright/python:v1.63.0-noble@sha256:72bd171a9ffc2b4b59532aaa6210e21014d07093120dc25528870c0b840da1f0",
+      "ghcr": null,
+      "digest": null,
+      "platform": "linux/arm64"
+    }
+  ]
+}

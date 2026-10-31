@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Isolado: nada de rede além do WebSocket de loopback do egress do computador; nada de eval, inline script ou frames. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src ws://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Computer viewer</title>
+<link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+<div id="screen"></div>
+<script type="module" src="viewer.js"></script>
+</body>
+</html>

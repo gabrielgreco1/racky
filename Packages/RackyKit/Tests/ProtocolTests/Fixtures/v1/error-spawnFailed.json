@@ -1,0 +1,1 @@
+{"code":"spawnFailed","errno":2,"id":2,"message":"execve failed","op":"error","path":"/nonexistent/bin"}

@@ -1,0 +1,24 @@
+{
+  "input": {
+    "tool": "task",
+    "sessionID": "ses_REDACTED",
+    "callID": "call_REDACTED"
+  },
+  "output": {
+    "args": {
+      "description": "Study site",
+      "prompt": "Study the website http://example.com/ and report its title",
+      "subagent_type": "general"
+    }
+  },
+  "ctxKeys": [
+    "client",
+    "project",
+    "worktree",
+    "directory",
+    "experimental_workspace",
+    "serverUrl",
+    "$"
+  ],
+  "note": "Real OpenCode 1.19.3 payload of tool.execute.before for the subagent tool, via plugin loaded by config.plugin=[file://...] in OPENCODE_CONFIG_CONTENT (temp HOME/XDG, model opencode/deepseek-v4.1-flash-free). Throwing in the hook blocks the call. The child session fires the hook again for its own tools (webfetch)."
+}

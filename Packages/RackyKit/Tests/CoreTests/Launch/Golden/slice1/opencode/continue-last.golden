@@ -1,0 +1,11 @@
+case: opencode/continue-last
+executable: ["/usr/local/bin/opencode"]
+identity: ["-c"]
+profile: []
+injected: []
+prompt: []
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: -
+warnings: resumeWithoutID
+files: 

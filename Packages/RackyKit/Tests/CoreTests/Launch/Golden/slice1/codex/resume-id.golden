@@ -1,0 +1,11 @@
+case: codex/resume-id
+executable: ["/usr/local/bin/codex"]
+identity: ["resume","01a147e5-72b7-7c52-a686-6e002673cc8b"]
+profile: ["--no-daemon","--dangerously-bypass-approvals-and-sandbox"]
+injected: []
+prompt: []
+cwd: /Users/example/work/repo
+native_id: 01a147e5-72b7-7c52-a686-6e002673cc8b
+shield_off: Skip permissions (--dangerously-bypass-approvals-and-sandbox)
+warnings: 
+files: 

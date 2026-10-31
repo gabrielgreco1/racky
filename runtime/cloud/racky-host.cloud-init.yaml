@@ -1,0 +1,114 @@
+# Referência gerada por CloudInit.userData com chaves de mentira (BK-12). Regerar: RACKY_UPDATE_GOLDEN=1 swift test --filter DeadManTests
+#cloud-config
+# Racky: host de computadores. Gerado por CloudInit.userData.
+users:
+  - name: racky
+    gecos: Racky
+    shell: /bin/bash
+    groups: [docker]
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEFVVEhPUklaRURBVVRIT1JJWkVEQVVUSE9SSVpFRA racky
+disable_root: true
+ssh_pwauth: false
+ssh_deletekeys: true
+ssh_keys:
+  ed25519_private: |
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    AAAAFAKEFAKEFAKEFAKE
+    FAKEFAKEFAKEFAKEFAKE
+    -----END OPENSSH PRIVATE KEY-----
+  ed25519_public: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEhPU1RIT1NUSE9TVEhPU1RIT1NUSE9TVEhPU1RI
+packages:
+  - docker
+write_files:
+  - path: /usr/local/bin/racky-deadman
+    permissions: '0755'
+    owner: root:root
+    content: |
+      #!/bin/bash
+      # Chave morta do Racky (P27.2). Gerado por DeadManScript.render; não editar na VM.
+      # Se o app (o Mac) parar de renovar o lease, a VM se apaga: InstanceInitiatedShutdownBehavior=terminate transforma
+      # `shutdown -h now` em TerminateInstances. Não usa credencial da nuvem.
+      set -u
+      STATE_DIR="${RACKY_STATE_DIR:-/var/lib/racky}"
+      HEARTBEAT="$STATE_DIR/heartbeat"
+      BOOT_FILE="$STATE_DIR/boot"
+      IDLE_FILE="$STATE_DIR/idle-since"
+      INTERVAL=60
+      LEASE=1200
+      BOOT_GRACE=900
+      MAX_LIFETIME=28800
+      IDLE_LIMIT=900
+
+      read_int() { local v; v=$(cat "$1" 2>/dev/null | tr -dc '0-9'); [ -n "$v" ] && echo "$v"; }
+
+      computers() {
+        if [ -n "${RACKY_COMPUTERS:-}" ]; then echo "$RACKY_COMPUTERS"; return; fi
+        docker ps -q --filter "label=racky.computer" 2>/dev/null | wc -l | tr -d ' '
+      }
+
+      stop_host() {
+        if [ "${RACKY_DRY_RUN:-0}" = 1 ]; then echo "shutdown:$1"; return; fi
+        logger -t racky-deadman "shutdown: $1" 2>/dev/null
+        /usr/sbin/shutdown -h now "racky: $1"
+      }
+
+      tick() {
+        local now boot beat idle n
+        now="${RACKY_NOW:-$(date +%s)}"
+        mkdir -p "$STATE_DIR"
+        boot=$(read_int "$BOOT_FILE") || { boot=$now; echo "$boot" > "$BOOT_FILE"; }
+        if [ $((now - boot)) -ge "$MAX_LIFETIME" ]; then stop_host max-lifetime; return; fi
+        if beat=$(read_int "$HEARTBEAT"); then
+          [ "$beat" -gt "$now" ] && beat=$now
+          if [ $((now - beat)) -ge "$LEASE" ]; then stop_host lease-expired; return; fi
+        elif [ $((now - boot)) -ge "$BOOT_GRACE" ]; then
+          stop_host boot-grace-expired; return
+        fi
+        n=$(computers)
+        if [ "$n" -gt 0 ]; then
+          rm -f "$IDLE_FILE"
+        else
+          idle=$(read_int "$IDLE_FILE") || { idle=$boot; echo "$idle" > "$IDLE_FILE"; }
+          if [ $((now - idle)) -ge "$IDLE_LIMIT" ]; then stop_host idle; return; fi
+        fi
+        [ "${RACKY_DRY_RUN:-0}" = 1 ] && echo keep
+      }
+
+      while true; do
+        tick
+        [ "${RACKY_ONCE:-0}" = 1 ] && exit 0
+        sleep "$INTERVAL"
+      done
+  - path: /etc/systemd/system/racky-deadman.service
+    permissions: '0644'
+    content: |
+      [Unit]
+      Description=Racky dead-man switch
+      After=docker.service
+      [Service]
+      ExecStart=/usr/local/bin/racky-deadman
+      Restart=always
+      RestartSec=5
+      [Install]
+      WantedBy=multi-user.target
+  - path: /etc/ssh/sshd_config.d/50-racky.conf
+    permissions: '0644'
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PermitRootLogin no
+      AllowUsers racky
+      AllowTcpForwarding local
+      AllowStreamLocalForwarding local
+      AllowAgentForwarding no
+      X11Forwarding no
+      PermitTunnel no
+runcmd:
+  - [install, -d, -o, racky, -g, racky, -m, '0755', /var/lib/racky]
+  - [sh, -c, 'date +%s > /var/lib/racky/boot']
+  - [systemctl, daemon-reload]
+  - [systemctl, restart, sshd]
+  - [systemctl, enable, --now, docker]
+  - [systemctl, enable, --now, racky-deadman]

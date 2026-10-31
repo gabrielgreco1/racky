@@ -1,0 +1,11 @@
+case: opencode/model-auto
+executable: ["/usr/local/bin/opencode"]
+identity: []
+profile: ["-m","openai/gpt-5","--auto"]
+injected: []
+prompt: ["--prompt","hello"]
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: Skip permissions (--auto)
+warnings: unsupportedFlag
+files: 

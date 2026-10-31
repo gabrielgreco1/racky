@@ -1,0 +1,3 @@
+{"stream":"Step 1/2 : FROM alpine"}
+{"stream":"Step 2/2 : RUN false"}
+{"errorDetail":{"code":1,"message":"The command '/bin/sh -c false' returned a non-zero code: 1"},"error":"The command '/bin/sh -c false' returned a non-zero code: 1"}

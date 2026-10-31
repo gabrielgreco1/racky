@@ -1,0 +1,11 @@
+{
+    "CreatedAt": "2026-10-17T05:10:15Z",
+    "Driver": "local",
+    "Labels": {
+        "racky.test": "1"
+    },
+    "Mountpoint": "/var/lib/docker/volumes/abx-fixture-vol/_data",
+    "Name": "abx-fixture-vol",
+    "Options": null,
+    "Scope": "local"
+}

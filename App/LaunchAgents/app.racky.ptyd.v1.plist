@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  LaunchAgent do daemon de PTY (08 §0.1, 06 §1.2, S-01). Copiado por scripts/build.sh para
+  Contents/Library/LaunchAgents/; __BUILD__ vira CFBundleVersion (o app compara builds no helloAck, 06 §1.10).
+  O socket NÃO usa SockPathName (o plist é estático e o launchd não expande ~): SecureSocketWithKey faz o launchd criar o
+  socket num diretório privado dele e publicar o caminho em RACKY_PTYD_SOCK_V1 no domínio do usuário (launchctl getenv).
+  SockPathMode 384 = 0600 (sem isso o socket sai 0666; o diretório do launchd já é 0700, S-01).
+  BundleProgram é o launcher estável (rackyd-launch, só faz exec do rackyd): o launchd prende o job ao cdhash do
+  BundleProgram, e com o rackyd direto toda atualização deixaria o job em spawn failed (S-01).
+  O daemon recebe o descritor com launch_activate_socket("Listeners"). Sem RunAtLoad: o launchd sobe o daemon na primeira
+  conexão; sem KeepAlive: ele sai sozinho depois de 60 s sem sessões vivas nem clientes.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>app.racky.ptyd.v1</string>
+    <key>BundleProgram</key>
+    <string>Contents/MacOS/rackyd-launch</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>Contents/MacOS/rackyd-launch</string>
+        <string>--launchd</string>
+        <string>Listeners</string>
+        <string>--build</string>
+        <string>__BUILD__</string>
+    </array>
+    <key>AssociatedBundleIdentifiers</key>
+    <array>
+        <string>app.racky.mac</string>
+    </array>
+    <key>ProcessType</key>
+    <string>Interactive</string>
+    <key>AbandonProcessGroup</key>
+    <true/>
+    <key>KeepAlive</key>
+    <false/>
+    <key>Sockets</key>
+    <dict>
+        <key>Listeners</key>
+        <dict>
+            <key>SecureSocketWithKey</key>
+            <string>RACKY_PTYD_SOCK_V1</string>
+            <key>SockPathMode</key>
+            <integer>384</integer>
+        </dict>
+    </dict>
+</dict>
+</plist>

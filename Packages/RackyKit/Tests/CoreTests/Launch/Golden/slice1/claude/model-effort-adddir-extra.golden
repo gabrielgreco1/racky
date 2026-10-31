@@ -1,0 +1,11 @@
+case: claude/model-effort-adddir-extra
+executable: ["/usr/local/bin/claude"]
+identity: ["--session-id","11111111-2222-4333-8444-555555555555"]
+profile: ["--model","opus","--effort","high","--permission-mode","acceptEdits","--add-dir","/Users/example/shared","--add-dir","/Users/example/docs dir","--name","work session"]
+injected: []
+prompt: ["--","hello"]
+cwd: /Users/example/work/repo
+native_id: 11111111-2222-4333-8444-555555555555
+shield_off: -
+warnings: 
+files: 

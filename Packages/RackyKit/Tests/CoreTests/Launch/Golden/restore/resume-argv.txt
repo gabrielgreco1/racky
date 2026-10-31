@@ -1,0 +1,37 @@
+## claude resume (id captured, flags regenerated)
+/usr/local/bin/claude
+--resume
+aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee
+--model
+opus
+--dangerously-skip-permissions
+
+## claude resume after first launch (automatic mode, resumeOf set)
+/usr/local/bin/claude
+--resume
+aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee
+--model
+opus
+--dangerously-skip-permissions
+
+## claude start fresh
+/usr/local/bin/claude
+--session-id
+11111111-2222-4333-8444-555555555555
+--model
+opus
+--dangerously-skip-permissions
+
+## claude continue last (no id)
+/usr/local/bin/claude
+-c
+--model
+opus
+--dangerously-skip-permissions
+
+## codex resume
+/usr/local/bin/codex
+resume
+01a147e5-72b7-7c52-a686-6e002673cc8b
+--no-daemon
+--dangerously-bypass-approvals-and-sandbox

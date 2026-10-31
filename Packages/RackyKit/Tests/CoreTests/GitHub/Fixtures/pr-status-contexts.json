@@ -1,0 +1,58 @@
+{
+  "data": {
+    "rateLimit": { "cost": 1, "remaining": 150, "resetAt": "2026-10-17T18:00:00Z" },
+    "repository": {
+      "b0": {
+        "nodes": [
+          {
+            "number": 412,
+            "title": "Anonymized PR title mixed checks",
+            "url": "https://github.com/acme/widgets/pull/412",
+            "state": "OPEN",
+            "isDraft": false,
+            "reviewDecision": "CHANGES_REQUESTED",
+            "mergeable": "CONFLICTING",
+            "mergeStateStatus": "DIRTY",
+            "headRefName": "dev/mixed",
+            "headRefOid": "1111111111111111111111111111111111111111",
+            "baseRefName": "main",
+            "commits": { "nodes": [ { "commit": { "statusCheckRollup": {
+              "state": "FAILURE",
+              "contexts": { "totalCount": 130, "nodes": [
+                { "__typename": "CheckRun", "name": "build", "status": "COMPLETED", "conclusion": "FAILURE",
+                  "detailsUrl": "https://github.com/acme/widgets/actions/runs/7100000001/job/8100000001", "databaseId": 8100000001,
+                  "checkSuite": { "workflowRun": { "databaseId": 7100000001 } } },
+                { "__typename": "CheckRun", "name": "e2e", "status": "COMPLETED", "conclusion": "TIMED_OUT",
+                  "detailsUrl": "https://github.com/acme/widgets/actions/runs/7100000001/job/8100000002", "databaseId": 8100000002,
+                  "checkSuite": { "workflowRun": { "databaseId": 7100000001 } } },
+                { "__typename": "CheckRun", "name": "deploy-preview", "status": "COMPLETED", "conclusion": "CANCELLED",
+                  "detailsUrl": "https://github.com/acme/widgets/actions/runs/7100000002/job/8100000003", "databaseId": 8100000003,
+                  "checkSuite": { "workflowRun": { "databaseId": 7100000002 } } },
+                { "__typename": "CheckRun", "name": "approval-gate", "status": "COMPLETED", "conclusion": "ACTION_REQUIRED",
+                  "detailsUrl": "https://github.com/acme/widgets/actions/runs/7100000003/job/8100000004", "databaseId": 8100000004,
+                  "checkSuite": { "workflowRun": { "databaseId": 7100000003 } } },
+                { "__typename": "CheckRun", "name": "lint", "status": "COMPLETED", "conclusion": "SUCCESS",
+                  "detailsUrl": "https://github.com/acme/widgets/actions/runs/7100000001/job/8100000005", "databaseId": 8100000005,
+                  "checkSuite": { "workflowRun": { "databaseId": 7100000001 } } },
+                { "__typename": "CheckRun", "name": "docs", "status": "COMPLETED", "conclusion": "NEUTRAL",
+                  "detailsUrl": "https://github.com/acme/widgets/actions/runs/7100000001/job/8100000006", "databaseId": 8100000006,
+                  "checkSuite": { "workflowRun": { "databaseId": 7100000001 } } },
+                { "__typename": "CheckRun", "name": "windows", "status": "IN_PROGRESS", "conclusion": null,
+                  "detailsUrl": "https://github.com/acme/widgets/actions/runs/7100000001/job/8100000007", "databaseId": 8100000007,
+                  "checkSuite": { "workflowRun": { "databaseId": 7100000001 } } },
+                { "__typename": "CheckRun", "name": "queued-job", "status": "QUEUED", "conclusion": null,
+                  "detailsUrl": null, "databaseId": 8100000008, "checkSuite": { "workflowRun": null } },
+                { "__typename": "StatusContext", "context": "ci/external", "state": "FAILURE", "targetUrl": "https://ci.example.com/builds/9" },
+                { "__typename": "StatusContext", "context": "ci/legacy", "state": "ERROR", "targetUrl": null },
+                { "__typename": "StatusContext", "context": "ci/ok", "state": "SUCCESS", "targetUrl": "https://ci.example.com/builds/10" },
+                { "__typename": "StatusContext", "context": "ci/waiting", "state": "PENDING", "targetUrl": null },
+                { "__typename": "CheckRun", "name": "weird", "status": "COMPLETED", "conclusion": "SOMETHING_NEW",
+                  "detailsUrl": null, "databaseId": 8100000009, "checkSuite": { "workflowRun": null } }
+              ] }
+            } } } ] }
+          }
+        ]
+      }
+    }
+  }
+}

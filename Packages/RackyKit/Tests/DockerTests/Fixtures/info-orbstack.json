@@ -1,0 +1,15 @@
+{
+  "ID": "REDACTED",
+  "Name": "orbstack",
+  "MemTotal": 17179869184,
+  "NCPU": 10,
+  "Architecture": "aarch64",
+  "OperatingSystem": "OrbStack",
+  "OSType": "linux",
+  "ServerVersion": "28.5.2",
+  "DockerRootDir": "/var/lib/docker",
+  "KernelVersion": "6.12.76-linuxkit",
+  "Containers": 0,
+  "ContainersRunning": 0,
+  "Images": 4
+}

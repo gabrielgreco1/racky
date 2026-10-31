@@ -1,0 +1,10 @@
+{
+ "hook_started_per_event_from_stream_json": {
+  "SessionStart:startup": 5,
+  "UserPromptSubmit": 3,
+  "PreToolUse:Bash": 2,
+  "PostToolUse:Bash": 2,
+  "Stop": 2
+ },
+ "explanation": "UserPromptSubmit=3 (global ~/.claude/settings.json hook of another app + project .claude/settings.json + --settings); SessionStart=5 (global + --settings + 3 plugin hooks); PreToolUse/PostToolUse/Stop=2 (global + --settings). The global hook is visible in --debug-file as 'Hooks: <event> [if [ -z \"${HOME-}\" ] ... claude-hook.sh'. Hooks from all sources ran; none replaced another."
+}

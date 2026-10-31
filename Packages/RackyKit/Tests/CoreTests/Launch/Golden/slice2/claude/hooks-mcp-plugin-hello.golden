@@ -1,0 +1,11 @@
+case: claude/hooks-mcp-plugin-hello
+executable: ["/usr/local/bin/claude"]
+identity: ["--session-id","11111111-2222-4333-8444-555555555555"]
+profile: ["--dangerously-skip-permissions"]
+injected: ["--settings","/tmp/ab/run/launch/00000000-0000-4000-8000-0000000000bb/settings.json","--mcp-config","/tmp/ab/run/launch/00000000-0000-4000-8000-0000000000bb/mcp.json","--plugin-dir","/tmp/ab/run/launch/00000000-0000-4000-8000-0000000000bb/plugin"]
+prompt: ["--","hello"]
+cwd: /Users/example/work/repo
+native_id: 11111111-2222-4333-8444-555555555555
+shield_off: Skip permissions (--dangerously-skip-permissions)
+warnings: 
+files: settings.json mode=600 bytes=3360,mcp.json mode=600 bytes=59,plugin/.claude-plugin/plugin.json mode=600 bytes=20,plugin/skills/x/SKILL.md mode=600 bytes=16

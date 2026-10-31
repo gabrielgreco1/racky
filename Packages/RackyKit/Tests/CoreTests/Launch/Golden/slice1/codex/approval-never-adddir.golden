@@ -1,0 +1,11 @@
+case: codex/approval-never-adddir
+executable: ["/usr/local/bin/codex"]
+identity: []
+profile: ["--no-daemon","--model","gpt-5.6-luna","--ask-for-approval","never","--add-dir","/Users/example/shared"]
+injected: []
+prompt: ["hello"]
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: -
+warnings: 
+files: 

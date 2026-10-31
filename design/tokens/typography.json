@@ -1,0 +1,254 @@
+{
+  "schema": "racky.tokens.typography",
+  "version": 1,
+  "_nota": "02 §4. Tamanhos em pt; tracking em em (global +0.01; nav -0.025). Pesos: 400, 450 (eixo wght), 500, 600. lineHeightSource 'spec' = line-height que o CSS extraido nao usa (so 02).",
+  "families": {
+    "ui": {
+      "name": "Geist",
+      "kind": "variable",
+      "weightAxis": "wght",
+      "fallback": "system",
+      "note": "Geist Variable (OFL); arquivo Geist[wght].ttf via scripts/bootstrap.sh --fonts"
+    },
+    "mono": {
+      "name": "SF Mono",
+      "kind": "system",
+      "fallback": "monospacedSystem",
+      "note": "NSFont.monospacedSystemFont"
+    }
+  },
+  "terminal": {
+    "family": "mono",
+    "size": 14,
+    "sizeMin": 8,
+    "sizeMax": 32,
+    "weight": 500,
+    "boldWeight": 700,
+    "lineHeight": 1.0,
+    "lineHeightMin": 1.0,
+    "lineHeightMax": 1.6,
+    "padding": 4
+  },
+  "styles": {
+    "keycap": {
+      "family": "ui",
+      "size": 9,
+      "weight": 500,
+      "lineHeight": 12,
+      "tracking": 0.01,
+      "lineHeightSource": "spec"
+    },
+    "micro": {
+      "family": "ui",
+      "size": 10,
+      "weight": 500,
+      "lineHeight": 12,
+      "tracking": 0.01,
+      "lineHeightSource": "spec"
+    },
+    "microNumeric": {
+      "family": "ui",
+      "size": 10,
+      "weight": 400,
+      "lineHeight": 12,
+      "tracking": 0.01,
+      "tabularDigits": true,
+      "lineHeightSource": "spec"
+    },
+    "monoMicro": {
+      "family": "mono",
+      "size": 10,
+      "weight": 400,
+      "lineHeight": 12,
+      "tracking": 0,
+      "lineHeightSource": "spec"
+    },
+    "small": {
+      "family": "ui",
+      "size": 11,
+      "weight": 400,
+      "lineHeight": 14,
+      "tracking": 0.01
+    },
+    "label": {
+      "family": "ui",
+      "size": 12,
+      "weight": 500,
+      "lineHeight": 16,
+      "tracking": 0.01
+    },
+    "sectionLabel": {
+      "family": "ui",
+      "size": 12,
+      "weight": 600,
+      "lineHeight": 16,
+      "tracking": 0.01
+    },
+    "tab": {
+      "family": "ui",
+      "size": 12,
+      "weight": 400,
+      "lineHeight": 16,
+      "tracking": 0.01
+    },
+    "tabActive": {
+      "family": "ui",
+      "size": 12,
+      "weight": 500,
+      "lineHeight": 16,
+      "tracking": 0.01
+    },
+    "menuItem": {
+      "family": "ui",
+      "size": 12,
+      "weight": 450,
+      "lineHeight": 16,
+      "tracking": 0.01
+    },
+    "body": {
+      "family": "ui",
+      "size": 13,
+      "weight": 400,
+      "lineHeight": 20,
+      "tracking": 0.01
+    },
+    "bodyStrong": {
+      "family": "ui",
+      "size": 13,
+      "weight": 600,
+      "lineHeight": 20,
+      "tracking": 0.01
+    },
+    "nav": {
+      "family": "ui",
+      "size": 13.5,
+      "weight": 400,
+      "lineHeight": 18,
+      "tracking": 0,
+      "note": "Racky v5: atalhos da sidebar em peso regular"
+    },
+    "monoPane": {
+      "family": "mono",
+      "size": 13,
+      "weight": 400,
+      "lineHeight": 24,
+      "tracking": 0
+    },
+    "control": {
+      "family": "ui",
+      "size": 14,
+      "weight": 500,
+      "lineHeight": 20,
+      "tracking": 0.01
+    },
+    "input": {
+      "family": "ui",
+      "size": 14,
+      "weight": 400,
+      "lineHeight": 20,
+      "tracking": 0.01
+    },
+    "inputCompact": {
+      "family": "ui",
+      "size": 13,
+      "weight": 400,
+      "lineHeight": 20,
+      "tracking": 0.01
+    },
+    "dialogBody": {
+      "family": "ui",
+      "size": 14,
+      "weight": 400,
+      "lineHeight": 20,
+      "tracking": 0.01
+    },
+    "composerTitle": {
+      "family": "ui",
+      "size": 16,
+      "weight": 600,
+      "lineHeight": 24,
+      "tracking": 0.01
+    },
+    "dialogTitle": {
+      "family": "ui",
+      "size": 18,
+      "weight": 600,
+      "lineHeight": 28,
+      "tracking": 0.01
+    },
+    "pageTitle": {
+      "family": "ui",
+      "size": 24,
+      "weight": 600,
+      "lineHeight": 32,
+      "tracking": 0.01
+    },
+    "display": {
+      "family": "ui",
+      "size": 28,
+      "weight": 600,
+      "lineHeight": 34,
+      "tracking": 0.01,
+      "lineHeightSource": "spec"
+    },
+    "paletteInput": {
+      "family": "ui",
+      "size": 16,
+      "weight": 400,
+      "lineHeight": 24,
+      "tracking": 0.01
+    },
+    "cell": {
+      "family": "ui",
+      "size": 12.5,
+      "weight": 400,
+      "lineHeight": 16,
+      "tracking": 0.01,
+      "tabularDigits": false
+    },
+    "monoCell": {
+      "family": "mono",
+      "size": 12,
+      "weight": 400,
+      "lineHeight": 16,
+      "tracking": 0,
+      "tabularDigits": true
+    },
+    "metric": {
+      "family": "ui",
+      "size": 20,
+      "weight": 600,
+      "lineHeight": 24,
+      "tracking": -0.01,
+      "tabularDigits": true
+    },
+    "sessionTitle": {
+      "family": "ui",
+      "size": 14,
+      "weight": 500,
+      "lineHeight": 20,
+      "tracking": -0.005,
+      "lineHeightSource": "spec",
+      "note": "Racky v5: título do card de sessão"
+    },
+    "sidebarMeta": {
+      "family": "ui",
+      "size": 12,
+      "weight": 400,
+      "lineHeight": 16,
+      "tracking": 0,
+      "lineHeightSource": "spec",
+      "note": "Racky v5: branch, agente e subagentes na sidebar"
+    },
+    "sidebarMetaNumeric": {
+      "family": "ui",
+      "size": 12,
+      "weight": 400,
+      "lineHeight": 16,
+      "tracking": 0,
+      "tabularDigits": true,
+      "lineHeightSource": "spec",
+      "note": "Racky v5: contagens e tempos na sidebar"
+    }
+  }
+}

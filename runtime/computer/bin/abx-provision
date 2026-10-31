@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+"""Entrega de segredos ao computador (P24). O app roda isto com `docker exec -i -u egress <container> abx-provision`.
+
+Lê UM objeto JSON do stdin: {"files": {"token": "...", "egress.json": "...", "proxy-ca.pem": "..."}} e grava cada arquivo em
+/run/racky (tmpfs 0700 do usuário `egress`, fora do alcance do `agent`) com modo 0400, de forma atômica (rename). Nada vai
+por env, argv, `inspect` ou disco do host. Também serve à troca de proxy (reescreve egress.json e o app chama o reload).
+"""
+import json
+import os
+import sys
+
+DIRECTORY = os.environ.get("RACKY_SECRETS_DIR", "/run/racky")
+
+
+def main() -> int:
+    payload = json.load(sys.stdin)
+    files = payload["files"]
+    for name in files:
+        if "/" in name or name.startswith(".") or not name:
+            print(f"nome inválido: {name}", file=sys.stderr)
+            return 2
+    for name, content in files.items():
+        final = os.path.join(DIRECTORY, name)
+        temp = os.path.join(DIRECTORY, f".{name}.{os.getpid()}.tmp")
+        fd = os.open(temp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, "w") as handle:
+            handle.write(content)
+        os.chmod(temp, 0o400)
+        os.replace(temp, final)
+    print("ok")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

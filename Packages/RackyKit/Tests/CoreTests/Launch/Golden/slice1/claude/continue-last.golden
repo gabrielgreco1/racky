@@ -1,0 +1,11 @@
+case: claude/continue-last
+executable: ["/usr/local/bin/claude"]
+identity: ["-c"]
+profile: ["--dangerously-skip-permissions"]
+injected: []
+prompt: []
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: Skip permissions (--dangerously-skip-permissions)
+warnings: resumeWithoutID
+files: 

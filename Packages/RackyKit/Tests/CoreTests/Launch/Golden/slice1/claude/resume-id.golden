@@ -1,0 +1,11 @@
+case: claude/resume-id
+executable: ["/usr/local/bin/claude"]
+identity: ["--resume","aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"]
+profile: ["--dangerously-skip-permissions"]
+injected: []
+prompt: []
+cwd: /Users/example/work/repo
+native_id: aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee
+shield_off: Skip permissions (--dangerously-skip-permissions)
+warnings: 
+files: 
