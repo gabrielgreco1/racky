@@ -1,0 +1,27 @@
+.DS_Store
+.build/
+.swiftpm/
+build/
+dist/
+*.app/
+*.zip
+.env
+.env.*
+!.env.example
+*.p12
+*.pem
+*.key
+*.xcuserstate
+work/
+
+__pycache__/
+*.py[cod]
+.tools/
+DerivedData/
+
+# Rebuild (T1-01): projeto Xcode gerado por scripts/gen.sh (AR-120)
+*.xcodeproj/
+
+# Geist (T1-03): a fonte variavel vem de scripts/bootstrap.sh --fonts; OFL.txt e versionado.
+Packages/RackyKit/Sources/RackyDesignSystem/Resources/Fonts/*.ttf
+.vercel

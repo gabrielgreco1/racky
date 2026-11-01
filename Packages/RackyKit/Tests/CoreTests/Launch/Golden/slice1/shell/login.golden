@@ -1,0 +1,11 @@
+case: shell/login
+executable: ["/bin/zsh"]
+identity: []
+profile: ["-l"]
+injected: []
+prompt: []
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: -
+warnings: promptIgnored
+files: 

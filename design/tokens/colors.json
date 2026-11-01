@@ -1,0 +1,552 @@
+{
+  "schema": "racky.tokens.colors",
+  "version": 1,
+  "_nota": "Fonte dos tokens de cor (02 §2, P17). 'dark' e o valor do app (v1 so escuro). 'palette:--color-*'; null exige 'note'. 'opacity' compoe sobre a superficie (nunca pre-misturar). 'light' e registro (DS13), nao gerado.",
+  "groups": [
+    {
+      "name": "surfaces",
+      "tokens": {
+        "canvas": {
+          "dark": "#0e0f11",
+          "reference": "--background",
+          "light": "#ffffff",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "chrome": {
+          "dark": "#141518",
+          "reference": "--card",
+          "light": "#ffffff",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "sidebar": {
+          "dark": "#141518",
+          "reference": "--worktree-sidebar",
+          "light": "#f5f5f5",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "sidebarSelected": {
+          "dark": "#23252a",
+          "reference": "--worktree-sidebar-accent",
+          "light": "#eaeaea",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "panel": {
+          "dark": "#141518",
+          "reference": "--sidebar",
+          "light": "#fafafa",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "panelSelected": {
+          "dark": "#1c1d21",
+          "reference": "--sidebar-accent",
+          "light": "#f5f5f5",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "secondary": {
+          "dark": "#1c1d21",
+          "reference": "--secondary",
+          "light": "#f5f5f5",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "accent": {
+          "dark": "#2c2e33",
+          "reference": "--accent",
+          "light": "#f5f5f5",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "editor": {
+          "dark": "#0e0f11",
+          "reference": "--editor-surface",
+          "light": "#ffffff",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "overlayCard": {
+          "dark": "#16171a",
+          "opacity": 0.96,
+          "reference": "--popover",
+          "light": "#ffffff",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "overlaySolid": {
+          "dark": "#16171a",
+          "reference": "--popover",
+          "light": "#ffffff",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "menuMaterial": {
+          "dark": "#000000",
+          "opacity": 0.72,
+          "reference": null,
+          "note": "sem variavel no CSS extraido (02 §0)"
+        },
+        "menuSolid": {
+          "dark": "#16171a",
+          "reference": "--popover",
+          "light": "#ffffff",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "scrim": {
+          "dark": "#000000",
+          "opacity": 0.55,
+          "reference": null,
+          "note": "black/55 de dialog.tsx; sem variavel no CSS"
+        },
+        "scrimReducedTransparency": {
+          "dark": "#000000",
+          "opacity": 0.7,
+          "reference": null,
+          "note": "02 §8, Reduce Transparency"
+        },
+        "terminalBackground": {
+          "dark": "#0e0f11",
+          "reference": null,
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        }
+      }
+    },
+    {
+      "name": "text",
+      "tokens": {
+        "textPrimary": {
+          "dark": "#ecedef",
+          "reference": "--foreground",
+          "light": "#0a0a0a",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "textSecondary": {
+          "dark": "#a4a7ae",
+          "reference": "--muted-foreground",
+          "light": "#737373",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "textTertiary": {
+          "dark": "#a4a7ae",
+          "opacity": 0.6,
+          "reference": "--muted-foreground",
+          "light": "#737373",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "textQuaternary": {
+          "dark": "#a4a7ae",
+          "opacity": 0.45,
+          "reference": "--muted-foreground",
+          "light": "#737373",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "primary": {
+          "dark": "#e6e8ec",
+          "reference": "--primary",
+          "light": "#171717",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "textOnPrimary": {
+          "dark": "#171717",
+          "reference": "--primary-foreground",
+          "light": "#fafafa"
+        },
+        "navText": {
+          "dark": "#ecedef",
+          "opacity": 0.6,
+          "reference": "--foreground",
+          "light": "#0a0a0a"
+        },
+        "navIcon": {
+          "dark": "#ecedef",
+          "opacity": 0.3,
+          "reference": "--foreground",
+          "light": "#0a0a0a"
+        },
+        "paneTitle": {
+          "dark": "#ffffff85",
+          "reference": "--terminal-pane-title-on-dark-fg"
+        },
+        "paneTitleInput": {
+          "dark": "#ffffffb3",
+          "reference": "--terminal-pane-title-on-dark-input-fg"
+        },
+        "paneTitleInputBackground": {
+          "dark": "#ffffff0a",
+          "reference": "--terminal-pane-title-on-dark-input-bg"
+        },
+        "paneTitlePlaceholder": {
+          "dark": "#ffffff61",
+          "reference": "--terminal-pane-title-on-dark-placeholder"
+        },
+        "paneTitleSeparator": {
+          "dark": "#ffffff0f",
+          "reference": "--terminal-pane-title-on-dark-separator"
+        }
+      }
+    },
+    {
+      "name": "fgOpacity",
+      "tokens": {
+        "fg5": {
+          "dark": "#ecedef",
+          "opacity": 0.05,
+          "reference": null,
+          "note": "fg = #fafafa (--foreground) com opacidade; derivado, sem variavel"
+        },
+        "fg6": {
+          "dark": "#ecedef",
+          "opacity": 0.06,
+          "reference": null,
+          "note": "idem"
+        },
+        "fg8": {
+          "dark": "#ecedef",
+          "opacity": 0.08,
+          "reference": null,
+          "note": "idem"
+        },
+        "fg10": {
+          "dark": "#ecedef",
+          "opacity": 0.1,
+          "reference": null,
+          "note": "idem"
+        },
+        "fg18": {
+          "dark": "#ecedef",
+          "opacity": 0.18,
+          "reference": null,
+          "note": "idem"
+        },
+        "fg20": {
+          "dark": "#ecedef",
+          "opacity": 0.2,
+          "reference": null,
+          "note": "idem"
+        },
+        "hoverRow": {
+          "dark": "#23252a",
+          "opacity": 0.4,
+          "reference": "--sidebar-accent",
+          "light": "#f5f5f5",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "hoverAgentRow": {
+          "dark": "#404040",
+          "opacity": 0.18,
+          "reference": "--accent",
+          "light": "#f5f5f5"
+        }
+      }
+    },
+    {
+      "name": "lines",
+      "tokens": {
+        "border": {
+          "dark": "#ffffff12",
+          "reference": "--border",
+          "light": "#e5e5e5",
+          "note": "02 diz white/7"
+        },
+        "borderStrong": {
+          "dark": "#ffffff",
+          "opacity": 0.14,
+          "reference": null,
+          "note": "white/14 de 02 §2.4; sem variavel"
+        },
+        "input": {
+          "dark": "#ffffff26",
+          "reference": "--input",
+          "light": "#e5e5e5",
+          "note": "02 diz white/15"
+        },
+        "ring": {
+          "dark": "#737373",
+          "reference": "--ring",
+          "light": "#a1a1a1"
+        },
+        "paneDivider": {
+          "dark": "#3f3f46",
+          "reference": "palette:--color-zinc-700",
+          "light": "#d4d4d8"
+        },
+        "groupDivider": {
+          "dark": "#71717a",
+          "reference": "--tab-group-split-divider",
+          "light": "#868690"
+        },
+        "groupDividerStrong": {
+          "dark": "#a1a1aa",
+          "reference": "--tab-group-split-divider-strong",
+          "light": "#71717a"
+        }
+      }
+    },
+    {
+      "name": "semantic",
+      "tokens": {
+        "destructive": {
+          "dark": "#ff6568",
+          "reference": "--destructive",
+          "light": "#e40014"
+        },
+        "destructiveFill": {
+          "dark": "#ff6568",
+          "opacity": 0.6,
+          "reference": "--destructive",
+          "light": "#e40014"
+        },
+        "destructiveBackground": {
+          "dark": "#ff6568",
+          "opacity": 0.1,
+          "reference": "--destructive",
+          "light": "#e40014"
+        },
+        "destructiveBorder": {
+          "dark": "#ff6568",
+          "opacity": 0.4,
+          "reference": "--destructive",
+          "light": "#e40014"
+        },
+        "success": {
+          "dark": "#86efac",
+          "reference": "--status-success",
+          "light": "#15803d"
+        },
+        "warning": {
+          "dark": "#eab308",
+          "reference": "--status-warning",
+          "light": "#ca8a04",
+          "note": "P17: extraido vence; 02 listava #edb200 (yellow-500), que e agentWorking"
+        },
+        "warningBackground": {
+          "dark": "#eab308",
+          "opacity": 0.1,
+          "reference": "--status-warning",
+          "light": "#ca8a04"
+        },
+        "warningBorder": {
+          "dark": "#eab308",
+          "opacity": 0.25,
+          "reference": "--status-warning",
+          "light": "#ca8a04"
+        },
+        "locate": {
+          "dark": "#8ab4ff",
+          "reference": "--terminal-pane-locate",
+          "light": "#155dfc",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "aiAccent": {
+          "dark": "#a685ff",
+          "reference": "--ai-action-accent",
+          "light": "#8d54ff"
+        }
+      }
+    },
+    {
+      "name": "agentState",
+      "tokens": {
+        "agentStarting": {
+          "dark": "#a1a1a1",
+          "reference": "--muted-foreground",
+          "light": "#737373"
+        },
+        "agentWorking": {
+          "dark": "#e6e8ec",
+          "reference": "palette:--color-yellow-500",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "agentNeedsInput": {
+          "dark": "#8ab4ff",
+          "reference": "--agent-question",
+          "light": "#f05100",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "agentNeedsInputText": {
+          "dark": "#8ab4ff",
+          "reference": "--agent-question-text",
+          "light": "#c53c00",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "agentWaitingOnSubagents": {
+          "dark": "#a4a7ae",
+          "reference": "palette:--color-yellow-500",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "agentDone": {
+          "dark": "#8b8f98",
+          "reference": "palette:--color-emerald-500",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "agentFailed": {
+          "dark": "#fb2c36",
+          "reference": "palette:--color-red-500"
+        },
+        "agentInterrupted": {
+          "dark": "#a1a1a1",
+          "reference": "--muted-foreground",
+          "light": "#737373"
+        },
+        "agentIdle": {
+          "dark": "#737373",
+          "opacity": 0.4,
+          "reference": "palette:--color-neutral-500"
+        },
+        "agentUnknown": {
+          "dark": "#6c7079",
+          "reference": "palette:--color-amber-500",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "processExited": {
+          "dark": "#737373",
+          "reference": "palette:--color-neutral-500"
+        },
+        "unread": {
+          "dark": "#8ab4ff",
+          "reference": "palette:--color-amber-500",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        },
+        "unreadTabOverlay": {
+          "dark": "#8ab4ff",
+          "opacity": 0.1,
+          "reference": "palette:--color-amber-500",
+          "note": "Racky v5 (2026-10-27): identidade própria, neutro frio e azul claro só no que precisa de você"
+        }
+      }
+    },
+    {
+      "name": "git",
+      "tokens": {
+        "gitAdded": {
+          "dark": "#81b88b",
+          "reference": "--git-decoration-added",
+          "light": "#587c0c"
+        },
+        "gitModified": {
+          "dark": "#e2c08d",
+          "reference": "--git-decoration-modified",
+          "light": "#895503"
+        },
+        "gitDeleted": {
+          "dark": "#c74e39",
+          "reference": "--git-decoration-deleted",
+          "light": "#ad0707"
+        },
+        "gitUntracked": {
+          "dark": "#73c991",
+          "reference": "--git-decoration-untracked",
+          "light": "#007100"
+        },
+        "gitRenamed": {
+          "dark": "#73c991",
+          "reference": "--git-decoration-renamed",
+          "light": "#007acc"
+        },
+        "diffAddedBg": {
+          "dark": "#81b88b",
+          "opacity": 0.16,
+          "reference": "--git-decoration-added",
+          "light": "#587c0c"
+        },
+        "diffAddedGutter": {
+          "dark": "#81b88b",
+          "opacity": 0.3,
+          "reference": "--git-decoration-added",
+          "light": "#587c0c"
+        },
+        "diffRemovedBg": {
+          "dark": "#c74e39",
+          "opacity": 0.18,
+          "reference": "--git-decoration-deleted",
+          "light": "#ad0707"
+        },
+        "diffRemovedGutter": {
+          "dark": "#c74e39",
+          "opacity": 0.32,
+          "reference": "--git-decoration-deleted",
+          "light": "#ad0707"
+        },
+        "prOpen": {
+          "dark": "#00bb7f",
+          "opacity": 0.8,
+          "reference": "palette:--color-emerald-500"
+        },
+        "prDraft": {
+          "dark": "#a1a1a1",
+          "opacity": 0.5,
+          "reference": "--muted-foreground",
+          "light": "#737373"
+        },
+        "prMerged": {
+          "dark": "#c07eff",
+          "opacity": 0.7,
+          "reference": "palette:--color-purple-400"
+        },
+        "prClosed": {
+          "dark": "#a1a1a1",
+          "opacity": 0.6,
+          "reference": "--muted-foreground",
+          "light": "#737373"
+        },
+        "checksFailing": {
+          "dark": "#ff2357",
+          "opacity": 0.85,
+          "reference": "palette:--color-rose-500"
+        },
+        "checksPending": {
+          "dark": "#f99c00",
+          "opacity": 0.85,
+          "reference": "palette:--color-amber-500"
+        },
+        "checksPassing": {
+          "dark": "#00bb7f",
+          "opacity": 0.8,
+          "reference": "palette:--color-emerald-500"
+        },
+        "conflict": {
+          "dark": "#f99c00",
+          "reference": "palette:--color-amber-500"
+        }
+      }
+    },
+    {
+      "name": "data",
+      "tokens": {
+        "dataValid": {
+          "dark": "#3ecf8e",
+          "light": "#16a34a",
+          "reference": "racky: linha válida e barra do gráfico (verde Supabase)"
+        },
+        "dataKey": {
+          "dark": "#6f9bf5",
+          "light": "#2563eb",
+          "reference": "racky: nome do atributo no painel da linha"
+        },
+        "dataString": {
+          "dark": "#a5d6a7",
+          "light": "#15803d",
+          "reference": "racky: valor de texto no painel da linha"
+        }
+      }
+    }
+  ],
+  "terminal": {
+    "background": "#0e0f11",
+    "foreground": "#ffffff",
+    "cursor": "#ffffff",
+    "cursorText": "#282c34",
+    "selectionBackground": "#5a7898",
+    "ansi": [
+      "#1d1f21",
+      "#cc6666",
+      "#b5bd68",
+      "#f0c674",
+      "#81a2be",
+      "#b294bb",
+      "#8abeb7",
+      "#c5c8c6",
+      "#666666",
+      "#d54e53",
+      "#b9ca4a",
+      "#e7c547",
+      "#7aa6da",
+      "#c397d8",
+      "#70c0b1",
+      "#eaeaea"
+    ]
+  }
+}

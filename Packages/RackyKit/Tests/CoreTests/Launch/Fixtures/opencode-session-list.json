@@ -1,0 +1,4 @@
+[
+  {"id": "ses_aaaaaaaaaaaaaaaaaaaaaaaa01", "title": "Older session", "updated": 1790875547733, "created": 1790719239823, "projectId": "global", "directory": "/Users/example/other"},
+  {"id": "ses_bbbbbbbbbbbbbbbbbbbbbbbb02", "title": "New session - 2026-10-17T00:00:00.000Z", "updated": 1790875600000, "created": 1790875599000, "projectId": "global", "directory": "/Users/example/work"}
+]

@@ -1,0 +1,11 @@
+case: opencode/resume-id
+executable: ["/usr/local/bin/opencode"]
+identity: ["-s","ses_bbbbbbbbbbbbbbbbbbbbbbbb02"]
+profile: []
+injected: []
+prompt: []
+cwd: /Users/example/work/repo
+native_id: ses_bbbbbbbbbbbbbbbbbbbbbbbb02
+shield_off: -
+warnings: 
+files: 

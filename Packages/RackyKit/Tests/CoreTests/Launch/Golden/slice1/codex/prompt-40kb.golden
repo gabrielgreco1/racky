@@ -1,0 +1,11 @@
+case: codex/prompt-40kb
+executable: ["/usr/local/bin/codex"]
+identity: []
+profile: ["--no-daemon","--dangerously-bypass-approvals-and-sandbox"]
+injected: []
+prompt: ["Read and follow the task in /tmp/ab/run/launch/00000000-0000-4000-8000-0000000000bb/prompt.md"]
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: Skip permissions (--dangerously-bypass-approvals-and-sandbox)
+warnings: 
+files: prompt.md mode=600 bytes=40960

@@ -1,0 +1,11 @@
+case: claude/bare-extra-arg
+executable: ["/usr/local/bin/claude"]
+identity: ["--session-id","11111111-2222-4333-8444-555555555555"]
+profile: ["--dangerously-skip-permissions","--bare"]
+injected: []
+prompt: ["--","hello"]
+cwd: /Users/example/work/repo
+native_id: 11111111-2222-4333-8444-555555555555
+shield_off: Skip permissions (--dangerously-skip-permissions)
+warnings: hooksDisabledByFlag
+files: 

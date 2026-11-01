@@ -1,0 +1,10 @@
+{"stream":"Step 1/3 : FROM alpine"}
+{"stream":"\n"}
+{"stream":" ---\u003e d9e853e87e55\n"}
+{"stream":"Step 2/3 : LABEL racky.test=1"}
+{"stream":"\n"}
+{"stream":" ---\u003e Running in 0a1b2c3d4e5f\n"}
+{"stream":"Step 3/3 : RUN echo ok"}
+{"stream":"\n"}
+{"aux":{"ID":"sha256:feedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedfacefeedface"}}
+{"stream":"Successfully built feedfacefeed\n"}

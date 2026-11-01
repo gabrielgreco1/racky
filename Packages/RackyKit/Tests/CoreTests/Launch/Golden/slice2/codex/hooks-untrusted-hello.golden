@@ -1,0 +1,11 @@
+case: codex/hooks-untrusted-hello
+executable: ["/usr/local/bin/codex"]
+identity: []
+profile: ["--no-daemon","--dangerously-bypass-approvals-and-sandbox"]
+injected: ["-c","hooks.SessionStart=[{hooks=[{type=\"command\",command=\"\\\"/Applications/Racky.app/Contents/MacOS/racky\\\" hook --provider codex --event SessionStart\",timeout=5}]}]","-c","hooks.UserPromptSubmit=[{hooks=[{type=\"command\",command=\"\\\"/Applications/Racky.app/Contents/MacOS/racky\\\" hook --provider codex --event UserPromptSubmit\",timeout=5}]}]","-c","hooks.PreToolUse=[{hooks=[{type=\"command\",command=\"\\\"/Applications/Racky.app/Contents/MacOS/racky\\\" hook --provider codex --event PreToolUse\",timeout=5}]}]","-c","hooks.PostToolUse=[{hooks=[{type=\"command\",command=\"\\\"/Applications/Racky.app/Contents/MacOS/racky\\\" hook --provider codex --event PostToolUse\",timeout=5}]}]","-c","hooks.PermissionRequest=[{hooks=[{type=\"command\",command=\"\\\"/Applications/Racky.app/Contents/MacOS/racky\\\" hook --provider codex --event PermissionRequest\",timeout=5}]}]","-c","hooks.Stop=[{hooks=[{type=\"command\",command=\"\\\"/Applications/Racky.app/Contents/MacOS/racky\\\" hook --provider codex --event Stop\",timeout=5}]}]","-c","hooks.SubagentStart=[{hooks=[{type=\"command\",command=\"\\\"/Applications/Racky.app/Contents/MacOS/racky\\\" hook --provider codex --event SubagentStart\",timeout=5}]}]","-c","hooks.SubagentStop=[{hooks=[{type=\"command\",command=\"\\\"/Applications/Racky.app/Contents/MacOS/racky\\\" hook --provider codex --event SubagentStop\",timeout=5}]}]"]
+prompt: ["hello"]
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: Skip permissions (--dangerously-bypass-approvals-and-sandbox)
+warnings: 
+files: 

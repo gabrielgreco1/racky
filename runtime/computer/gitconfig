@@ -1,0 +1,11 @@
+# Git do computador Racky: tudo pelo proxy do egress; https://github.com/ vira o gateway local (o egress põe o token).
+[http]
+	proxy = http://127.0.0.1:3128
+[url "http://github.racky/"]
+	insteadOf = https://github.com/
+	insteadOf = git@github.com:
+[user]
+	name = Racky computer
+	email = computer@racky.local
+[init]
+	defaultBranch = main

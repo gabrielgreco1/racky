@@ -1,0 +1,33 @@
+{
+ "command": "codex exec --skip-git-repo-check -m gpt-5.6-luna -c model_reasoning_effort=low -s read-only <5x -c hooks.*> -c hooks.state={<inline trust>} --json '<prompt>'",
+ "untrusted_run": "zero hook invocations (c1)",
+ "trusted_via_inline_state": "SessionStart and UserPromptSubmit fired; the turn then failed with the account usage limit, so PreToolUse/PostToolUse/Stop (and last_assistant_message) were NOT captured",
+ "events": [
+  {
+   "tag": "SessionStart",
+   "payload": {
+    "session_id": "01a147db-1c2c-7810-bddd-85fd4792ff97",
+    "transcript_path": "/Users/me/.codex/sessions/2026/10/17/rollout-2026-10-17T00-15-04-01a147db-1c2c-7810-bddd-85fd4792ff97.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/cwork",
+    "hook_event_name": "SessionStart",
+    "model": "gpt-5.6-luna",
+    "permission_mode": "bypassPermissions",
+    "source": "startup"
+   }
+  },
+  {
+   "tag": "UserPromptSubmit",
+   "payload": {
+    "session_id": "01a147db-1c2c-7810-bddd-85fd4792ff97",
+    "turn_id": "01a147db-1ca5-78d3-99d1-a824e6608544",
+    "transcript_path": "/Users/me/.codex/sessions/2026/10/17/rollout-2026-10-17T00-15-04-01a147db-1c2c-7810-bddd-85fd4792ff97.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/cwork",
+    "hook_event_name": "UserPromptSubmit",
+    "model": "gpt-5.6-luna",
+    "permission_mode": "bypassPermissions",
+    "prompt": "Run echo hi and reply DONE"
+   }
+  }
+ ],
+ "tui_runs": "TUI in a PTY (default and --no-daemon) with -c hooks + inline trust: SessionStart + UserPromptSubmit fired in both"
+}

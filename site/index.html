@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Racky</title>
+<meta name="description" content="Racky is a Mac app that runs Claude Code, Codex and OpenCode side by side and gives every subagent its own computer: a real browser you can watch and take over, a terminal, and a log of every request.">
+<meta property="og:title" content="Racky">
+<meta property="og:description" content="Every subagent gets its own computer.">
+<meta property="og:image" content="assets/start.webp">
+<link rel="icon" href="assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0e0f11; --panel:#141518; --unit:#17181c; --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.14);
+    --fg:#ecedef; --muted:#9a9ca3; --quiet:#6b6e76; --blue:#8ab4ff; --green:#5fd38d;
+    --mono:"Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  html,body { margin:0; background:var(--bg); color:var(--fg); }
+  body { font:16px/1.55 Geist, -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  img,video { display:block; max-width:100%; }
+  .wrap { max-width:1180px; margin:0 auto; padding:0 24px; }
+
+  /* nav */
+  .nav { position:fixed; inset:0 0 auto; z-index:20; display:flex; align-items:center; justify-content:space-between; padding:16px 24px; pointer-events:none; }
+  .nav > * { pointer-events:auto; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:17px; padding:7px 14px 7px 8px; border-radius:12px; background:rgba(14,15,17,.86); border:1px solid var(--line); }
+  .brand img { width:26px; height:26px; border-radius:7px; }
+  .links { display:flex; align-items:center; gap:4px; padding:5px; border-radius:12px; background:rgba(14,15,17,.86); border:1px solid var(--line); font-size:14px; }
+  .links a { padding:6px 12px; border-radius:8px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .links a.dl { background:var(--fg); color:#0e0f11; font-weight:600; }
+  .links a.dl:hover { color:#0e0f11; }
+
+  .btn { white-space:nowrap; display:inline-flex; align-items:center; gap:10px; border-radius:12px; padding:14px 22px; font-weight:600; font-size:16px; }
+  .btn svg { width:18px; height:18px; }
+  .btn-primary { background:var(--fg); color:#0e0f11; }
+  .btn-primary:hover { background:#fff; }
+  .btn-ghost { border:1px solid var(--line-2); }
+  .btn-ghost:hover { border-color:rgba(255,255,255,.32); }
+
+  /* the rack: pinned scroll scene */
+  .scene { position:relative; height:520vh; }
+  .stage { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; }
+  .word { position:absolute; left:0; right:0; top:50%; transform:translateY(-58%); text-align:center; font-weight:900; letter-spacing:-.055em; line-height:.8; font-size:min(30vw, 62vh); color:var(--fg); white-space:nowrap; user-select:none; will-change:opacity, transform; }
+  .tag { position:absolute; left:24px; bottom:12vh; max-width:360px; font-size:clamp(17px, 1.6vw, 21px); line-height:1.35; font-weight:500; }
+  .tag span { color:var(--muted); }
+  .hint { position:absolute; right:24px; bottom:12vh; font:13px var(--mono); color:var(--quiet); }
+  .scene-cta { position:absolute; left:50%; bottom:6vh; transform:translateX(-50%); display:flex; gap:10px; opacity:0; pointer-events:none; }
+  .scene-cta.on { opacity:1; pointer-events:auto; transition:opacity .4s; }
+
+  .rack { position:absolute; left:50%; top:50%; width:min(560px, 88vw); transform:translate(-50%, -50%); }
+  .rail { position:absolute; top:-14px; bottom:-14px; width:10px; border:1px solid var(--line-2); border-radius:3px; opacity:0; background:repeating-linear-gradient(to bottom, transparent 0 9px, rgba(255,255,255,.12) 9px 11px); }
+  .rail.l { left:-22px; } .rail.r { right:-22px; }
+  .u { position:relative; height:62px; margin:0 0 8px; display:grid; grid-template-columns:34px 14px 1fr auto; align-items:center; gap:12px; padding:0 16px 0 10px; background:var(--unit); border:1px solid var(--line-2); border-radius:7px; box-shadow:0 18px 40px rgba(0,0,0,.45); opacity:0; will-change:transform, opacity; }
+  .u .ear { display:flex; flex-direction:column; align-items:center; gap:6px; font:10px var(--mono); color:var(--quiet); }
+  .u .ear i { width:7px; height:7px; border-radius:50%; border:1px solid rgba(255,255,255,.22); }
+  .u .led { width:8px; height:8px; border-radius:50%; background:var(--green); }
+  .u.need .led { background:var(--blue); }
+  .u.need { border-color:rgba(138,180,255,.55); }
+  .u .name { font:500 15px var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .u .name small { display:block; font:12px Geist, sans-serif; color:var(--muted); margin-top:2px; }
+  .u .read { font:12px var(--mono); color:var(--muted); text-align:right; white-space:nowrap; }
+  .u .read b { color:var(--fg); font-weight:500; }
+  .u.need .read b { color:var(--blue); }
+  .bars { display:inline-flex; gap:2px; align-items:flex-end; height:16px; margin-right:8px; vertical-align:-3px; }
+  .bars i { width:3px; background:rgba(255,255,255,.35); border-radius:1px; }
+
+  .note { position:absolute; top:50%; width:230px; transform:translateY(-50%); opacity:0; }
+  .note b { display:block; font-size:17px; font-weight:700; }
+  .note span { display:block; color:var(--muted); font-size:14px; line-height:1.4; margin-top:2px; }
+  .note::after { content:""; position:absolute; top:13px; width:44px; height:1px; background:var(--line-2); }
+  .note.l { right:calc(100% + 70px); text-align:right; } .note.l::after { left:calc(100% + 14px); }
+  .note.r { left:calc(100% + 70px); } .note.r::after { right:calc(100% + 14px); }
+  .caption { position:absolute; left:24px; right:24px; bottom:16vh; text-align:center; display:none; }
+  .caption b { display:block; font-size:18px; }
+  .caption span { color:var(--muted); font-size:15px; }
+  .total { position:absolute; left:0; right:0; top:calc(100% + 26px); text-align:center; font-size:clamp(18px, 2vw, 22px); font-weight:600; opacity:0; }
+  .total span { color:var(--muted); font-weight:500; }
+
+  /* sections */
+  section { padding:120px 0; }
+  h2 { font-size:clamp(34px, 5.4vw, 68px); line-height:1; letter-spacing:-.04em; margin:0 0 20px; font-weight:800; }
+  h2 span { color:var(--quiet); }
+  .lead { color:var(--muted); font-size:clamp(17px, 1.7vw, 20px); max-width:560px; margin:0; }
+  .split { display:grid; grid-template-columns:5fr 7fr; gap:56px; align-items:center; }
+  .split > *, .install > *, .where > * { min-width:0; }
+  .shot { border-radius:14px; overflow:hidden; border:1px solid var(--line-2); box-shadow:0 40px 100px rgba(0,0,0,.55); background:#000; }
+  .facts { display:flex; gap:36px; margin-top:34px; flex-wrap:wrap; }
+  .facts div { font-size:44px; font-weight:800; letter-spacing:-.04em; line-height:1; }
+  .facts small { display:block; font-size:14px; font-weight:400; letter-spacing:0; color:var(--muted); margin-top:8px; }
+
+  .agents { display:flex; gap:10px; flex-wrap:wrap; margin-top:28px; }
+  .agents span { font:14px var(--mono); padding:8px 12px; border:1px solid var(--line-2); border-radius:8px; color:var(--muted); }
+  .video { margin-top:56px; }
+
+  .steps-take { list-style:none; padding:0; margin:30px 0 0; counter-reset:t; }
+  .steps-take li { position:relative; padding:14px 0 14px 44px; border-top:1px solid var(--line); color:var(--muted); }
+  .steps-take li b { color:var(--fg); font-weight:600; }
+  .steps-take li::before { counter-increment:t; content:counter(t); position:absolute; left:0; top:14px; font:13px var(--mono); color:var(--quiet); }
+  .steps-take li.you::before { color:var(--blue); }
+
+  .where { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:48px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:28px; }
+  .card h3 { margin:0 0 6px; font-size:22px; letter-spacing:-.01em; }
+  .card p { margin:0; color:var(--muted); }
+  .kv { margin-top:22px; border-top:1px solid var(--line); }
+  .kv > div { display:flex; justify-content:space-between; gap:16px; padding:11px 0; border-bottom:1px solid var(--line); font-size:15px; }
+  .kv > div span:first-child { color:var(--muted); }
+  .kv > div span:last-child { font-family:var(--mono); font-size:14px; }
+  .meter { height:4px; border-radius:2px; background:rgba(255,255,255,.08); margin-top:8px; overflow:hidden; }
+  .meter i { display:block; height:100%; width:18%; background:var(--green); }
+
+  .install { display:grid; grid-template-columns:5fr 7fr; gap:56px; }
+  .install ol { list-style:none; margin:0; padding:0; counter-reset:s; }
+  .install li { position:relative; padding:18px 0 18px 48px; border-top:1px solid var(--line); }
+  .install li::before { counter-increment:s; content:"0" counter(s); position:absolute; left:0; top:19px; font:14px var(--mono); color:var(--quiet); }
+  .install li b { display:block; font-size:17px; }
+  .install li span { color:var(--muted); font-size:15px; }
+  .cmd { display:flex; align-items:center; gap:12px; margin-top:22px; background:var(--panel); border:1px solid var(--line-2); border-radius:12px; padding:14px 14px 14px 18px; }
+  .cmd code { flex:1; font:13px var(--mono); color:var(--muted); overflow-x:auto; white-space:nowrap; }
+  .cmd code span { color:var(--fg); }
+  .copy { font:600 13px Geist, sans-serif; color:var(--fg); background:rgba(255,255,255,.08); border:0; border-radius:8px; padding:8px 12px; cursor:pointer; }
+  .copy:hover { background:rgba(255,255,255,.14); }
+
+  .end { padding:140px 0 120px; text-align:center; }
+  .end h2 { font-size:clamp(44px, 9vw, 128px); }
+  .end .req { color:var(--quiet); font-size:14px; margin-top:18px; }
+  footer { border-top:1px solid var(--line); padding:28px 0; color:var(--quiet); font-size:14px; }
+  footer .wrap { display:flex; justify-content:space-between; }
+  footer a:hover { color:var(--fg); }
+
+  @media (max-width:1100px) {
+    .note { display:none; }
+    .caption { display:block; }
+    .total { display:none; }
+  }
+  @media (max-width:860px) {
+    .split, .install, .where { grid-template-columns:1fr; gap:36px; }
+    section { padding:88px 0; }
+    .links a:not(.dl) { display:none; }
+    .hint { display:none; }
+    .tag { bottom:auto; top:16vh; right:24px; }
+    .word { font-size:34vw; }
+    .u { height:54px; gap:10px; padding:0 12px 0 8px; grid-template-columns:28px 10px 1fr auto; }
+    .u .name { font-size:13px; } .u .read { font-size:11px; } .bars { display:none; }
+    .facts div { font-size:34px; }
+  }
+  @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="#top"><img src="assets/icon.png" alt="">Racky</a>
+  <div class="links">
+    <a href="#agents">Agents</a>
+    <a href="#takeover">Take Over</a>
+    <a href="#cloud">Cloud</a>
+    <a href="#install">Install</a>
+    <a class="dl" href="https://github.com/gabrielgreco1/racky/releases/latest/download/Racky.dmg">Download</a>
+  </div>
+</nav>
+
+<div class="scene" id="top">
+  <div class="stage">
+    <div class="word" id="word">racky</div>
+    <p class="tag" id="tag">A Mac app for coding agents. <span>Every subagent gets its own computer.</span></p>
+    <p class="hint" id="hint">scroll ↓</p>
+
+    <div class="rack" id="rack">
+      <div class="rail l"></div><div class="rail r"></div>
+
+      <div class="u"><div class="ear"><i></i>U1<i></i></div><div class="led"></div>
+        <div class="name">scrape-la-hotels<small>Chrome · tripadvisor.com</small></div>
+        <div class="read"><b>live</b></div>
+        <p class="note l"><b>A real browser</b><span>Chrome on its own machine. You watch every tab live.</span></p></div>
+
+      <div class="u"><div class="ear"><i></i>U2<i></i></div><div class="led"></div>
+        <div class="name">parse-menus<small>terminal · /work</small></div>
+        <div class="read">$ python parse.py<b>▍</b></div>
+        <p class="note r"><b>Its own terminal</b><span>Shell, files and tools in a sandbox. Nothing touches your Mac.</span></p></div>
+
+      <div class="u"><div class="ear"><i></i>U3<i></i></div><div class="led"></div>
+        <div class="name">booking-lisbon<small>traffic</small></div>
+        <div class="read"><span class="bars"><i style="height:6px"></i><i style="height:11px"></i><i style="height:8px"></i><i style="height:15px"></i><i style="height:10px"></i><i style="height:13px"></i><i style="height:5px"></i></span><b>715</b> req · 49.5 MB</div>
+        <p class="note l"><b>Every request logged</b><span>Headers and bodies go through a proxy, so results come with evidence.</span></p></div>
+
+      <div class="u"><div class="ear"><i></i>U4<i></i></div><div class="led"></div>
+        <div class="name">listings-austin<small>exit · your proxy</small></div>
+        <div class="read">talked to <b>12</b> hosts</div>
+        <p class="note r"><b>Its own way out</b><span>Pick the proxy each computer uses and see every host it talked to.</span></p></div>
+
+      <div class="u need"><div class="ear"><i></i>U5<i></i></div><div class="led"></div>
+        <div class="name">tripadvisor-la<small>CAPTCHA · waiting for you</small></div>
+        <div class="read"><b>Take Over</b></div>
+        <p class="note l"><b>You step in</b><span>Captcha or login? Take its browser, solve it, hand it back.</span></p></div>
+
+      <div class="u"><div class="ear"><i></i>U6<i></i></div><div class="led"></div>
+        <div class="name">t4g.small<small>AWS · Ohio</small></div>
+        <div class="read"><b>US$ 0.005</b> · stops when done</div>
+        <p class="note r"><b>Or in your cloud</b><span>VMs in your own AWS, with daily and monthly limits. They shut off when the agent ends.</span></p></div>
+
+      <p class="total">Six subagents, six computers. <span>One Mac.</span></p>
+    </div>
+
+    <div class="caption" id="caption"><b></b><span></span></div>
+    <div class="scene-cta" id="scta">
+      <a class="btn btn-primary" href="https://github.com/gabrielgreco1/racky/releases/latest/download/Racky.dmg"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.18-1.53 2.66-.39 6.6 1.1 8.75.73 1.05 1.6 2.24 2.73 2.2 1.1-.05 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.83-1.22 1.18-2.4 1.2-2.46-.03-.01-2.3-.88-2.32-3.5zM14.2 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.65-1.05 1.68-.92 2.68.97.07 1.96-.5 2.56-1.23z"/></svg>Download for Mac</a>
+      <a class="btn btn-ghost" href="https://github.com/gabrielgreco1/racky">GitHub</a>
+    </div>
+  </div>
+</div>
+
+<section id="agents">
+  <div class="wrap">
+    <h2>Claude Code, Codex and OpenCode. <span>Side by side.</span></h2>
+    <p class="lead">Each session gets its own folder or worktree. Start an agent in one click, open a project, or clone a repository. When it spawns subagents, Racky gives each one a computer and shows them under the session.</p>
+    <div class="agents"><span>claude</span><span>codex</span><span>opencode</span></div>
+    <div class="shot video"><img src="assets/start.webp" alt="Racky start screen: Claude Code, Codex CLI and OpenCode, each in a new session" loading="lazy" width="1800" height="1145"></div>
+  </div>
+</section>
+
+<section id="takeover">
+  <div class="wrap split">
+    <div>
+      <h2>The site wants a human. <span>You're one click away.</span></h2>
+      <ol class="steps-take">
+        <li>The subagent hits a captcha and <b>flags it</b>. Its row in the sidebar turns blue.</li>
+        <li class="you">You press <b>Take Over</b> and get its browser, mouse and keyboard.</li>
+        <li>You solve it, write a note and <b>Hand Back</b>. The agent carries on from there.</li>
+      </ol>
+    </div>
+    <div class="shot"><img src="assets/viewer.webp" alt="Racky showing a subagent's browser on Tripadvisor, with You're in control and Hand Back" loading="lazy" width="1800" height="1145"></div>
+  </div>
+</section>
+
+<section id="traffic">
+  <div class="wrap split">
+    <div class="shot"><img src="assets/traffic.webp" alt="Racky Traffic view: 715 requests from a booking.com run, sorted by kind, with request headers and response body" loading="lazy" width="1600" height="1193"></div>
+    <div>
+      <h2>Every request it made. <span>Every byte.</span></h2>
+      <p class="lead">Each computer's traffic goes through a recording proxy. Filter by page, API, analytics or anti-bot, open any request and copy it as cURL.</p>
+      <div class="facts">
+        <div>715<small>requests in one run</small></div>
+        <div>57<small>API calls found</small></div>
+        <div>73<small>anti-bot checks</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cloud">
+  <div class="wrap">
+    <h2>On your Mac for free. <span>In your cloud when you need more.</span></h2>
+    <p class="lead">Choose where computers run. On your own AWS account, Racky signs in through the browser and never sees a password or key.</p>
+    <div class="where">
+      <div class="card">
+        <h3>This Mac</h3>
+        <p>Computers run right here, isolated from your files. Nothing to set up.</p>
+        <div class="kv">
+          <div><span>Cost</span><span>free</span></div>
+          <div><span>Starts</span><span>when a subagent asks</span></div>
+          <div><span>Leftovers</span><span>you keep or delete</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Your AWS</h3>
+        <p>Graviton VMs in the region you pick, SSH only from your IP, a disk that dies with the VM.</p>
+        <div class="kv">
+          <div><span>Today</span><span>US$ 0.90 of US$ 5</span></div>
+          <div style="display:block;border-bottom:0;padding-top:0"><div class="meter"><i></i></div></div>
+          <div><span>At once</span><span>up to 3 computers</span></div>
+          <div><span>Shuts off</span><span>when the agent ends</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap install">
+    <div>
+      <h2>Download, drag, done.</h2>
+      <p class="lead">Free. macOS 26 or later on Apple silicon. You need Claude Code, Codex or OpenCode installed and signed in.</p>
+    </div>
+    <div>
+      <ol>
+        <li><b>Get Racky.dmg</b><span>Open it and drag Racky into Applications.</span></li>
+        <li><b>Open Racky</b><span>The first time, macOS says it can't verify the developer. Click Done.</span></li>
+        <li><b>Allow it once</b><span>System Settings › Privacy &amp; Security, scroll down, Open Anyway.</span></li>
+        <li><b>You're in</b><span>Confirm with Touch ID. The setup checklist walks you through the rest.</span></li>
+      </ol>
+      <div class="cmd"><code id="cmd"><span>curl -fsSL https://github.com/gabrielgreco1/racky/releases/latest/download/install.sh | bash</span></code><button class="copy" type="button" id="copy">Copy</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="end">
+  <div class="wrap">
+    <h2>Give every agent<br>a computer.</h2>
+    <a class="btn btn-primary" href="https://github.com/gabrielgreco1/racky/releases/latest/download/Racky.dmg">Download for Mac</a>
+    <p class="req">Free · macOS 26 or later · Apple silicon</p>
+  </div>
+</section>
+
+<footer><div class="wrap"><span>© 2026 Racky</span><a href="https://github.com/gabrielgreco1/racky">GitHub</a></div></footer>
+
+<script>
+(function () {
+  var scene = document.querySelector('.scene');
+  var word = document.getElementById('word');
+  var tag = document.getElementById('tag');
+  var hint = document.getElementById('hint');
+  var units = [].slice.call(document.querySelectorAll('.u'));
+  var notes = units.map(function (u) { return u.querySelector('.note'); });
+  var rails = document.querySelectorAll('.rail');
+  var total = document.querySelector('.total');
+  var cta = document.getElementById('scta');
+  var cap = document.getElementById('caption');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+  var ease = function (t) { return 1 - Math.pow(1 - t, 3); };
+  var lastCap = -1;
+
+  function frame() {
+    var r = scene.getBoundingClientRect();
+    var p = reduce ? 1 : clamp(-r.top / (scene.offsetHeight - innerHeight));
+    var intro = clamp(p / 0.1);
+    word.style.opacity = String(1 - 0.9 * intro + 0.9 * clamp((p - 0.87) / 0.08));
+    word.style.transform = 'translateY(-58%) scale(' + (1 - 0.06 * intro) + ')';
+    tag.style.opacity = hint.style.opacity = String(1 - intro);
+    for (var k = 0; k < rails.length; k++) rails[k].style.opacity = String(intro);
+
+    var landed = -1;
+    units.forEach(function (u, i) {
+      var t = ease(clamp((p - 0.1 - i * 0.11) / 0.09));
+      u.style.opacity = String(clamp(t * 1.4));
+      u.style.transform = 'translateY(' + ((1 - t) * 70) + 'vh) rotate(' + ((1 - t) * (i % 2 ? 4 : -4)) + 'deg)';
+      var n = clamp((p - 0.17 - i * 0.11) / 0.05);
+      notes[i].style.opacity = String(n * (1 - clamp((p - 0.83) / 0.04)));
+      if (t > 0.98) landed = i;
+    });
+    total.style.opacity = String(clamp((p - 0.82) / 0.06));
+    cta.classList.toggle('on', p > 0.9);
+
+    if (landed !== lastCap) {
+      lastCap = landed;
+      var src = landed >= 0 ? notes[landed] : null;
+      cap.querySelector('b').textContent = src ? src.querySelector('b').textContent : '';
+      cap.querySelector('span').textContent = src ? src.querySelector('span').textContent : '';
+    }
+    cap.style.opacity = p > 0.9 ? '0' : '1';
+  }
+  var ticking = false;
+  addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; frame(); }); } }, { passive: true });
+  addEventListener('resize', frame);
+  frame();
+
+  var btn = document.getElementById('copy');
+  btn.addEventListener('click', function () {
+    var t = document.getElementById('cmd').textContent;
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () {
+      btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+    }, function () { getSelection().selectAllChildren(document.getElementById('cmd')); });
+  });
+})();
+</script>
+</body>
+</html>

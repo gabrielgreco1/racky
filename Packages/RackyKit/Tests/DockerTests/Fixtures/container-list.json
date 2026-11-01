@@ -1,0 +1,56 @@
+[
+    {
+        "Id": "1bb9958e3e41f5992904ea40620232b2653ed1ae1fb89ed97013dd5d0eb9a568",
+        "Names": [
+            "/abx-fixture-capture"
+        ],
+        "Image": "alpine@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc",
+        "ImageID": "sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc",
+        "Command": "sleep 30",
+        "Created": 1792213814,
+        "Ports": [
+            {
+                "IP": "127.0.0.1",
+                "PrivatePort": 3128,
+                "PublicPort": 57936,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "racky.computer": "fixture-computer",
+            "racky.ephemeral": "true",
+            "racky.owner": "fixture-owner",
+            "racky.role": "egress",
+            "racky.test": "1",
+            "desktop.docker.io/ports.scheme": "v2",
+            "desktop.docker.io/ports/3128/tcp": "127.0.0.1:"
+        },
+        "State": "running",
+        "Status": "Up Less than a second",
+        "HostConfig": {
+            "NetworkMode": "bridge"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "18c2ae9a51d342bfa56aa7d7e870a625172154baaf9b3d2f5d60762436969a4d",
+                    "EndpointID": "3bb1e3768dd2557a2c13b27aa15d64e05525bb5766f648c7aa83eae080da13e9",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "MacAddress": "22:58:fe:19:ce:80",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": []
+    }
+]

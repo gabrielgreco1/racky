@@ -1,0 +1,11 @@
+case: codex/default-bypass-hello
+executable: ["/usr/local/bin/codex"]
+identity: []
+profile: ["--no-daemon","--dangerously-bypass-approvals-and-sandbox"]
+injected: []
+prompt: ["hello"]
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: Skip permissions (--dangerously-bypass-approvals-and-sandbox)
+warnings: 
+files: 

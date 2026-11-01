@@ -1,0 +1,97 @@
+# XcodeGen 2.46.0 (instalado por scripts/bootstrap.sh em .tools/). O .xcodeproj gerado não é versionado (AR-120).
+# O app só contém @main, Info.plist e assets; todo o código vive em Packages/RackyKit (AR-121).
+# rackyd e racky (executáveis SPM) são compilados por scripts/build.sh e embutidos em Contents/MacOS.
+name: Racky
+options:
+  bundleIdPrefix: app.racky
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: YES
+    GCC_TREAT_WARNINGS_AS_ERRORS: YES
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
+    ENABLE_HARDENED_RUNTIME: YES
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+    SWIFT_UPCOMING_FEATURE_NONISOLATED_NONSENDING_BY_DEFAULT: YES
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    # Assinatura é feita por scripts/build.sh (de dentro para fora, AR-531).
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    ALWAYS_SEARCH_USER_PATHS: NO
+packages:
+  RackyKit:
+    path: Packages/RackyKit
+targets:
+  Racky:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+        excludes:
+          - LaunchAgents/**  # plist do daemon: scripts/build.sh o embute em Contents/Library/LaunchAgents
+          - Racky.entitlements  # assinatura: scripts/build.sh passa --entitlements ao codesign do app (o build do xcodebuild é sem assinatura)
+    dependencies:
+      - package: RackyKit
+        product: RackyPlatform
+      # RackyUI (T1-02): registro de ações, A11yID, janela e canal ctl. Puxa SwiftTerm (shaders Metal).
+      - package: RackyKit
+        product: RackyUI
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleName: Racky
+        CFBundleDisplayName: Racky
+        CFBundleExecutable: Racky
+        CFBundleIconFile: Racky
+        CFBundlePackageType: APPL
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSMinimumSystemVersion: "15.0"
+        LSApplicationCategoryType: public.app-category.developer-tools
+        NSHighResolutionCapable: true
+        NSPrincipalClass: NSApplication
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.racky.mac
+        PRODUCT_NAME: Racky
+        # Executável 'Racky' (antes 'Racky'): 'Racky' colidiria com o helper Contents/Helpers/racky
+        # em volumes case-insensitive (APFS padrão).
+        EXECUTABLE_NAME: Racky
+        PRODUCT_MODULE_NAME: Racky
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_APP_SANDBOX: NO
+        # Entitlement único: com.apple.security.virtualization (runtime de computadores sem Docker, VMs hospedadas no app). Sem sandbox
+        # e sem perfil de provisionamento, então vale com assinatura ad-hoc e com a identidade local. Aplicado por scripts/build.sh.
+        CODE_SIGN_ENTITLEMENTS: App/Racky.entitlements
+  RackyUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: AppUITests
+    dependencies:
+      - target: Racky
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.racky.mac.uitests
+        TEST_TARGET_NAME: Racky
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Racky:
+    build:
+      targets:
+        Racky: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - RackyUITests
+    archive:
+      config: Release

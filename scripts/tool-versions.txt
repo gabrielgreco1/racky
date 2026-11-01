@@ -1,0 +1,23 @@
+# Fonte única de versões fixadas (roadmap 09 §2.5, AR-120/AR-901).
+# Formato: CHAVE=valor (sem espaços ao redor do '='). Lido por scripts/bootstrap.sh.
+# Alterar uma versão exige alterar o SHA-256 correspondente no mesmo commit.
+
+# Toolchain
+XCODE_MAJOR=26
+XCODE_MIN=26.3
+
+# XcodeGen (binário baixado para .tools/, gitignored)
+XCODEGEN_VERSION=2.46.0
+XCODEGEN_URL=https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip
+XCODEGEN_SHA256=4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806
+
+# Dependências SPM (versão exata; Package.resolved é versionado e conferido pelo bootstrap quando existir)
+SWIFTTERM_VERSION=1.99.0          # rev 2dad6a1 (S-02, P20; pré-release da v2, fixada por Package.resolved)
+GRDB_VERSION=7.11.1
+SWIFT_SNAPSHOT_TESTING_VERSION=1.19.6
+SWIFT_ARGUMENT_PARSER_VERSION=1.8.2
+
+# Geist (fonte de UI; OFL.txt vem dentro do zip)
+GEIST_VERSION=1.8.1
+GEIST_URL=https://github.com/vercel/geist-font/releases/download/v1.8.1/geist-font-v1.8.1.zip
+GEIST_SHA256=70f42c1452fb6df12ea183e20a65999157354f91d11dac18b4c713e383808ec2

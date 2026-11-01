@@ -1,0 +1,8 @@
+#!/bin/sh
+# Wrapper do Chromium (Playwright `executable_path`): o servidor de controle roda como `egress`; o navegador roda como `agent`,
+# sem nenhuma capacidade e sem como virar `egress` (P24). Os descritores 3/4 do `--remote-debugging-pipe` passam intactos.
+set -eu
+chrome=$(ls -d /ms-playwright/chromium-*/chrome-linux*/chrome 2>/dev/null | head -n 1)
+[ -n "$chrome" ] || { echo "abx-chromium: chromium não encontrado" >&2; exit 127; }
+exec setpriv --reuid=agent --regid=agent --init-groups --bounding-set=-all --inh-caps=-all --ambient-caps=-all --no-new-privs \
+  env HOME=/home/agent PATH=/usr/local/bin:/usr/bin:/bin "$chrome" "$@"

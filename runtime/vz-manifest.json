@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "version": "1-b0fe423cccf4",
+  "kernel": {
+    "url": "https://github.com/gabrielgreco1/racky/releases/download/runtime-1-b0fe423cccf4/vmlinux",
+    "sha256": "f437320bab94f19105d12b932aa29735f0d54d2588218872254367f312c1027c",
+    "size": 18815488,
+    "license": "GPL-2.0-only",
+    "sourceURL": "https://github.com/kata-containers/kata-containers/tree/3.32.0/tools/packaging/kernel"
+  },
+  "vminit": {
+    "url": "https://github.com/gabrielgreco1/racky/releases/download/runtime-1-b0fe423cccf4/vminit.oci.tar",
+    "sha256": "6f5f3c61c8b827f407c04b6ada6b53fb0bf392d99f46905067a3adc2f3e76bc3",
+    "size": 69424640,
+    "reference": "ghcr.io/apple/containerization/vminit:0.52.1"
+  },
+  "computer": {
+    "url": "https://github.com/gabrielgreco1/racky/releases/download/runtime-1-b0fe423cccf4/computer.oci.tar",
+    "sha256": "753a1af3b0b2829bee55c51bb9eb4276da97caf04e7c3fc9d055f88e2506ca98",
+    "size": 498673152,
+    "reference": "racky-computer:vz-b0fe423cccf4"
+  }
+}

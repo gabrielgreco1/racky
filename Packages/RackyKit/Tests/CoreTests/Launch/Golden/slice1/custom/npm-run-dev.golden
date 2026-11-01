@@ -1,0 +1,11 @@
+case: custom/npm-run-dev
+executable: ["npm"]
+identity: []
+profile: ["run","dev","--","--port=3000"]
+injected: []
+prompt: []
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: -
+warnings: 
+files: 

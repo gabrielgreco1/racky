@@ -1,0 +1,71 @@
+{
+  "schema": "racky.tokens.shadows",
+  "version": 1,
+  "_nota": "02 §8. Camadas CSS (x y blur color); 'inset' = sombra interna. SwiftUI radius = blur/2. Cards, linhas, tabs, botoes, paineis e terminal: nenhuma sombra.",
+  "shadows": {
+    "dialog": [
+      {
+        "x": 0,
+        "y": 24,
+        "blur": 72,
+        "color": "#000000",
+        "opacity": 0.55,
+        "inset": false
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "blur": 0,
+        "color": "#ffffff",
+        "opacity": 0.06,
+        "inset": true
+      }
+    ],
+    "palette": [
+      {
+        "x": 0,
+        "y": 26,
+        "blur": 84,
+        "color": "#000000",
+        "opacity": 0.32,
+        "inset": false
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "blur": 0,
+        "color": "#ffffff",
+        "opacity": 0.06,
+        "inset": true
+      }
+    ],
+    "menu": [
+      {
+        "x": 0,
+        "y": 16,
+        "blur": 34,
+        "color": "#000000",
+        "opacity": 0.4,
+        "inset": false
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "blur": 0,
+        "color": "#ffffff",
+        "opacity": 0.04,
+        "inset": true
+      }
+    ],
+    "floating": [
+      {
+        "x": 0,
+        "y": 10,
+        "blur": 24,
+        "color": "#000000",
+        "opacity": 0.18,
+        "inset": false
+      }
+    ]
+  }
+}

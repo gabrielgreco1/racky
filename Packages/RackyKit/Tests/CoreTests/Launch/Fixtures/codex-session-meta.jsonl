@@ -1,0 +1,2 @@
+{"timestamp":"2026-10-17T03:26:22.543Z","ordinal":0,"type":"session_meta","payload":{"session_id":"01a147e5-72b7-7c52-a686-6e002673cc8b","id":"01a147e5-72b7-7c52-a686-6e002673cc8b","timestamp":"2026-10-17T03:26:21.890Z","cwd":"/Users/example/work","originator":"codex_tui","cli_version":"0.163.0","source":"cli","model_provider":"openai","base_instructions":"(redacted in fixture)","history_mode":"paginated"}}
+{"timestamp":"2026-10-17T03:26:23.000Z","ordinal":1,"type":"event_msg","payload":{"type":"task_started"}}

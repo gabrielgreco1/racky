@@ -1,0 +1,115 @@
+{
+ "command": "claude -p --model haiku --settings hooks.json --permission-mode default (Write tool denied in -p)",
+ "events": [
+  {
+   "tag": "SessionStart",
+   "payload": {
+    "session_id": "e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s05-work/e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/work",
+    "hook_event_name": "SessionStart",
+    "source": "startup"
+   }
+  },
+  {
+   "tag": "project-UserPromptSubmit",
+   "payload": {
+    "session_id": "e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s05-work/e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/work",
+    "prompt_id": "6f8824ad-1d41-4d8d-8a51-3cc46437e0a0",
+    "permission_mode": "default",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "Create a file named x.txt containing hi using the Write tool, then reply DONE"
+   }
+  },
+  {
+   "tag": "UserPromptSubmit",
+   "payload": {
+    "session_id": "e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s05-work/e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/work",
+    "prompt_id": "6f8824ad-1d41-4d8d-8a51-3cc46437e0a0",
+    "permission_mode": "default",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "Create a file named x.txt containing hi using the Write tool, then reply DONE"
+   }
+  },
+  {
+   "tag": "PreToolUse",
+   "payload": {
+    "session_id": "e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s05-work/e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/work",
+    "prompt_id": "6f8824ad-1d41-4d8d-8a51-3cc46437e0a0",
+    "permission_mode": "default",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Write",
+    "tool_input": {
+     "file_path": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/work/x.txt",
+     "content": "hi"
+    },
+    "tool_use_id": "toolu_01UcFDfL63K2y1bbbZqbofPz"
+   }
+  },
+  {
+   "tag": "PermissionRequest",
+   "payload": {
+    "session_id": "e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s05-work/e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/work",
+    "prompt_id": "6f8824ad-1d41-4d8d-8a51-3cc46437e0a0",
+    "permission_mode": "default",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "PermissionRequest",
+    "tool_name": "Write",
+    "tool_input": {
+     "file_path": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/work/x.txt",
+     "content": "hi"
+    },
+    "permission_suggestions": [
+     {
+      "type": "setMode",
+      "mode": "acceptEdits",
+      "destination": "session"
+     }
+    ]
+   }
+  },
+  {
+   "tag": "Stop",
+   "payload": {
+    "session_id": "e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s05-work/e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/work",
+    "prompt_id": "6f8824ad-1d41-4d8d-8a51-3cc46437e0a0",
+    "permission_mode": "default",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "Stop",
+    "stop_hook_active": false,
+    "last_assistant_message": "I couldn't create `x.txt`. The Write call was blocked: Claude Code says write permission for `/private/tmp/claude-501/.../scratchpad/spikes/s05/work/x.txt` hasn't been granted. I didn't retry or switch to another tool to get around the block.\n\nTo finish, grant write access to that directory (or approve the Write prompt if one appears), and I'll create the file with `hi` and reply DONE.",
+    "background_tasks": [],
+    "session_crons": []
+   }
+  },
+  {
+   "tag": "SessionEnd",
+   "payload": {
+    "session_id": "e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s05-work/e925d3b4-5b4a-4a89-9a5b-ced1ca383e1d.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s05/work",
+    "prompt_id": "6f8824ad-1d41-4d8d-8a51-3cc46437e0a0",
+    "hook_event_name": "SessionEnd",
+    "reason": "other"
+   }
+  }
+ ],
+ "note": "PermissionRequest fires in -p mode, after PreToolUse; Notification was NOT observed in -p (needs interactive; not exercised, would need folder-trust write to ~/.claude.json)."
+}

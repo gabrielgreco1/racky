@@ -1,0 +1,444 @@
+{
+ "command": "claude -p --model haiku --agents \"$(cat agents.json)\" --settings hooks.json --output-format stream-json --verbose --include-hook-events --permission-mode acceptEdits --allowedTools 'Agent,mcp__whoami-a__whoami,mcp__whoami-b__whoami' --max-budget-usd 0.3 '<spawn child-a and child-b in one turn>'",
+ "events": [
+  {
+   "tag": "SessionStart",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "hook_event_name": "SessionStart",
+    "source": "startup"
+   }
+  },
+  {
+   "tag": "UserPromptSubmit",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "Launch the subagents child-a and child-b using the Agent tool (one call each, in the same turn, subagent_type child-a and child-b). Then reply with the two replies on one line."
+   }
+  },
+  {
+   "tag": "PreToolUse",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Agent",
+    "tool_input": {
+     "description": "Ping child-a agent",
+     "prompt": "Reply to this task as child-a. Keep your reply short.",
+     "subagent_type": "child-a",
+     "run_in_background": false
+    },
+    "tool_use_id": "toolu_01Dsges4NyrBk3aH8NPDz3NE"
+   }
+  },
+  {
+   "tag": "SubagentStart",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "agent_id": "a9d32b813be6acccc",
+    "agent_type": "child-a",
+    "hook_event_name": "SubagentStart"
+   }
+  },
+  {
+   "tag": "PreToolUse",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Agent",
+    "tool_input": {
+     "description": "Ping child-b agent",
+     "prompt": "Reply to this task as child-b. Keep your reply short.",
+     "subagent_type": "child-b",
+     "run_in_background": false
+    },
+    "tool_use_id": "toolu_01A7Prmg4tuZQ7wATvmsSfXG"
+   }
+  },
+  {
+   "tag": "SubagentStart",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "agent_id": "a69e07ec721dc760d",
+    "agent_type": "child-b",
+    "hook_event_name": "SubagentStart"
+   }
+  },
+  {
+   "tag": "PreToolUse",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "agent_id": "a9d32b813be6acccc",
+    "agent_type": "child-a",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "PreToolUse",
+    "tool_name": "mcp__whoami-a__whoami",
+    "tool_input": {},
+    "tool_use_id": "toolu_01BhqKnwgeZsZEJBUVPPVBzi",
+    "mcp_server": {
+     "name": "whoami-a",
+     "source": "agent"
+    }
+   }
+  },
+  {
+   "tag": "PostToolUse",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "agent_id": "a9d32b813be6acccc",
+    "agent_type": "child-a",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "PostToolUse",
+    "tool_name": "mcp__whoami-a__whoami",
+    "tool_input": {},
+    "tool_response": [
+     {
+      "type": "text",
+      "text": "I_AM_A"
+     }
+    ],
+    "tool_use_id": "toolu_01BhqKnwgeZsZEJBUVPPVBzi",
+    "duration_ms": 2,
+    "mcp_server": {
+     "name": "whoami-a",
+     "source": "agent"
+    }
+   }
+  },
+  {
+   "tag": "PreToolUse",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "agent_id": "a69e07ec721dc760d",
+    "agent_type": "child-b",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "PreToolUse",
+    "tool_name": "mcp__whoami-b__whoami",
+    "tool_input": {},
+    "tool_use_id": "toolu_019HeLThBiQi9bS84JhMDpQS",
+    "mcp_server": {
+     "name": "whoami-b",
+     "source": "agent"
+    }
+   }
+  },
+  {
+   "tag": "PostToolUse",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "agent_id": "a69e07ec721dc760d",
+    "agent_type": "child-b",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "PostToolUse",
+    "tool_name": "mcp__whoami-b__whoami",
+    "tool_input": {},
+    "tool_response": [
+     {
+      "type": "text",
+      "text": "I_AM_B"
+     }
+    ],
+    "tool_use_id": "toolu_019HeLThBiQi9bS84JhMDpQS",
+    "duration_ms": 1,
+    "mcp_server": {
+     "name": "whoami-b",
+     "source": "agent"
+    }
+   }
+  },
+  {
+   "tag": "SubagentStop",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "agent_id": "a9d32b813be6acccc",
+    "agent_type": "child-a",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059/subagents/agent-a9d32b813be6acccc.jsonl",
+    "last_assistant_message": "I_AM_A",
+    "background_tasks": [],
+    "session_crons": []
+   }
+  },
+  {
+   "tag": "PostToolUse",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Agent",
+    "tool_input": {
+     "description": "Ping child-a agent",
+     "prompt": "Reply to this task as child-a. Keep your reply short.",
+     "subagent_type": "child-a",
+     "run_in_background": false
+    },
+    "tool_response": {
+     "status": "completed",
+     "prompt": "Reply to this task as child-a. Keep your reply short.",
+     "agentId": "a9d32b813be6acccc",
+     "agentType": "child-a",
+     "harnessNoteCount": 0,
+     "harnessTailCount": 0,
+     "harnessSectionHash": "12af98bb322b3c84",
+     "content": [
+      {
+       "type": "text",
+       "text": "I_AM_A"
+      }
+     ],
+     "resolvedModel": "claude-haiku-5-5",
+     "totalDurationMs": 2103,
+     "totalTokens": 4381,
+     "totalToolUseCount": 1,
+     "usage": {
+      "output_tokens_details": {
+       "thinking_tokens": 0
+      },
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 2917,
+      "cache_read_input_tokens": 1454,
+      "output_tokens": 8,
+      "server_tool_use": {
+       "web_search_requests": 0,
+       "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+       "ephemeral_1h_input_tokens": 0,
+       "ephemeral_5m_input_tokens": 2917
+      },
+      "inference_geo": "global",
+      "iterations": [
+       {
+        "input_tokens": 2,
+        "output_tokens": 8,
+        "cache_read_input_tokens": 1454,
+        "cache_creation_input_tokens": 2917,
+        "cache_creation": {
+         "ephemeral_5m_input_tokens": 2917,
+         "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+       }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+     },
+     "toolStats": {
+      "readCount": 0,
+      "searchCount": 0,
+      "bashCount": 0,
+      "editFileCount": 0,
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "otherToolCount": 1
+     },
+     "canContinueAgent": true
+    },
+    "tool_use_id": "toolu_01Dsges4NyrBk3aH8NPDz3NE",
+    "duration_ms": 2105
+   }
+  },
+  {
+   "tag": "SubagentStop",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "agent_id": "a69e07ec721dc760d",
+    "agent_type": "child-b",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059/subagents/agent-a69e07ec721dc760d.jsonl",
+    "last_assistant_message": "I_AM_B",
+    "background_tasks": [],
+    "session_crons": []
+   }
+  },
+  {
+   "tag": "PostToolUse",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Agent",
+    "tool_input": {
+     "description": "Ping child-b agent",
+     "prompt": "Reply to this task as child-b. Keep your reply short.",
+     "subagent_type": "child-b",
+     "run_in_background": false
+    },
+    "tool_response": {
+     "status": "completed",
+     "prompt": "Reply to this task as child-b. Keep your reply short.",
+     "agentId": "a69e07ec721dc760d",
+     "agentType": "child-b",
+     "harnessNoteCount": 0,
+     "harnessTailCount": 0,
+     "harnessSectionHash": "43d139cc31fbbb85",
+     "content": [
+      {
+       "type": "text",
+       "text": "I_AM_B"
+      }
+     ],
+     "resolvedModel": "claude-haiku-5-5",
+     "totalDurationMs": 2079,
+     "totalTokens": 4381,
+     "totalToolUseCount": 1,
+     "usage": {
+      "output_tokens_details": {
+       "thinking_tokens": 0
+      },
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 2917,
+      "cache_read_input_tokens": 1454,
+      "output_tokens": 8,
+      "server_tool_use": {
+       "web_search_requests": 0,
+       "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+       "ephemeral_1h_input_tokens": 0,
+       "ephemeral_5m_input_tokens": 2917
+      },
+      "inference_geo": "global",
+      "iterations": [
+       {
+        "input_tokens": 2,
+        "output_tokens": 8,
+        "cache_read_input_tokens": 1454,
+        "cache_creation_input_tokens": 2917,
+        "cache_creation": {
+         "ephemeral_5m_input_tokens": 2917,
+         "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+       }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+     },
+     "toolStats": {
+      "readCount": 0,
+      "searchCount": 0,
+      "bashCount": 0,
+      "editFileCount": 0,
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "otherToolCount": 1
+     },
+     "canContinueAgent": true
+    },
+    "tool_use_id": "toolu_01A7Prmg4tuZQ7wATvmsSfXG",
+    "duration_ms": 2080
+   }
+  },
+  {
+   "tag": "Stop",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "permission_mode": "acceptEdits",
+    "effort": {
+     "level": "medium"
+    },
+    "hook_event_name": "Stop",
+    "stop_hook_active": false,
+    "last_assistant_message": "I_AM_A I_AM_B",
+    "background_tasks": [],
+    "session_crons": []
+   }
+  },
+  {
+   "tag": "SessionEnd",
+   "payload": {
+    "session_id": "830a4e38-7e7a-420a-a631-93d0ffbb1059",
+    "transcript_path": "/Users/me/.claude/projects/-private-tmp-claude-501--Users-me-code-racky-5dda428d-ecea-4852-b667-584fd17012cc-scratchpad-spikes-s08-work/830a4e38-7e7a-420a-a631-93d0ffbb1059.jsonl",
+    "cwd": "/private/tmp/claude-501/-Users-me-code-racky/5dda428d-ecea-4852-b667-584fd17012cc/scratchpad/spikes/s08/work",
+    "prompt_id": "de235a55-be7c-4cdf-a52d-8fb7bbbef565",
+    "hook_event_name": "SessionEnd",
+    "reason": "other"
+   }
+  }
+ ]
+}

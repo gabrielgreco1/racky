@@ -1,0 +1,11 @@
+case: claude/hooks-no-prompt
+executable: ["/usr/local/bin/claude"]
+identity: ["--session-id","11111111-2222-4333-8444-555555555555"]
+profile: ["--dangerously-skip-permissions"]
+injected: ["--settings","/tmp/ab/run/launch/00000000-0000-4000-8000-0000000000bb/settings.json"]
+prompt: []
+cwd: /Users/example/work/repo
+native_id: 11111111-2222-4333-8444-555555555555
+shield_off: Skip permissions (--dangerously-skip-permissions)
+warnings: 
+files: settings.json mode=600 bytes=3360

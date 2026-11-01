@@ -1,0 +1,17 @@
+{
+  "schema": "racky.tokens.radii",
+  "version": 1,
+  "_nota": "02 §6 + errata P17 (sm 6, md 8). full = 9999 (pilulas); raio de foco = raio do controle + focusRingOutset.",
+  "radius": {
+    "xs": 2,
+    "sm": 6,
+    "md": 8,
+    "control": 8,
+    "card": 10,
+    "menu": 11,
+    "large": 14,
+    "tile": 18,
+    "full": 9999
+  },
+  "focusRingOutset": 3
+}

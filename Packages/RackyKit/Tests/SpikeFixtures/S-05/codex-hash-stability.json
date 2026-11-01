@@ -1,0 +1,12 @@
+{
+ "probe": "hooks/list currentHash of hooks.Stop=[{hooks=[{type=command,command=\"<logger> Stop\",timeout=5}]}] under variations",
+ "results": {
+  "repeat_launch_same_cwd": "same hash",
+  "different_cwd (repo dir, /tmp)": "same hash",
+  "timeout 5 -> 9": "different hash",
+  "command text changed": "different hash"
+ },
+ "hash_example": "sha256:719c5beac76c364484396e2f05d5b92cf497bdc3b242a89d4b100a26d014ffbc",
+ "trust_via_dotted_c": "-c 'hooks.state.\"<key>\".trusted_hash=\"...\"' -> still untrusted (dotted key with dots/colons not parsed as intended)",
+ "trust_via_inline_table": "-c 'hooks.state={\"<key>\"={trusted_hash=\"<currentHash>\"}}' -> trustStatus=trusted, with no write to ~/.codex/config.toml"
+}

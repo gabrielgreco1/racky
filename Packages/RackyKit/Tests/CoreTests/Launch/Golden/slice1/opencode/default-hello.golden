@@ -1,0 +1,11 @@
+case: opencode/default-hello
+executable: ["/usr/local/bin/opencode"]
+identity: []
+profile: []
+injected: []
+prompt: ["--prompt","hello"]
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: -
+warnings: 
+files: 

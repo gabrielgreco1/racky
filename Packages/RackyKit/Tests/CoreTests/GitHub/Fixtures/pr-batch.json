@@ -1,0 +1,1080 @@
+{
+  "data": {
+    "rateLimit": {
+      "cost": 1,
+      "remaining": 4997,
+      "resetAt": "2026-10-17T18:00:00Z"
+    },
+    "repository": {
+      "b0": {
+        "nodes": [
+          {
+            "number": 400,
+            "title": "Anonymized PR title 1",
+            "url": "https://github.com/acme/widgets/pull/400",
+            "state": "OPEN",
+            "isDraft": false,
+            "reviewDecision": "REVIEW_REQUIRED",
+            "mergeable": "MERGEABLE",
+            "mergeStateStatus": "BLOCKED",
+            "headRefName": "dev/fix-pagination-round-2",
+            "headRefOid": "d569338db029a8f57e511dcc8392ce6757080a62",
+            "baseRefName": "main",
+            "commits": {
+              "nodes": [
+                {
+                  "commit": {
+                    "statusCheckRollup": {
+                      "state": "FAILURE",
+                      "contexts": {
+                        "totalCount": 18,
+                        "nodes": [
+                          {
+                            "__typename": "CheckRun",
+                            "name": "CodeQL-Build (go, manual, ./.github/codeql/codeql-config.yml)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000170/job/80000000000",
+                            "databaseId": 80000000000,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000000
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "lint",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000514/job/80000000031",
+                            "databaseId": 80000000031,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000034
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "label-external / label_issues",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000858/job/80000000062",
+                            "databaseId": 80000000062,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000068
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "build (ubuntu-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000001192/job/80000000093",
+                            "databaseId": 80000000093,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000102
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "CodeQL-Build (actions, none, security-and-quality)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000170/job/80000000124",
+                            "databaseId": 80000000124,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000000
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "build (windows-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000001192/job/80000000155",
+                            "databaseId": 80000000155,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000102
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "build (macos-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000001192/job/80000000186",
+                            "databaseId": 80000000186,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000102
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "govulncheck",
+                            "status": "COMPLETED",
+                            "conclusion": "FAILURE",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000514/job/80000000217",
+                            "databaseId": 80000000217,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000034
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-from-default-branch / close-from-default-branch",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000858/job/80000000248",
+                            "databaseId": 80000000248,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000068
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "integration-tests (ubuntu-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000001192/job/80000000279",
+                            "databaseId": 80000000279,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000102
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "integration-tests (windows-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000001192/job/80000000310",
+                            "databaseId": 80000000310,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000102
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "integration-tests (macos-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000001192/job/80000000341",
+                            "databaseId": 80000000341,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000102
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "check-requirements / check-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000858/job/80000000372",
+                            "databaseId": 80000000372,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000068
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "check-requirements / close-unmet-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000858/job/80000000403",
+                            "databaseId": 80000000403,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000068
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-unmet-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000858/job/80000000434",
+                            "databaseId": 80000000434,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000068
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-no-help-wanted",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000858/job/80000000465",
+                            "databaseId": 80000000465,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000068
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "ready-for-review",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000000858/job/80000000496",
+                            "databaseId": 80000000496,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000068
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "CodeQL",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/runs/7000000136",
+                            "databaseId": 80000000527,
+                            "checkSuite": {
+                              "workflowRun": null
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "b1": {
+        "nodes": [
+          {
+            "number": 401,
+            "title": "Anonymized PR title 2",
+            "url": "https://github.com/acme/widgets/pull/401",
+            "state": "OPEN",
+            "isDraft": true,
+            "reviewDecision": "REVIEW_REQUIRED",
+            "mergeable": "MERGEABLE",
+            "mergeStateStatus": "BLOCKED",
+            "headRefName": "dev/draft-login-error",
+            "headRefOid": "81676d2cd74f5f1a70af1932ad08da7d530ac716",
+            "baseRefName": "main",
+            "commits": {
+              "nodes": [
+                {
+                  "commit": {
+                    "statusCheckRollup": {
+                      "state": "SUCCESS",
+                      "contexts": {
+                        "totalCount": 18,
+                        "nodes": [
+                          {
+                            "__typename": "CheckRun",
+                            "name": "CodeQL-Build (go, manual, ./.github/codeql/codeql-config.yml)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000001703/job/80000000558",
+                            "databaseId": 80000000558,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000153
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "lint",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002047/job/80000000589",
+                            "databaseId": 80000000589,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000187
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "label-external / label_issues",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002381/job/80000000620",
+                            "databaseId": 80000000620,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000221
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "build (ubuntu-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002725/job/80000000651",
+                            "databaseId": 80000000651,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000255
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "CodeQL-Build (actions, none, security-and-quality)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000001703/job/80000000682",
+                            "databaseId": 80000000682,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000153
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "build (windows-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002725/job/80000000713",
+                            "databaseId": 80000000713,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000255
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "build (macos-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002725/job/80000000744",
+                            "databaseId": 80000000744,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000255
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-from-default-branch / close-from-default-branch",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002381/job/80000000775",
+                            "databaseId": 80000000775,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000221
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "govulncheck",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002047/job/80000000806",
+                            "databaseId": 80000000806,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000187
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "integration-tests (ubuntu-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002725/job/80000000837",
+                            "databaseId": 80000000837,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000255
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "integration-tests (windows-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002725/job/80000000868",
+                            "databaseId": 80000000868,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000255
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "integration-tests (macos-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002725/job/80000000899",
+                            "databaseId": 80000000899,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000255
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "check-requirements / check-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002381/job/80000000930",
+                            "databaseId": 80000000930,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000221
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "check-requirements / close-unmet-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002381/job/80000000961",
+                            "databaseId": 80000000961,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000221
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-unmet-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002381/job/80000000992",
+                            "databaseId": 80000000992,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000221
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-no-help-wanted",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002381/job/80000001023",
+                            "databaseId": 80000001023,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000221
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "ready-for-review",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000002381/job/80000001054",
+                            "databaseId": 80000001054,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000221
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "CodeQL",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/runs/7000000289",
+                            "databaseId": 80000001085,
+                            "checkSuite": {
+                              "workflowRun": null
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "b2": {
+        "nodes": [
+          {
+            "number": 402,
+            "title": "Anonymized PR title 3",
+            "url": "https://github.com/acme/widgets/pull/402",
+            "state": "MERGED",
+            "isDraft": false,
+            "reviewDecision": "APPROVED",
+            "mergeable": "UNKNOWN",
+            "mergeStateStatus": "UNKNOWN",
+            "headRefName": "dev/clarify-help",
+            "headRefOid": "3f0f9475af7d6a5887c6b6afcf7c1e2cf6242549",
+            "baseRefName": "main",
+            "commits": {
+              "nodes": [
+                {
+                  "commit": {
+                    "statusCheckRollup": {
+                      "state": "SUCCESS",
+                      "contexts": {
+                        "totalCount": 18,
+                        "nodes": [
+                          {
+                            "__typename": "CheckRun",
+                            "name": "label-external",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003236/job/80000001116",
+                            "databaseId": 80000001116,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000306
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "CodeQL-Build (go, manual, ./.github/codeql/codeql-config.yml)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003570/job/80000001147",
+                            "databaseId": 80000001147,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000340
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "lint",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003914/job/80000001178",
+                            "databaseId": 80000001178,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000374
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "build (ubuntu-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004258/job/80000001209",
+                            "databaseId": 80000001209,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000408
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "CodeQL-Build (actions, none, security-and-quality)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003570/job/80000001240",
+                            "databaseId": 80000001240,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000340
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "build (windows-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004258/job/80000001271",
+                            "databaseId": 80000001271,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000408
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "build (macos-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004258/job/80000001302",
+                            "databaseId": 80000001302,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000408
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-from-default-branch",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003236/job/80000001333",
+                            "databaseId": 80000001333,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000306
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "govulncheck",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003914/job/80000001364",
+                            "databaseId": 80000001364,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000374
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "integration-tests (ubuntu-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004258/job/80000001395",
+                            "databaseId": 80000001395,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000408
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "integration-tests (windows-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004258/job/80000001426",
+                            "databaseId": 80000001426,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000408
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "integration-tests (macos-latest)",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004258/job/80000001457",
+                            "databaseId": 80000001457,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000408
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "check-requirements / check-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003236/job/80000001488",
+                            "databaseId": 80000001488,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000306
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "check-requirements / close-unmet-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003236/job/80000001519",
+                            "databaseId": 80000001519,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000306
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-unmet-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003236/job/80000001550",
+                            "databaseId": 80000001550,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000306
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-no-help-wanted",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003236/job/80000001581",
+                            "databaseId": 80000001581,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000306
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "ready-for-review",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000003236/job/80000001612",
+                            "databaseId": 80000001612,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000306
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "CodeQL",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/runs/7000000442",
+                            "databaseId": 80000001643,
+                            "checkSuite": {
+                              "workflowRun": null
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "b3": {
+        "nodes": [
+          {
+            "number": 403,
+            "title": "Anonymized PR title 4",
+            "url": "https://github.com/acme/widgets/pull/403",
+            "state": "OPEN",
+            "isDraft": false,
+            "reviewDecision": "APPROVED",
+            "mergeable": "UNKNOWN",
+            "mergeStateStatus": "UNKNOWN",
+            "headRefName": "dev/telemetry",
+            "headRefOid": "9f24114741a2a249e58800ed067d6c59d0ae1cb9",
+            "baseRefName": "main",
+            "commits": {
+              "nodes": [
+                {
+                  "commit": {
+                    "statusCheckRollup": {
+                      "state": "SUCCESS",
+                      "contexts": {
+                        "totalCount": 7,
+                        "nodes": [
+                          {
+                            "__typename": "CheckRun",
+                            "name": "label-external",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004769/job/80000001674",
+                            "databaseId": 80000001674,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000459
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-from-default-branch",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004769/job/80000001705",
+                            "databaseId": 80000001705,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000459
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "check-requirements / check-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004769/job/80000001736",
+                            "databaseId": 80000001736,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000459
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "check-requirements / close-unmet-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004769/job/80000001767",
+                            "databaseId": 80000001767,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000459
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-unmet-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004769/job/80000001798",
+                            "databaseId": 80000001798,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000459
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-no-help-wanted",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004769/job/80000001829",
+                            "databaseId": 80000001829,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000459
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "ready-for-review",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000004769/job/80000001860",
+                            "databaseId": 80000001860,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000459
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "b4": {
+        "nodes": [
+          {
+            "number": 404,
+            "title": "Anonymized PR title 5",
+            "url": "https://github.com/acme/widgets/pull/404",
+            "state": "OPEN",
+            "isDraft": false,
+            "reviewDecision": "APPROVED",
+            "mergeable": "UNKNOWN",
+            "mergeStateStatus": "UNKNOWN",
+            "headRefName": "dev/rename-flag",
+            "headRefOid": "897e649470d4abf30357a196ca07ec02b3ae282f",
+            "baseRefName": "main",
+            "commits": {
+              "nodes": [
+                {
+                  "commit": {
+                    "statusCheckRollup": null
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "b5": {
+        "nodes": [
+          {
+            "number": 405,
+            "title": "Anonymized PR title 6",
+            "url": "https://github.com/acme/widgets/pull/405",
+            "state": "CLOSED",
+            "isDraft": false,
+            "reviewDecision": "REVIEW_REQUIRED",
+            "mergeable": "MERGEABLE",
+            "mergeStateStatus": "BLOCKED",
+            "headRefName": "dev/closed-attempt",
+            "headRefOid": "60a3ff8ed74353aca0dc33ed497ab424c76c5768",
+            "baseRefName": "main",
+            "commits": {
+              "nodes": [
+                {
+                  "commit": {
+                    "statusCheckRollup": {
+                      "state": "SUCCESS",
+                      "contexts": {
+                        "totalCount": 7,
+                        "nodes": [
+                          {
+                            "__typename": "CheckRun",
+                            "name": "label-external / label_issues",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000005103/job/80000001891",
+                            "databaseId": 80000001891,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000493
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-from-default-branch / close-from-default-branch",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000005103/job/80000001922",
+                            "databaseId": 80000001922,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000493
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "check-requirements / check-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SUCCESS",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000005103/job/80000001953",
+                            "databaseId": 80000001953,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000493
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "check-requirements / close-unmet-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000005103/job/80000001984",
+                            "databaseId": 80000001984,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000493
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-unmet-requirements",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000005103/job/80000002015",
+                            "databaseId": 80000002015,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000493
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "close-no-help-wanted",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000005103/job/80000002046",
+                            "databaseId": 80000002046,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000493
+                              }
+                            }
+                          },
+                          {
+                            "__typename": "CheckRun",
+                            "name": "ready-for-review",
+                            "status": "COMPLETED",
+                            "conclusion": "SKIPPED",
+                            "detailsUrl": "https://github.com/acme/widgets/actions/runs/70000005103/job/80000002077",
+                            "databaseId": 80000002077,
+                            "checkSuite": {
+                              "workflowRun": {
+                                "databaseId": 7000000493
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+case: codex/prompt-special-chars
+executable: ["/usr/local/bin/codex"]
+identity: []
+profile: ["--no-daemon","--dangerously-bypass-approvals-and-sandbox"]
+injected: []
+prompt: ["He said \"hi\" & 'bye'\nline2 $(rm -rf ~) `id` \\n ; | > emoji 👩🏽‍💻 日本語 *.swift"]
+cwd: /Users/example/work/repo
+native_id: -
+shield_off: Skip permissions (--dangerously-bypass-approvals-and-sandbox)
+warnings: 
+files: 

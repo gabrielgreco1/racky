@@ -1,0 +1,228 @@
+{
+  "retrieved": "2026-10-16",
+  "notes": "Official vendor assets; originals preserved. Logos identify third-party integrations, not Racky ownership. Google ICO decoded to PNG without redrawing.",
+  "assets": [
+    {
+      "file": "claude.png",
+      "source": "https://anthropic.com/press-kit",
+      "member": "Anthropic media resources/Anthropic logos/Claude logos/3 Claude Spark/PNG/Claude Spark - Clay.png",
+      "sha256": "c7d8415b1edba67e5337d3684b480b563826f07be9e28e10ccc14bf92037ef6d"
+    },
+    {
+      "file": "claude-code-wordmark.png",
+      "source": "https://anthropic.com/press-kit",
+      "member": "Anthropic media resources/Anthropic logos/Claude logos/2 Claude Code logo/PNG/Claude Code logo - Ivory.png",
+      "sha256": "fa1dff0d379c332889be563efb39b6064f91689e3cc3072d8d0f9d9572cb1055"
+    },
+    {
+      "file": "codex.png",
+      "source": "/Applications/Codex.app/Contents/Resources/icon-codex-dark-color.png",
+      "member": "dark rounded background removed (flood fill from the edges), cloud mark kept as is",
+      "sha256": "69fb4384e161be8a20dcb94a9ac34aea4fbfaeb67514110a71e7b0732eccb0fc"
+    },
+    {
+      "file": "docker.png",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/docker.svg",
+      "member": "Simple Icons docker (CC0 icon data; mark belongs to Docker, Inc.), rasterized to @2x/@3x by NSImage; sha256 is of the SVG",
+      "sha256": "65571291c261ef869c31540a38f3ca0f0ee3bb73f179c172211c8860f19a6359"
+    },
+    {
+      "file": "linkedin.png",
+      "source": "https://content.linkedin.com/content/dam/me/business/en-us/amp/xbu/linkedin-revised-brand-guidelines/logos/in-logo.zip",
+      "member": "in-logo/LI-In-Bug.png",
+      "sha256": "3c0149f26168b5fe0f43e68664abe40341a6443b3cd435d18a73e12f64f8b600"
+    },
+    {
+      "file": "x.png",
+      "source": "https://about.x.com/content/dam/about-twitter/x/brand-toolkit/x-logo.zip",
+      "member": "logo-white.png",
+      "sha256": "432bdd47255b48366843ec21d209e774f93b807e1fd0894fc983aad0dc7bd03b"
+    },
+    {
+      "file": "crunchbase.png",
+      "source": "https://cdn.prod.website-files.com/687e6d0359c517be389ea464/69257c9295545c9acddcaa0d_cb-webclip-256x256.png",
+      "member": "",
+      "sha256": "e173d6992ebb535bf47a22a39412756231ad446300116dc0ac848df315a41782"
+    },
+    {
+      "file": "google.png",
+      "source": "https://www.google.com/favicon.ico",
+      "member": "Lossless decode of largest ICO image",
+      "sha256": "5db49d9c0401a60449c34526976cdef142d2bf7b88b46c42362d12105eaed136"
+    },
+    {
+      "file": "opencode.png",
+      "source": "https://opencode.ai/opencode-brand-assets.zip",
+      "member": "OpenCode Brand Assets/Logo/opencode-logo-dark.png",
+      "sha256": "20c8b4794f4c988ab335a519980415ba94ea3442b5a794b920c5408be295bc53"
+    },
+    {
+      "file": "github.png",
+      "source": "https://cdn.jsdelivr.net/npm/@primer/octicons@19.15.0/build/svg/mark-github-24.svg",
+      "member": "Octicons mark-github (MIT, GitHub Inc.), rasterized to @2x/@3x by NSImage; sha256 is of the SVG",
+      "sha256": "0c5e839c440504f3b0d06e6d15421cb7c4aef55f60ccac43ed45a08efeb6809e"
+    },
+    {
+      "file": "aws.png",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/amazonwebservices.svg",
+      "member": "Simple Icons (CC0 icon data; marks belong to their owners, used to identify the provider), rasterized to @2x/@3x by NSImage; sha256 is of the SVG",
+      "sha256": "f67734a0f5a7f925c84b6a9ea6e5489fe7af96e4ae167da6b71506a5d6afcab4"
+    },
+    {
+      "file": "cloudflare.png",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/cloudflare.svg",
+      "member": "Simple Icons (CC0 icon data; marks belong to their owners, used to identify the provider), rasterized to @2x/@3x by NSImage; sha256 is of the SVG",
+      "sha256": "408096d99907fd99e0863cb5d73f77a72537c6a85fd8d5e2704178a83a891f08"
+    },
+    {
+      "file": "gcp.png",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/googlecloud.svg",
+      "member": "Simple Icons (CC0 icon data; marks belong to their owners, used to identify the provider), rasterized to @2x/@3x by NSImage; sha256 is of the SVG",
+      "sha256": "534a0359c2784e152f5c88ce64a56976036d7336c7831775c995977fd3432713"
+    },
+    {
+      "file": "hetzner.png",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/hetzner.svg",
+      "member": "Simple Icons (CC0 icon data; marks belong to their owners, used to identify the provider), rasterized to @2x/@3x by NSImage; sha256 is of the SVG",
+      "sha256": "df276671b4076812a5a4b46f4113b0c38f56109f6bd368d1a6f09915b67961b4"
+    },
+    {
+      "file": "digitalocean.png",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/digitalocean.svg",
+      "member": "Simple Icons (CC0 icon data; marks belong to their owners, used to identify the provider), rasterized to @2x/@3x by NSImage; sha256 is of the SVG",
+      "sha256": "21c374a43a70f8a833ea6c84c904e64f5a20586714b1e0a16b34cb1d9cf29998"
+    },
+    {
+      "file": "data-postgresql.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/postgresql.svg",
+      "member": "Simple Icons postgresql (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "c8ccadbd88c9312c2ad3734c4861b31d3485ce179ee91d64793143f83cfa745c"
+    },
+    {
+      "file": "data-supabase.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/supabase.svg",
+      "member": "Simple Icons supabase (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "61bf16d93be418f723ae1e137e57afdad4f185352fbc6dea9482af1e0a89ccf7"
+    },
+    {
+      "file": "data-mysql.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/mysql.svg",
+      "member": "Simple Icons mysql (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "67c144cc3e44ad14062a3f20ebe29c5e7eeb2c2c9c0f43cf48d87fe6291a8b2d"
+    },
+    {
+      "file": "data-sqlite.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/sqlite.svg",
+      "member": "Simple Icons sqlite (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "71d4153bc9661dfe6b92dad70f737ec2b6c7c839311e502b4ca66fe664fe12b6"
+    },
+    {
+      "file": "data-googlebigquery.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/googlebigquery.svg",
+      "member": "Simple Icons googlebigquery (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "9911daac258359ac5e73916bc8e97f6df03d5f5845b210bdb99c629f8caf0f84"
+    },
+    {
+      "file": "data-snowflake.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/snowflake.svg",
+      "member": "Simple Icons snowflake (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "75690c4c666a406278286284f89896e8ef55dd0bfbc791acb910ce40e4a46aa9"
+    },
+    {
+      "file": "data-clickhouse.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/clickhouse.svg",
+      "member": "Simple Icons clickhouse (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "9fa7c12613763111ca26bbc1fe10994960028bc3da9faf47247de231a0b27589"
+    },
+    {
+      "file": "data-databricks.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/databricks.svg",
+      "member": "Simple Icons databricks (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "454aa3efdb318c655e3da2ea844e3577a9c47a20e24d20fff6489362176e5fe4"
+    },
+    {
+      "file": "data-amazons3.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/amazons3.svg",
+      "member": "Simple Icons amazons3 (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "cba625e28cf2a5f653d53aad6a0f33ffb21f8e2c70e07237506c216684bbda2e"
+    },
+    {
+      "file": "data-googlecloudstorage.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/googlecloudstorage.svg",
+      "member": "Simple Icons googlecloudstorage (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "d56c2fed6b3fd6bbd963bb798f9c182f4a70b4b044f0ce20d7b4e083462517e7"
+    },
+    {
+      "file": "data-cloudflare.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/cloudflare.svg",
+      "member": "Simple Icons cloudflare (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "408096d99907fd99e0863cb5d73f77a72537c6a85fd8d5e2704178a83a891f08"
+    },
+    {
+      "file": "data-googlesheets.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/googlesheets.svg",
+      "member": "Simple Icons googlesheets (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "5f28308c62e37d7d5533f52bbff5b48dc8630189d1c9d9dcbd8d7821f50d877f"
+    },
+    {
+      "file": "data-airtable.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/airtable.svg",
+      "member": "Simple Icons airtable (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "5d65b71d7c21151d54ef18acdcbac914c264f7139e3e8160a0895979fe31e391"
+    },
+    {
+      "file": "data-microsoftsqlserver.svg",
+      "source": "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/icons/microsoftsqlserver/microsoftsqlserver-plain.svg",
+      "member": "Devicon (MIT); mark belongs to Microsoft",
+      "sha256": "b49115d6dc952690790cea30383a41a7cc8923cd8b7dd070b2e3fb71e1a04d8d"
+    },
+    {
+      "file": "data-prefect.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/prefect.svg",
+      "member": "Simple Icons prefect (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "3bf1928838632541fd4058fce5feaf1993adedfc2b459c0061adcb5c75dc427b"
+    },
+    {
+      "file": "proxy-zyte.png",
+      "source": "https://www.zyte.com/apple-touch-icon.png?v=2",
+      "member": "official site icon (apple-touch-icon or favicon), retrieved 2026-10-27; mark belongs to the provider",
+      "sha256": "992a1fd5cfce631443e74f0787720e22a4969f9228247710ad9152df5af38d0b"
+    },
+    {
+      "file": "proxy-brightdata.png",
+      "source": "https://brightdata.com/wp-content/themes/brightdata/assets/images/favicon.png",
+      "member": "official site icon (apple-touch-icon or favicon), retrieved 2026-10-27; mark belongs to the provider",
+      "sha256": "c9b3cb09c1cf5f0715fee4cbdfff0316f9cbce636832b3f01fe190ffb2019544"
+    },
+    {
+      "file": "proxy-oxylabs.png",
+      "source": "https://oxylabs.io/apple-touch-icon.png",
+      "member": "official site icon (apple-touch-icon or favicon), retrieved 2026-10-27; mark belongs to the provider",
+      "sha256": "c5b7686ed33f00118b2e6c44c38e5dc88eabe7a1856925ae1614ec9f127d2ad1"
+    },
+    {
+      "file": "proxy-decodo.png",
+      "source": "https://decodo.com/favicon/apple-touch-icon.png",
+      "member": "official site icon (apple-touch-icon or favicon), retrieved 2026-10-27; mark belongs to the provider",
+      "sha256": "b863b28f28284458a731eb02db596fe3c0e7c461db7efb1e334e8c910eaaf23c"
+    },
+    {
+      "file": "proxy-iproyal.png",
+      "source": "https://iproyal.com/apple-touch-icon.png",
+      "member": "official site icon (apple-touch-icon or favicon), retrieved 2026-10-27; mark belongs to the provider",
+      "sha256": "ad51e2092b5ac4791ce71635ca9a57e47bdb75cf39bab4e8a88f0df5f2f285c0"
+    },
+    {
+      "file": "proxy-webshare.png",
+      "source": "https://www.webshare.io/apple-touch-icon.png",
+      "member": "official site icon (apple-touch-icon or favicon), retrieved 2026-10-27; mark belongs to the provider",
+      "sha256": "6ab0672a5a442efc099e82687037f28eb05ef6ebae2e5a83ec5a0f4ee95738f1"
+    },
+    {
+      "file": "proxy-soax.png",
+      "source": "https://soax.com/apple-icon.png",
+      "member": "official site icon (apple-touch-icon or favicon), retrieved 2026-10-27; mark belongs to the provider",
+      "sha256": "2bb21a2ba795f866f9dc0735588b46e69dd360a62eef1bd064d271bc0a64385a"
+    }
+  ]
+}

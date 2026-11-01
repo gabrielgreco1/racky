@@ -1,0 +1,54 @@
+# racky-computer, variante SLIM (runtime sem Docker, `scripts/vz/build-image.sh`): a mesma imagem lógica do `Dockerfile` (Xvfb + x11vnc +
+# Chromium headed + servidor de controle + egress + utilitários de trabalho), mas ~1,4 GB em vez de ~3,6 GB, porque o app a baixa e a
+# desempacota num disco ext4 por VM. O `Dockerfile` continua sendo o do modo Docker.
+#
+# O que sai em relação ao Dockerfile padrão (portado de Dockerfile.slim2 do spike, que passou o fluxo completo):
+#   - base: python:3.12-slim-bookworm (fixada por digest) em vez da imagem do Playwright (3,4 GB, com Firefox e WebKit);
+#   - só o Chromium do Playwright (sem shell headless, sem ffmpeg, sem Widevine, só os locales en/pt/es);
+#   - o pacote `playwright` (o runtime usa o `patchright`, que traz o próprio driver); pip, setuptools e wheel;
+#   - Mesa/LLVM, ghostscript, z3 e gconv, que o Chromium com Xvfb não usa (renderiza por software via SwiftShader).
+# Contexto de build: runtime/computer (não escreve nada nele).
+FROM python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258
+
+ENV DEBIAN_FRONTEND=noninteractive PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1 PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+COPY requirements.txt /tmp/requirements.txt
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends xvfb openbox x11vnc xdotool curl jq ca-certificates iptables iproute2 procps fonts-liberation util-linux git postgresql \
+    && python -m pip install -r /tmp/requirements.txt \
+    && python -m playwright install-deps chromium \
+    && python -m playwright install --no-shell chromium \
+    && rm -rf /ms-playwright/ffmpeg-* /var/lib/apt/lists/* /tmp/requirements.txt /root/.cache /usr/share/doc /usr/share/man /usr/share/locale/* \
+    && find /usr/local/lib/python3.12 -name __pycache__ -prune -exec rm -rf {} + \
+    && python -m pip uninstall -y playwright pip setuptools wheel 2>/dev/null; \
+    rm -rf /usr/local/lib/python3.12/site-packages/playwright /usr/local/lib/python3.12/site-packages/pip \
+    && rm -rf /ms-playwright/chromium-*/chrome-linux*/WidevineCdm \
+    && find /ms-playwright/chromium-*/chrome-linux*/locales -name '*.pak' ! -name 'en-US.pak' ! -name 'pt-BR.pak' ! -name 'pt-PT.pak' ! -name 'es*.pak' -delete \
+    && rm -rf /var/lib/postgresql/*/main /etc/postgresql/*/main \
+    && for b in initdb pg_ctl postgres pg_isready createdb psql; do ln -sf /usr/lib/postgresql/*/bin/$b /usr/local/bin/$b; done \
+    && ln -sf /opt/racky/bin/racky-pr /usr/local/bin/racky-pr \
+    && rm -rf /usr/lib/aarch64-linux-gnu/libLLVM-15.so.1 /usr/lib/aarch64-linux-gnu/dri /usr/lib/aarch64-linux-gnu/libgs.so* /usr/lib/aarch64-linux-gnu/libz3.so* /usr/lib/aarch64-linux-gnu/gconv
+
+RUN useradd --uid 10001 --create-home --home-dir /home/agent --shell /bin/bash agent \
+    && useradd --uid 10003 --no-create-home --home-dir /run/racky --shell /usr/sbin/nologin egress \
+    && mkdir -p /opt/racky/bin /work /profile \
+    && chown agent:agent /profile \
+    && chmod 0755 /work
+
+COPY racky_runtime /opt/racky/racky_runtime
+COPY racky_egress /opt/racky/racky_egress
+COPY racky_supervisor /opt/racky/racky_supervisor
+COPY bin/abx-http bin/abx-chromium bin/abx-provision bin/racky-pr /opt/racky/bin/
+# Git pelo gateway do egress (github_gateway.py): o egress põe o token e aplica a política; o agente nunca o vê.
+COPY gitconfig /etc/gitconfig
+RUN chmod 0755 /opt/racky/bin/abx-http /opt/racky/bin/abx-chromium /opt/racky/bin/abx-provision /opt/racky/bin/racky-pr \
+    && chmod -R go-w /opt/racky
+
+# initdb/pg_ctl no PATH (os smokes criam o próprio cluster descartável); o proxy só vale para os comandos do agente (os serviços têm
+# ambiente explícito sem ele, racky_supervisor.service_env).
+ENV PYTHONPATH=/opt/racky PATH=/opt/racky/bin:/usr/lib/postgresql/15/bin:$PATH DISPLAY=:99 HOME=/home/agent \
+    HTTP_PROXY=http://127.0.0.1:3128 HTTPS_PROXY=http://127.0.0.1:3128 NO_PROXY=127.0.0.1,localhost
+WORKDIR /work
+
+EXPOSE 8790
+ENTRYPOINT ["python", "-m", "racky_supervisor"]
