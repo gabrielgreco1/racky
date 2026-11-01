@@ -26,6 +26,10 @@ import Testing
         #expect(table.cost(model: "claude-opus-4-5", counts: TokenCounts(input: 1_000_000, output: 1_000_000))! == 30)
         #expect(abs(table.cost(model: "claude-sonnet-4-5", counts: TokenCounts(cacheRead: 1_000_000))! - 0.3) < 1e-9)
         #expect(table.cost(model: "mystery-model", counts: TokenCounts(input: 1)) == nil)
+        // Geração 5 tem preço próprio; a linha genérica "opus" não pode cobrar o 4.x por ela.
+        #expect(table.cost(model: "claude-opus-5-5", counts: TokenCounts(input: 1_000_000, output: 1_000_000))! == 24)
+        #expect(abs(table.cost(model: "claude-haiku-5-5", counts: TokenCounts(input: 1_000_000, output: 1_000_000))! - 0.6) < 1e-9)
+        #expect(table.cost(model: "claude-fable-5-1", counts: TokenCounts(input: 1_000_000))! == 10)
         let custom = PriceTable(entries: [.init(match: "opus", price: ModelPrice(input: 1, output: 1, cacheRead: 0, cacheWrite5m: 0, cacheWrite1h: 0))])
         #expect(custom.cost(model: "Claude-OPUS", counts: TokenCounts(input: 2_000_000))! == 2)
     }

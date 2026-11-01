@@ -48,6 +48,12 @@ public struct PriceTable: Codable, Sendable, Equatable {
     }
 
     public static let `default` = PriceTable(entries: [
+        // Geração 5 (claude.com/pricing, conferido em 01/11/2026). O Haiku 5.5 sobe para 0,50/2,50 acima de 100K tokens de prompt;
+        // a tabela usa a faixa de baixo. As linhas genéricas abaixo seguem valendo para os modelos 4.x.
+        Entry(match: "fable", price: .claude(input: 10, output: 50)),
+        Entry(match: "opus-5", price: .claude(input: 4, output: 20)),
+        Entry(match: "sonnet-5", price: .claude(input: 2, output: 10)),
+        Entry(match: "haiku-5", price: .claude(input: 0.10, output: 0.50)),
         Entry(match: "opus", price: .claude(input: 5, output: 25)),
         Entry(match: "sonnet", price: .claude(input: 3, output: 15)),
         Entry(match: "haiku", price: .claude(input: 1, output: 5)),

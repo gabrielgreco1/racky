@@ -68,7 +68,7 @@ let package = Package(
         lib("RackyTerminalCore", [swiftTerm]),
         lib("RackyStore", ["RackyPlatform", "RackyProtocol", grdb]),
         lib("RackyDocker", ["RackyPlatform", "RackyProtocol"]),
-        lib("RackyCore", ["RackyProtocol", "RackyPlatform", "RackyStore", "RackyDocker", postgresNIO]),
+        lib("RackyCore", ["RackyProtocol", "RackyPlatform", "RackyStore", "RackyDocker", postgresNIO], resources: [.copy("Resources/ModelReferences")]),
         // Backend de computadores sem Docker (VMs via apple/containerization). Isolado: RackyDocker e RackyCore não o importam.
         lib("RackyVZ", ["RackyProtocol", "RackyPlatform", "RackyDocker", "RackyCore", containerization, containerizationOCI, containerizationExtras, containerizationOS, containerizationEXT4]),
         lib("RackyDesignSystem", ["RackyProtocol"], ui: true, resources: [.copy("Resources/Fonts"), .copy("Resources/AgentLogos")]),

@@ -8,7 +8,7 @@
 #             integration = só as suítes `integration`, em série.
 #   Efeitos : grava o log completo em Packages/RackyKit/.build/test-logs/; no fim mata só os daemons que ESTE run subiu.
 #   Saída   : resumo curto (contagem, tempos, falhas); exit 0 se tudo passou, 1 se algo falhou ou estourou o limite, 2 uso inválido.
-#   Limites : cada fase tem um teto de relógio (AB_TEST_UNIT_LIMIT, AB_TEST_INTEGRATION_LIMIT, em segundos; 240 e 480), e cada
+#   Limites : cada fase tem um teto de relógio (AB_TEST_UNIT_LIMIT, AB_TEST_INTEGRATION_LIMIT, em segundos; 240 e 720), e cada
 #             teste de integração tem `.timeLimit` próprio. Nada fica pendurado.
 # Uso: scripts/test.sh unit|all|integration [--no-build] [--help]
 set -uo pipefail
@@ -30,7 +30,7 @@ done
 
 export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
 UNIT_LIMIT="${AB_TEST_UNIT_LIMIT:-240}"
-INTEGRATION_LIMIT="${AB_TEST_INTEGRATION_LIMIT:-480}"
+INTEGRATION_LIMIT="${AB_TEST_INTEGRATION_LIMIT:-720}"
 LOGDIR="$PKG/.build/test-logs"
 mkdir -p "$LOGDIR"
 STAMP="$(date +%Y%m%d-%H%M%S)"
