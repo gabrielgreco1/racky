@@ -25,9 +25,15 @@ public actor AppSockServer {
     private var acceptTask: Task<Void, Never>?
     private var connections: [Int: Task<Void, Never>] = [:]
     private var nextConnectionID = 0
+    /// Arquivo que este servidor criou em `path` (dispositivo, inode): só ele é apagado no `stop`, e o vigia percebe quando trocam.
+    private var bound: (dev: dev_t, ino: ino_t)?
+    private var watchTask: Task<Void, Never>?
+    private let watchInterval: Duration
 
-    public init(path: String, maxFrame: Int = AppSockFrame.defaultMaxLength, makeHandler: @escaping @Sendable () -> Handler) {
+    public init(path: String, maxFrame: Int = AppSockFrame.defaultMaxLength, watchInterval: Duration = .seconds(5),
+                makeHandler: @escaping @Sendable () -> Handler) {
         self.path = path
+        self.watchInterval = watchInterval
         self.maxFrame = maxFrame
         self.makeHandler = makeHandler
     }
@@ -64,10 +70,46 @@ public actor AppSockServer {
             throw error
         }
         listenFD = fd
+        bound = Self.identity(of: path)
         acceptTask = Task { [weak self] in await self?.acceptLoop(fd: fd) }
+        if watchTask == nil {
+            let interval = watchInterval
+            watchTask = Task { [weak self] in
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: interval)
+                    guard let self, !Task.isCancelled else { return }
+                    await self.rebindIfReplaced()
+                }
+            }
+        }
+    }
+
+    /// Alguém apagou ou trocou o arquivo de `path` (03/11: um teste deixou um socket morto no lugar e todos os agentes passaram a ver
+    /// "Racky is not running" com o app vivo). O servidor segue escutando num arquivo que ninguém alcança; aqui ele volta a se
+    /// publicar. Se outra instância viva atende em `path`, não mexe. As conexões abertas continuam.
+    public func rebindIfReplaced() async {
+        guard listenFD >= 0 else { return }
+        if let current = Self.identity(of: path), let bound, current.dev == bound.dev, current.ino == bound.ino { return }
+        if AppSockClient.isListening(path: path) { return }
+        let task = acceptTask
+        acceptTask = nil
+        task?.cancel()
+        await task?.value
+        Darwin.close(listenFD)
+        listenFD = -1
+        bound = nil
+        try? start()
+    }
+
+    static func identity(of path: String) -> (dev: dev_t, ino: ino_t)? {
+        var info = stat()
+        guard lstat(path, &info) == 0 else { return nil }
+        return (info.st_dev, info.st_ino)
     }
 
     public func stop() async {
+        watchTask?.cancel()
+        watchTask = nil
         guard listenFD >= 0 else { return }
         let task = acceptTask
         let conns = Array(connections.values)
@@ -79,7 +121,9 @@ public actor AppSockServer {
         for c in conns { await c.value }
         Darwin.close(listenFD)
         listenFD = -1
-        unlink(path)
+        // Só apaga o arquivo que é seu: se ele foi trocado, o de agora pode ser de outra instância viva.
+        if let current = Self.identity(of: path), let bound, current.dev == bound.dev, current.ino == bound.ino { unlink(path) }
+        bound = nil
     }
 
     private func acceptLoop(fd: Int32) async {

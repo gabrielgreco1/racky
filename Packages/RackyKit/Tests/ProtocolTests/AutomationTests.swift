@@ -189,5 +189,8 @@ import Testing
     @Test func appSockPathHonorsOverride() {
         #expect(AppSockPath.resolve(environment: ["RACKY_APP_SOCK": "/x/y.sock", "HOME": "/h"]) == "/x/y.sock")
         #expect(AppSockPath.resolve(environment: ["HOME": "/h"]) == "/h/Library/Application Support/Racky/run/app.sock")
+        // Um RACKY_HOME isolado nunca cai no app.sock do app do dono.
+        #expect(AppSockPath.resolve(environment: ["RACKY_HOME": "/t/home", "HOME": "/h"]) == "/t/home/run/app.sock")
+        #expect(AppSockPath.resolve(environment: ["RACKY_APP_SOCK": "/x/y.sock", "RACKY_HOME": "/t/home"]) == "/x/y.sock")
     }
 }
