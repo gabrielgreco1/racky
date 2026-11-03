@@ -196,6 +196,21 @@ extension RackyStore {
         }
     }
 
+    /// `agent_id` do filho nativo -> computador que ele usou, de todos os filhos que chegaram a pegar um. A sidebar liga cada
+    /// subagente ao seu computador e às tabelas dele depois de reabrir o app (antes só vinha dos hooks ao vivo).
+    public func orchestrationAgentComputers() async throws -> [String: String] {
+        try await read { db in
+            var out: [String: String] = [:]
+            for row in try Row.fetchAll(db, sql: """
+                SELECT provider_agent_id, computer_name FROM orchestration_child
+                WHERE provider_agent_id IS NOT NULL AND computer_name IS NOT NULL
+                """) {
+                out[row["provider_agent_id"]] = row["computer_name"]
+            }
+            return out
+        }
+    }
+
     public func orchestrationChild(parentID: String, computerName: String) async throws -> OrchestrationChild? {
         try await read { db in
             try Row.fetchOne(

@@ -13737,7 +13737,7 @@
         }
       }
     },
-    "Now": {
+    "Doing now": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -13770,7 +13770,7 @@
         }
       }
     },
-    "no screen": {
+    "without a screen": {
       "extractionState": "manual",
       "localizations": {
         "en": {

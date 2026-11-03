@@ -517,7 +517,7 @@ enum SidebarProjector {
                     children: ((t.state == .running ? input.attention.statuses[t.id]?.children : nil).map { list in
                         list.map {
                             SubagentRowData(
-                                id: $0.agentID, title: $0.displayTitle, phase: $0.phase, startedAt: $0.startedAt, endedAt: $0.endedAt,
+                                id: $0.agentID, title: $0.title ?? input.agentComputers[$0.agentID] ?? $0.displayTitle, phase: $0.phase, startedAt: $0.startedAt, endedAt: $0.endedAt,
                                 subtitle: $0.subtitle, computer: input.agentComputers[$0.agentID])
                         }
                     } ?? []) + workers.filter { $0.launchSpec.workerParentTerminalID == t.id }.map { w in

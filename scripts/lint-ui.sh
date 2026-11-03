@@ -97,6 +97,13 @@ catalog_rule() {
     printf '%s\n' "$keys" | grep -qxF -- "$text" || bad+="$line"$'\n'
   done <<< "$lits"
   report strings "string de UI fora do String Catalog ($CATALOG_REL)" "${bad%$'\n'}"
+  # O Xcode gera um símbolo por chave e falha a build quando duas chaves só diferem na caixa ("Now"/"now"); o swift test não pega.
+  local clash
+  clash="$(python3 -c 'import json,sys,collections
+g=collections.defaultdict(list)
+for k in json.load(open(sys.argv[1])).get("strings",{}): g[k.lower()].append(k)
+print("\n".join(" / ".join(v) for v in g.values() if len(v)>1))' "$catalog")"
+  report strings "chaves do String Catalog que só diferem na caixa (o Xcode não compila)" "$clash"
 }
 
 run_rules() {
@@ -175,6 +182,7 @@ if [ "$SELF_TEST" = 1 ]; then
   expect string-missing-bad $U 'Text("Not in catalog")' fail
   expect string-in-catalog-ok $U 'Text("Hello", bundle: .module)' pass
   expect string-verbatim-ok $U 'Text(verbatim: "Not in catalog")' pass
+  expect catalog-case-clash-bad $U 'Text("Hello", bundle: .module)' fail '{"strings":{"Hello":{},"Now":{},"now":{}}}'
   expect comment-ignored $U '// Button("x") { } .sheet( List( is forbidden' pass
   [ "$fails" -eq 0 ] || { echo "lint-ui self-test: $fails falha(s)" >&2; exit 1; }
   echo "lint-ui self-test: OK"

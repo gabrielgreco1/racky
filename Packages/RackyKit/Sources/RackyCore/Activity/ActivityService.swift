@@ -96,6 +96,7 @@ public actor ActivityService {
         let changes = try DirectoryWatcher.changes(of: spoolDirectory)
         await drainSpool()
         await reconcile()
+        await restoreLiveRuns()
         _ = try? await store.pruneAgentEvents()
         watchTask = Task { [weak self] in
             for await _ in changes {
@@ -227,6 +228,21 @@ public actor ActivityService {
             } catch {
                 log.error("reconcile failed: \(error)")
             }
+        }
+    }
+
+    /// Refaz e publica o estado de cada agente vivo (subagentes inclusos) a partir dos eventos gravados: depois de reabrir o app,
+    /// a sidebar mostra os filhos de um orquestrador parado sem esperar o próximo evento dele.
+    public func restoreLiveRuns() async {
+        guard let live = try? await store.liveTerminalRuns() else { return }
+        for (runID, terminalID) in live {
+            await acquire()
+            defer { release() }
+            guard cache[runID] == nil, let stored = try? await store.agentEvents(runID: runID), !stored.isEmpty else { continue }
+            let provider: HookProvider = (try? await store.agentRun(id: runID))?.harness == .codex ? .codex : .claude
+            let state = Self.replay(stored)
+            remember(runID, Cached(state: state, lastAtNs: stored.last?.atNs ?? 0, provider: provider, terminalID: terminalID, touched: 0))
+            publish(runID: runID, terminalID: terminalID, state: state)
         }
     }
 

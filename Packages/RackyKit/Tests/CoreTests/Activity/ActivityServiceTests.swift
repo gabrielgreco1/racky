@@ -207,6 +207,24 @@ private func waitUntil(timeout: Duration = .seconds(5), _ condition: @escaping @
         #expect(try await store.terminal(id: terminal.id)?.lastMessage == "DONE")
         try await store.close()
     }
+
+    /// 03/11: depois de reabrir o app, um orquestrador parado aparecia sem nenhum subagente (os filhos só vinham do próximo hook).
+    @Test func reopeningTheAppRepublishesTheSubagentsOfALiveAgent() async throws {
+        let (home, store, first) = try await setup(); defer { home.remove() }
+        let run = UUID()
+        let terminal = try await home.seedTerminal(store, currentRunID: run)
+        for e in RealHooks.envelopes(try RealHooks.events(RealHooks.claudeSubagents), runID: run, paneID: terminal.id) { try await first.ingest(e) }
+        await first.stop()
+
+        let reopened = ActivityService(store: store, spoolDirectory: home.spoolDirectory)
+        #expect(try await store.liveTerminalRuns().map(\.run) == [run])
+        var iterator = reopened.updates.makeAsyncIterator()
+        await reopened.restoreLiveRuns()
+        let update = try #require(await iterator.next())
+        #expect(update.terminalID == terminal.id && update.runID == run)
+        #expect(update.children.count == 2 && update.children.allSatisfy { $0.phase == .done })
+        try await store.close()
+    }
 }
 
 @Suite struct SpoolIngestionTests {

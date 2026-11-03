@@ -21,7 +21,7 @@ struct SubagentDeliveredColumn: View {
         ScrollView {
             VStack(alignment: .leading, spacing: DS.Space.s6) {
                 VStack(alignment: .leading, spacing: DS.Space.s1) {
-                    label(String(localized: "Now", bundle: .module))
+                    label(String(localized: "Doing now", bundle: .module))
                     Text(verbatim: row?.snapshot.lastDoing ?? String(localized: "Nothing yet", bundle: .module))
                         .dsFont(DS.Font.small).foregroundStyle(DS.Color.textSecondary).lineLimit(4)
                     if let url = row?.snapshot.url {
@@ -71,7 +71,7 @@ struct SubagentDeliveredColumn: View {
     /// `com tela · sem proxy · ao vivo`
     private var facts: String {
         guard let snapshot = row?.snapshot else { return String(localized: "Off", bundle: .module) }
-        let screen = snapshot.display == "http" ? String(localized: "no screen", bundle: .module) : String(localized: "with screen", bundle: .module)
+        let screen = snapshot.display == "http" ? String(localized: "without a screen", bundle: .module) : String(localized: "with screen", bundle: .module)
         let proxy = snapshot.proxy == "direct" || snapshot.proxy.isEmpty ? String(localized: "no proxy", bundle: .module) : snapshot.proxy
         return [computer, screen, proxy].joined(separator: " · ")
     }

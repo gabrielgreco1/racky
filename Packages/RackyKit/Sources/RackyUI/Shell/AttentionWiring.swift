@@ -26,6 +26,10 @@ extension AppEnvironment {
         // F12: os hooks dos filhos nativos ligam cada slot de worker ao `agent_run` dele (S-08).
         if let orchestrator = orchestratorHolder.value {
             let model = computers.model
+            // Filhos de antes de reabrir o app: o hook ao vivo não volta, então o vínculo subagente -> computador vem do banco.
+            if let known = try? await store.orchestrationAgentComputers(), !known.isEmpty {
+                await MainActor.run { model.agentComputers.merge(known) { live, _ in live } }
+            }
             await service.setChildObserver { hook in
                 await orchestrator.scheduler.handleChildHook(
                     parentRunID: hook.parentRunID, event: hook.event, agentID: hook.agentID, mcpServer: hook.mcpServer)

@@ -239,6 +239,22 @@ extension RackyStore {
         }
     }
 
+    /// Execução atual de cada terminal de agente vivo: ao abrir o app, a sidebar refaz os subagentes dela a partir dos eventos
+    /// gravados (sem isso, um orquestrador parado mostrava a sessão sem nenhum filho até o próximo evento, 03/11).
+    public func liveTerminalRuns() async throws -> [(run: UUID, terminal: UUID)] {
+        try await read { db in
+            try Row.fetchAll(db, sql: """
+                SELECT t.current_run_id AS run, t.id AS terminal FROM terminal t
+                JOIN agent_run r ON r.id = t.current_run_id AND r.parent_run_id IS NULL
+                WHERE t.state IN ('running', 'launching')
+                """).compactMap { row in
+                    let run: String = row["run"], terminal: String = row["terminal"]
+                    guard let r = UUID(uuidString: run), let t = UUID(uuidString: terminal) else { return nil }
+                    return (r, t)
+                }
+        }
+    }
+
     /// Execuções principais cuja projeção ficou para trás dos eventos gravados (crash entre os dois passos) ou que estão esperando
     /// subagentes: refazer a projeção com o redutor atual cura esperas presas (um subagente parado sem `SubagentStop`).
     public func runsNeedingReconcile() async throws -> [UUID] {
