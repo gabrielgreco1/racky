@@ -125,8 +125,12 @@ public struct DatasetSummary: Sendable, Equatable, Identifiable {
     public var dataset: Dataset
     public var rowCount: Int
     public var invalidCount: Int
+    /// Computador que gravou as linhas (o de mais linhas, se houver mais de um): a sidebar põe a tabela dentro do subagente dele.
+    public var computer: String?
     public var id: String { dataset.id }
-    public init(dataset: Dataset, rowCount: Int, invalidCount: Int) { self.dataset = dataset; self.rowCount = rowCount; self.invalidCount = invalidCount }
+    public init(dataset: Dataset, rowCount: Int, invalidCount: Int, computer: String? = nil) {
+        self.dataset = dataset; self.rowCount = rowCount; self.invalidCount = invalidCount; self.computer = computer
+    }
 }
 
 public enum DatasetRowFilter: String, Sendable, CaseIterable {
@@ -203,11 +207,13 @@ extension RackyStore {
             try Row.fetchAll(
                 db,
                 sql: """
-                SELECT d.*, COUNT(r.row_key) AS row_count, COALESCE(SUM(1 - r.valid), 0) AS invalid_count FROM dataset d
+                SELECT d.*, COUNT(r.row_key) AS row_count, COALESCE(SUM(1 - r.valid), 0) AS invalid_count,
+                  (SELECT c.computer FROM dataset_row c WHERE c.dataset_id = d.id AND c.computer IS NOT NULL
+                   GROUP BY c.computer ORDER BY COUNT(*) DESC LIMIT 1) AS computer FROM dataset d
                 LEFT JOIN dataset_row r ON r.dataset_id = d.id
                 WHERE (?1 IS NULL OR d.session_id = ?1) GROUP BY d.id ORDER BY d.updated_at DESC, d.id DESC
                 """, arguments: [session]
-            ).map { DatasetSummary(dataset: try Dataset(row: $0), rowCount: $0["row_count"], invalidCount: $0["invalid_count"]) }
+            ).map { DatasetSummary(dataset: try Dataset(row: $0), rowCount: $0["row_count"], invalidCount: $0["invalid_count"], computer: $0["computer"]) }
         }
     }
 
@@ -217,11 +223,13 @@ extension RackyStore {
             try Row.fetchOne(
                 db,
                 sql: """
-                SELECT d.*, COUNT(r.row_key) AS row_count, COALESCE(SUM(1 - r.valid), 0) AS invalid_count FROM dataset d
+                SELECT d.*, COUNT(r.row_key) AS row_count, COALESCE(SUM(1 - r.valid), 0) AS invalid_count,
+                  (SELECT c.computer FROM dataset_row c WHERE c.dataset_id = d.id AND c.computer IS NOT NULL
+                   GROUP BY c.computer ORDER BY COUNT(*) DESC LIMIT 1) AS computer FROM dataset d
                 LEFT JOIN dataset_row r ON r.dataset_id = d.id
                 WHERE d.id = ?1 GROUP BY d.id
                 """, arguments: [id]
-            ).map { DatasetSummary(dataset: try Dataset(row: $0), rowCount: $0["row_count"], invalidCount: $0["invalid_count"]) }
+            ).map { DatasetSummary(dataset: try Dataset(row: $0), rowCount: $0["row_count"], invalidCount: $0["invalid_count"], computer: $0["computer"]) }
         }
     }
 

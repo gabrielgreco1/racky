@@ -41,6 +41,9 @@ extension ActionID {
     public static let sessionSetSubagentComputers = ActionID(unchecked: "session.setSubagentComputers")
     public static let sessionSetSubagentHarness = ActionID(unchecked: "session.setSubagentHarness")
     public static let agentToggleChildren = ActionID(unchecked: "agent.toggleChildren")
+    public static let subagentToggleDetails = ActionID(unchecked: "subagent.toggleDetails")
+    public static let agentToggleFinished = ActionID(unchecked: "agent.toggleFinished")
+    public static let sessionToggleTables = ActionID(unchecked: "session.toggleTables")
     public static let sessionRestartToApply = ActionID(unchecked: "session.restartToApply")
     public static let projectCloneFromGitHub = ActionID(unchecked: "project.cloneFromGitHub")
     public static let sidebarSortFilter = ActionID(unchecked: "sidebar.sortFilter")
@@ -575,6 +578,9 @@ extension ActionID {
         ActionSpec(id: ActionID(unchecked: "session.setSubagentComputers"), label: "Subagent computers (card, header do pane)", shortcut: "", slice: .slice3),
         ActionSpec(id: ActionID(unchecked: "session.setSubagentHarness"), label: "Subagents run as (card, header do pane)", shortcut: "", slice: .slice3),
         ActionSpec(id: ActionID(unchecked: "agent.toggleChildren"), label: "Collapse / Expand Subagents (chevron da linha do agente)", shortcut: "", slice: .slice3),
+        ActionSpec(id: ActionID(unchecked: "subagent.toggleDetails"), label: "Show / Hide Subagent Details (setinha da linha do subagente)", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agent.toggleFinished"), label: "Show / Hide Finished Subagents", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "session.toggleTables"), label: "Show / Hide Session Tables", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "session.restartToApply"), label: "Restart to apply", shortcut: "", slice: .slice3),
         ActionSpec(id: ActionID(unchecked: "project.cloneFromGitHub"), label: "Clone from GitHub…", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "sidebar.sortFilter"), label: "Sort and Filter", shortcut: "", slice: .slice1),

@@ -99,4 +99,27 @@ import Testing
         model.toggleChildren(terminal: a)
         #expect(model.collapsedChildren == [b])
     }
+
+    /// v6 (03/11): a setinha do subagente, "N finished" e "N tables" abrem e fecham pelo registro de ações (automação e clique).
+    @Test func theV6TogglesOpenAndCloseThroughTheRegistry() async throws {
+        let model = SidebarModel()
+        let env = AppEnvironment(environment: [:])
+        let registry = ActionRegistry(flags: env.flags, surface: WindowAutomation(store: UIElementStore(), flags: env.flags, fixture: nil, automationEnabled: false))
+        try model.registerActions(in: registry)
+        let terminal = UUID(), session = UUID()
+        #expect(try await registry.perform(.subagentToggleDetails, .select("\(terminal.uuidString)/a1")).message == "expanded")
+        #expect(model.expandedSubagents.contains(SidebarModel.subagentKey(terminal: terminal, child: "a1")))
+        #expect(try await registry.perform(.subagentToggleDetails, .select("\(terminal.uuidString)/a1")).message == "collapsed")
+        #expect(try await registry.perform(.agentToggleFinished, .select(terminal.uuidString)).message == "expanded")
+        #expect(model.shownFinished == [terminal])
+        #expect(try await registry.perform(.sessionToggleTables, .select(session.uuidString)).message == "expanded")
+        #expect(try await registry.perform(.sessionToggleTables, .select(session.uuidString)).message == "collapsed")
+        await #expect(throws: (any Error).self) { try await registry.perform(.subagentToggleDetails, .select("not-a-pair")) }
+    }
+
+    @Test func insideASubagentTheTableDropsTheComputerPrefix() {
+        #expect(SubagentDeliveredColumn.shortName("wi-milwaukee-us_silver-permits", computer: "wi-milwaukee") == "us_silver-permits")
+        #expect(SubagentDeliveredColumn.shortName("permits", computer: "wi-milwaukee") == "permits")
+        #expect(SubagentDeliveredColumn.shortName("wi-milwaukee-", computer: "wi-milwaukee") == "wi-milwaukee-")
+    }
 }

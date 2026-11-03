@@ -257,11 +257,15 @@ struct SessionCardView: View {
             if !data.computers.isEmpty, !data.agentsCollapsed {
                 computerRows
             }
-            // As tabelas que a sessão coletou: um clique abre como tab da sessão (o mesmo nível do agente e dos computadores).
-            let tables = model.sessionDatasets(data.id)
+            // v6: as tabelas de um subagente ficam dentro dele; aqui só as sem dono, numa linha "N tables" que abre com um clique.
+            let owned = Set(data.agentRows.flatMap(\.children).compactMap(\.computer))
+            let tables = model.sessionDatasets(data.id).filter { $0.computer.map { !owned.contains($0) } ?? true }
             if !tables.isEmpty, !data.agentsCollapsed {
                 VStack(alignment: .leading, spacing: 0) {
-                    ForEach(tables) { SessionDatasetRowView(sessionID: data.id, row: $0) }
+                    looseTablesToggle(count: tables.count)
+                    if model.shownLooseTables.contains(data.id) {
+                        ForEach(tables) { SessionDatasetRowView(sessionID: data.id, row: $0) }
+                    }
                 }
                 .padding(.leading, agentIndent - SidebarMetrics.agentRowPaddingH)
             }
@@ -516,6 +520,26 @@ struct SessionCardView: View {
         }
     }
 
+    private func looseTablesToggle(count: Int) -> some View {
+        let open = model.shownLooseTables.contains(data.id)
+        return ActionButton(.sessionToggleTables, id: .sidebarSessionTables(data.id.uuidString), argument: .select(data.id.uuidString)) {
+            HStack(spacing: DS.Space.s1) {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: SidebarMetrics.chevron - DS.Space.s0_5, weight: .medium))
+                    .rotationEffect(.degrees(open ? 90 : 0))
+                    .frame(width: SubagentMetrics.toggleBox)
+                (count == 1 ? Text("1 table", bundle: .module) : Text("\(count) tables", bundle: .module)).dsFont(DS.Font.small)
+                Spacer(minLength: .zero)
+            }
+            .foregroundStyle(DS.Color.textTertiary)
+            .padding(.horizontal, SidebarMetrics.agentRowPaddingH)
+            .frame(height: SidebarMetrics.agentRowHeight)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityValue(Text(verbatim: open ? "expanded" : "collapsed"))
+    }
+
     private var groupedRow: some View {
         Text("+\(data.groupedTerminals) terminals", bundle: .module)
             .dsFont(DS.Font.small)
@@ -598,9 +622,18 @@ struct AgentRowView: View {
                 HumanControlLine(computer: held, controlID: .sidebarSessionAgentControl(sid, tid), handBackID: .sidebarSessionAgentHandBack(sid, tid))
             }
             if !row.children.isEmpty, !row.childrenCollapsed {
+                let tables = model.sessionDatasets(row.sessionID)
+                let active = row.children.filter { $0.phase != .done }
+                let finished = row.children.filter { $0.phase == .done }
+                // v6: quem terminou fica numa linha "N finished" (abre com um clique); se ninguém mais trabalha, aparecem direto.
+                let foldFinished = !active.isEmpty && !finished.isEmpty
                 VStack(alignment: .leading, spacing: 0) {
-                    ForEach(row.children) { child in
-                        SubagentRowView(sessionID: row.sessionID, terminalID: row.id, child: child)
+                    ForEach(active) { child in subagentRow(child, tables: tables) }
+                    if foldFinished {
+                        finishedToggle(count: finished.count)
+                    }
+                    if !foldFinished || model.shownFinished.contains(row.id) {
+                        ForEach(finished) { child in subagentRow(child, tables: tables) }
                     }
                 }
                 .padding(.leading, SidebarMetrics.statusColumn)
@@ -609,6 +642,31 @@ struct AgentRowView: View {
         }
         .animation(MotionPolicy.shared.animation(MotionTokens.Springs.snappy), value: row.children.map(\.id))
         .animation(MotionPolicy.shared.animation(MotionTokens.Springs.snappy), value: row.childrenCollapsed)
+    }
+
+    private func subagentRow(_ child: SubagentRowData, tables: [SessionDatasetRow]) -> some View {
+        SubagentRowView(
+            model: model, sessionID: row.sessionID, terminalID: row.id, provider: row.provider, child: child,
+            tables: child.computer.map { computer in tables.filter { $0.computer == computer } } ?? [])
+    }
+
+    private func finishedToggle(count: Int) -> some View {
+        let open = model.shownFinished.contains(row.id)
+        return ActionButton(.agentToggleFinished, id: .sidebarSessionAgentFinished(row.sessionID.uuidString, row.id.uuidString), argument: .select(row.id.uuidString)) {
+            HStack(spacing: DS.Space.s1) {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: SidebarMetrics.chevron - DS.Space.s0_5, weight: .medium))
+                    .rotationEffect(.degrees(open ? 90 : 0))
+                    .frame(width: SubagentMetrics.toggleBox)
+                Text("\(count) finished", bundle: .module).dsFont(DS.Font.small)
+                Spacer(minLength: .zero)
+            }
+            .foregroundStyle(DS.Color.textTertiary)
+            .frame(height: SidebarMetrics.agentRowHeight)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityValue(Text(verbatim: open ? "expanded" : "collapsed"))
     }
 }
 
@@ -648,18 +706,26 @@ struct SummaryPillView: View {
 struct SessionDatasetRowView: View {
     let sessionID: UUID
     let row: SessionDatasetRow
+    var id: A11yID?
+    /// Dentro do subagente, o nome sem o prefixo do computador (`wi-milwaukee-us_silver-permits` → `us_silver-permits`).
+    var stripPrefix: String?
     @State private var hovering = false
+
+    private var shownName: String {
+        guard let prefix = stripPrefix.map({ $0 + "-" }), row.name.hasPrefix(prefix), row.name.count > prefix.count else { return row.name }
+        return String(row.name.dropFirst(prefix.count))
+    }
 
     var body: some View {
         ActionButton(
-            .datasetOpen, id: .sidebarSessionDataset(sessionID.uuidString, row.id), argument: .select(row.id),
+            .datasetOpen, id: id ?? .sidebarSessionDataset(sessionID.uuidString, row.id), argument: .select(row.id),
             tooltip: String(localized: "Open the table in a tab", bundle: .module)
         ) {
             HStack(spacing: SidebarMetrics.agentRowGap) {
                 Image(systemName: "tablecells")
                     .font(.system(size: SidebarMetrics.line2Icon + DS.Space.s0_5))
                     .foregroundStyle(DS.Color.dataValid)
-                Text(verbatim: row.name).dsFont(DS.Font.small).foregroundStyle(DS.Color.textSecondary).lineLimit(1).help(row.name)
+                Text(verbatim: shownName).dsFont(DS.Font.small).foregroundStyle(DS.Color.textSecondary).lineLimit(1).help(row.name)
                 Spacer(minLength: DS.Space.s1)
                 Text(verbatim: row.rows.formatted()).dsFont(DS.Font.microNumeric).foregroundStyle(DS.Color.textTertiary).fixedSize()
             }

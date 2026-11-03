@@ -1071,6 +1071,11 @@ extension A11yID {
         A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).agent.\(A11yID.segment(terminalId)).handBack")
     }
 
+    /// `sidebar.session.<id>.agent.<terminalId>.finished`
+    public static func sidebarSessionAgentFinished(_ id: String, _ terminalId: String) -> A11yID {
+        A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).agent.\(A11yID.segment(terminalId)).finished")
+    }
+
     /// `sidebar.session.<id>.child.<childId>`
     public static func sidebarSessionChild(_ id: String, _ childId: String) -> A11yID {
         A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).child.\(A11yID.segment(childId))")
@@ -1126,9 +1131,29 @@ extension A11yID {
         A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).child.\(A11yID.segment(childId)).handBack")
     }
 
+    /// `sidebar.session.<id>.child.<childId>.toggle`
+    public static func sidebarSessionChildToggle(_ id: String, _ childId: String) -> A11yID {
+        A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).child.\(A11yID.segment(childId)).toggle")
+    }
+
+    /// `sidebar.session.<id>.child.<childId>.computer`
+    public static func sidebarSessionChildComputer(_ id: String, _ childId: String) -> A11yID {
+        A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).child.\(A11yID.segment(childId)).computer")
+    }
+
+    /// `sidebar.session.<id>.child.<childId>.dataset.<datasetId>`
+    public static func sidebarSessionChildDataset(_ id: String, _ childId: String, _ datasetId: String) -> A11yID {
+        A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).child.\(A11yID.segment(childId)).dataset.\(A11yID.segment(datasetId))")
+    }
+
     /// `sidebar.session.<id>.dataset.<datasetId>`
     public static func sidebarSessionDataset(_ id: String, _ datasetId: String) -> A11yID {
         A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).dataset.\(A11yID.segment(datasetId))")
+    }
+
+    /// `sidebar.session.<id>.tables`
+    public static func sidebarSessionTables(_ id: String) -> A11yID {
+        A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).tables")
     }
 
     /// `sidebar.pending.<id>`
@@ -1179,6 +1204,16 @@ extension A11yID {
     /// `pane.<id>.header`
     public static func paneHeader(_ id: String) -> A11yID {
         A11yID(unchecked: "pane.\(A11yID.segment(id)).header")
+    }
+
+    /// `pane.<id>.delivered`
+    public static func paneDelivered(_ id: String) -> A11yID {
+        A11yID(unchecked: "pane.\(A11yID.segment(id)).delivered")
+    }
+
+    /// `pane.<id>.delivered.<datasetId>`
+    public static func paneDeliveredWithIdDatasetId(_ id: String, _ datasetId: String) -> A11yID {
+        A11yID(unchecked: "pane.\(A11yID.segment(id)).delivered.\(A11yID.segment(datasetId))")
     }
 
     /// `pane.<id>.status`
@@ -2168,6 +2203,7 @@ extension A11yID {
         A11yIDSpec(pattern: "sidebar.session.<id>.agent.<terminalId>.children.toggle", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.agent.<terminalId>.control", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.agent.<terminalId>.handBack", surface: "Sidebar"),
+        A11yIDSpec(pattern: "sidebar.session.<id>.agent.<terminalId>.finished", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.status", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.glyph", surface: "Sidebar"),
@@ -2179,7 +2215,11 @@ extension A11yID {
         A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.openViewer", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.control", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.handBack", surface: "Sidebar"),
+        A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.toggle", surface: "Sidebar"),
+        A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.computer", surface: "Sidebar"),
+        A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.dataset.<datasetId>", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.dataset.<datasetId>", surface: "Sidebar"),
+        A11yIDSpec(pattern: "sidebar.session.<id>.tables", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.pending.<id>", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.pending.<id>.cancel", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.cleanSessions", surface: "Sidebar"),
@@ -2202,6 +2242,8 @@ extension A11yID {
         A11yIDSpec(pattern: "pane.<id>", surface: "Panes"),
         A11yIDSpec(pattern: "pane.<id>.terminal", surface: "Panes"),
         A11yIDSpec(pattern: "pane.<id>.header", surface: "Panes"),
+        A11yIDSpec(pattern: "pane.<id>.delivered", surface: "Panes"),
+        A11yIDSpec(pattern: "pane.<id>.delivered.<datasetId>", surface: "Panes"),
         A11yIDSpec(pattern: "pane.<id>.status", surface: "Panes"),
         A11yIDSpec(pattern: "pane.<id>.splitRight", surface: "Panes"),
         A11yIDSpec(pattern: "pane.<id>.splitDown", surface: "Panes"),

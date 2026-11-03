@@ -35,6 +35,20 @@ final class SidebarModel {
     private(set) var collapsedSessions: Set<UUID> = []
     private(set) var expandedSummaries: Set<UUID> = []
     private(set) var collapsedChildren: Set<UUID> = []
+    /// v6: subagentes abertos na barra (computador + tabelas dele); chave `<terminal>/<child>`. Só desta execução.
+    private(set) var expandedSubagents: Set<String> = []
+    /// v6: agentes com a linha "N finished" aberta (subagentes que já terminaram).
+    private(set) var shownFinished: Set<UUID> = []
+    /// v6: sessões com as tabelas sem subagente abertas.
+    private(set) var shownLooseTables: Set<UUID> = []
+
+    static func subagentKey(terminal: UUID, child: String) -> String { "\(terminal.uuidString)/\(child)" }
+    func toggleSubagent(terminal: UUID, child: String) {
+        let key = Self.subagentKey(terminal: terminal, child: child)
+        if expandedSubagents.remove(key) == nil { expandedSubagents.insert(key) }
+    }
+    func toggleFinished(terminal: UUID) { if shownFinished.remove(terminal) == nil { shownFinished.insert(terminal) } }
+    func toggleLooseTables(session: UUID) { if shownLooseTables.remove(session) == nil { shownLooseTables.insert(session) } }
     private(set) var selectedSession: UUID? {
         didSet { if oldValue != selectedSession { onSelectionChange?(selectedSession) } }
     }
@@ -550,4 +564,6 @@ struct SessionDatasetRow: Identifiable, Equatable {
     let id: String
     let name: String
     let rows: Int
+    /// Computador que gravou a tabela: ela aparece dentro do subagente dono dele (v6).
+    var computer: String? = nil
 }

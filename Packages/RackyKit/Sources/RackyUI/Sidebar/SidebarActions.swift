@@ -136,6 +136,25 @@ extension SidebarModel {
             toggleChildren(terminal: id)
             return collapsedChildren.contains(id) ? "collapsed" : "expanded"
         }
+        // v6: setinha do subagente (computador e tabelas na barra), "N finished" e "N tables".
+        try registry.register(.subagentToggleDetails) { [unowned self] arg in
+            let parts = (arg.value ?? "").split(separator: "/", maxSplits: 1).map(String.init)
+            guard parts.count == 2, let terminal = UUID(uuidString: parts[0]) else {
+                throw ActionError.failed(.subagentToggleDetails, message: "expected select(<terminalId>/<childId>)")
+            }
+            toggleSubagent(terminal: terminal, child: parts[1])
+            return expandedSubagents.contains(Self.subagentKey(terminal: terminal, child: parts[1])) ? "expanded" : "collapsed"
+        }
+        try registry.register(.agentToggleFinished) { [unowned self] arg in
+            let id = try uuid(arg, .agentToggleFinished)
+            toggleFinished(terminal: id)
+            return shownFinished.contains(id) ? "expanded" : "collapsed"
+        }
+        try registry.register(.sessionToggleTables) { [unowned self] arg in
+            let id = try uuid(arg, .sessionToggleTables)
+            toggleLooseTables(session: id)
+            return shownLooseTables.contains(id) ? "expanded" : "collapsed"
+        }
         try registry.register(.sessionRename) { [unowned self] arg in
             switch arg.kind {
             case .set:

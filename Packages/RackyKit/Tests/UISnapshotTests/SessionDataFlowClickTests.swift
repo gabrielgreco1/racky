@@ -189,6 +189,9 @@ import Testing
         await rig.env.datasets.reloadList()
         await VisualBatchTests.settle(400)
         let session = try #require(rig.env.workspace.currentSessionID)
+        // v6: as tabelas sem subagente ficam numa linha "N tables" que abre com um clique.
+        try click(rig, .sidebarSessionTables(session.uuidString))
+        await VisualBatchTests.settle(300)
         try click(rig, .sidebarSessionDataset(session.uuidString, rig.datasetID))
         await VisualBatchTests.settle(500)
         let active = try #require(rig.env.workspace.activeTab)

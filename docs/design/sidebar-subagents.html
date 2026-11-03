@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subagente em aba</title>
+<style>
+  :root {
+    --canvas: #0e0f11; --sidebar: #141518; --selected: #23252a; --hover: rgba(35,37,42,.55);
+    --t1: #ecedef; --t2: #a4a7ae; --t3: rgba(164,167,174,.62); --t4: rgba(164,167,174,.4);
+    --line: rgba(255,255,255,.07); --blue: #8ab4ff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #08090a; color: var(--t1); font: 13.5px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
+  .page { max-width: 1240px; margin: 0 auto; padding: 28px 16px 60px; }
+  p.lead { color: var(--t2); max-width: 780px; margin: 0 0 18px; font-size: 14px; }
+
+  .win { display: flex; height: 760px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--canvas); }
+
+  /* barra */
+  .side { width: 268px; flex: none; background: var(--sidebar); padding: 14px 10px; display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
+  .nav { display: flex; align-items: center; gap: 10px; padding: 6px 10px; color: var(--t2); border-radius: 8px; }
+  .nav .i { width: 16px; color: var(--t3); text-align: center; }
+  .sp { height: 14px; }
+  .label { color: var(--t4); font-size: 12px; padding: 4px 10px; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; color: var(--t1); white-space: nowrap; }
+  .row:hover { background: var(--hover); }
+  .row.sel { background: var(--selected); }
+  .row .t { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .row .m { color: var(--t4); font-size: 12px; }
+  .row.dim .t { color: var(--t2); }
+  .kid { padding-left: 34px; }
+  .st { width: 14px; height: 14px; flex: none; display: grid; place-items: center; }
+  .st.spin { border-radius: 50%; border: 2px solid var(--t4); border-top-color: var(--t1); }
+  .st.blue::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+  .st.done::after { content: "✓"; color: var(--t3); font-size: 11px; }
+  .st.idle::after { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--t4); }
+  .fold { color: var(--t4); font-size: 12px; padding: 5px 10px 5px 34px; }
+  .logo { width: 16px; height: 16px; flex: none; border-radius: 4px; }
+  .chev { width: 10px; flex: none; color: var(--t4); font-size: 9px; text-align: center; }
+  .kid { padding-left: 22px; }
+  .row .stt { width: 12px; height: 12px; flex: none; display: grid; place-items: center; }
+  .row .stt.spin { border-radius: 50%; border: 1.6px solid var(--t4); border-top-color: var(--t1); }
+  .row .stt.blue::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+  .row .stt.done::after { content: "✓"; color: var(--t3); font-size: 10px; }
+  .open { padding: 2px 6px 6px 62px; }
+  .vm { display: flex; align-items: center; gap: 8px; padding: 4px 4px; border-radius: 6px; color: var(--t2); font-size: 12.5px; }
+  .vm .scr { width: 40px; height: 24px; border-radius: 4px; border: 1px solid var(--line); background: #1b1c20; flex: none; position: relative; overflow: hidden; }
+  .vm .scr::before { content: ""; position: absolute; inset: 4px 5px auto; height: 3px; background: rgba(255,255,255,.12); border-radius: 2px; }
+  .vm .scr::after { content: ""; position: absolute; inset: 10px 5px 4px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0 6px, transparent 6px 8px); }
+  .vm .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vm .m { color: var(--t4); font-size: 11.5px; }
+  .ds { display: flex; align-items: center; gap: 8px; padding: 3px 4px; color: var(--t2); font-size: 12.5px; border-radius: 6px; }
+  .ds .ic { width: 14px; text-align: center; color: var(--t4); font-size: 11px; flex: none; }
+  .ds .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ds .m { color: var(--t4); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+
+  /* centro */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .tabs { display: flex; gap: 2px; padding: 8px 10px 0; border-bottom: 1px solid var(--line); }
+  .tab { padding: 7px 14px; color: var(--t3); border-radius: 8px 8px 0 0; white-space: nowrap; font-size: 13px; }
+  .tab.on { color: var(--t1); background: var(--sidebar); }
+  .body { flex: 1; overflow: hidden; padding: 22px 26px; display: flex; flex-direction: column; gap: 18px; }
+  .top { display: flex; align-items: center; gap: 12px; }
+  .top .who { font-size: 19px; font-weight: 600; }
+  .top .what { color: var(--t2); }
+  .top .grow { flex: 1; }
+  .btn { padding: 5px 12px; border-radius: 7px; border: 1px solid var(--line); color: var(--t1); font-size: 12.5px; }
+  .grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; flex: 1; min-height: 0; }
+  .screen { border-radius: 10px; border: 1px solid var(--line); background: #17181b; position: relative; overflow: hidden; min-height: 300px; }
+  .screen .bar { height: 30px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; padding: 0 12px; color: var(--t3); font-size: 12px; }
+  .screen .bar .url { flex: 1; background: rgba(255,255,255,.04); border-radius: 5px; padding: 2px 8px; }
+  .screen .pg { position: absolute; inset: 44px 16px 16px; display: grid; grid-template-rows: 18px 12px 1fr; gap: 10px; }
+  .screen .pg i { background: rgba(255,255,255,.06); border-radius: 4px; display: block; }
+  .screen .pg i:nth-child(2) { width: 60%; }
+  .screen .tbl { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; align-content: start; }
+  .screen .tbl i { height: 14px; }
+  .facts { color: var(--t3); font-size: 12px; display: flex; gap: 14px; margin-top: 8px; }
+  .side2 { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .list .h { color: var(--t3); font-size: 12px; margin-bottom: 6px; }
+  .li { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .li .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .li .n { color: var(--t3); font-variant-numeric: tabular-nums; }
+  .log .li { color: var(--t2); font-size: 12.5px; }
+  .log .li .n { width: 44px; flex: none; }
+
+  .notes { margin-top: 26px; max-width: 780px; color: var(--t2); font-size: 13.5px; }
+  .notes p { margin: 0 0 10px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<p class="lead">A barra vira uma lista limpa, uma linha por sessão e uma por subagente, só com nome, estado e tempo. Tudo do subagente sai da barra e vai pra aba dele no centro. A ideia que é só do Racky: cada subagente é alguém trabalhando num computador, e a aba dele mostra esse computador, o que ele está fazendo e o que já entregou.</p>
+
+<div class="win">
+  <div class="side">
+    <div class="nav"><span class="i">⌕</span>Search</div>
+    <div class="nav"><span class="i">▢</span>Sessions</div>
+    <div class="nav"><span class="i">▭</span>Computers</div>
+    <div class="nav"><span class="i">▦</span>Data</div>
+    <div class="nav"><span class="i">▤</span>Library</div>
+    <div class="sp"></div>
+    <div class="label">rti-platform</div>
+    <div class="row"><span class="chev">▾</span><img class="logo" src="logos/claude@2x.png" alt=""><span class="t">steady-kettle</span><span class="stt spin"></span><span class="m">17h</span></div>
+    <div class="row kid"><span class="chev">▸</span><img class="logo" src="logos/claude@2x.png" alt=""><span class="t">QA Salt Lake City</span><span class="stt blue"></span></div>
+    <div class="row kid sel"><span class="chev">▾</span><img class="logo" src="logos/claude@2x.png" alt=""><span class="t">Builder Milwaukee</span><span class="stt spin"></span><span class="m">14h</span></div>
+    <div class="open">
+      <div class="vm"><span class="scr"></span><span class="t">wi-milwaukee</span><span class="m">ao vivo</span></div>
+      <div class="ds"><span class="ic">▦</span><span class="t">silver permits</span><span class="m">430</span></div>
+      <div class="ds"><span class="ic">▦</span><span class="t">bronze, 3 tabelas</span><span class="m">2.285</span></div>
+    </div>
+    <div class="row kid"><span class="chev">▸</span><img class="logo" src="logos/claude@2x.png" alt=""><span class="t">QA Memphis a</span><span class="stt spin"></span><span class="m">1m</span></div>
+    <div class="row kid"><span class="chev">▸</span><img class="logo" src="logos/codex@2x.png" alt=""><span class="t">QA Memphis b</span><span class="stt spin"></span><span class="m">1m</span></div>
+    <div class="fold">2 terminaram</div>
+    <div class="sp"></div>
+    <div class="row dim"><span class="chev">▸</span><img class="logo" src="logos/codex@2x.png" alt=""><span class="t">windy-pebble</span><span class="stt done"></span><span class="m">2d</span></div>
+    <div class="row dim"><span class="chev">▸</span><img class="logo" src="logos/opencode@2x.png" alt=""><span class="t">amber-iris</span><span class="m">3d</span></div>
+    <div class="sp"></div>
+    <div class="label">agent-box</div>
+    <div class="row dim"><span class="chev">▸</span><img class="logo" src="logos/claude@2x.png" alt=""><span class="t">load-test</span><span class="m">11h</span></div>
+  </div>
+
+  <div class="main">
+    <div class="tabs">
+      <div class="tab">✳ steady-kettle</div>
+      <div class="tab on">Builder Milwaukee</div>
+      <div class="tab">ut-salt-lake-city_silver…</div>
+    </div>
+    <div class="body">
+      <div class="top">
+        <span class="st spin"></span>
+        <span class="who">Builder Milwaukee</span>
+        <span class="what">refazendo o override e o backfill</span>
+        <span class="grow"></span>
+        <span class="btn">Assumir a tela</span>
+        <span class="btn">Parar</span>
+      </div>
+      <div class="grid">
+        <div>
+          <div class="screen">
+            <div class="bar"><span class="url">aca-prod.accela.com/MILWAUKEE/Cap/CapHome.aspx</span></div>
+            <div class="pg"><i></i><i></i><div class="tbl"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+          </div>
+          <div class="facts"><span>wi-milwaukee</span><span>com tela</span><span>1,9 GB</span><span>sem proxy</span></div>
+        </div>
+        <div class="side2">
+          <div class="list">
+            <div class="h">Entregou</div>
+            <div class="li"><span class="t">silver permits</span><span class="n">430</span></div>
+            <div class="li"><span class="t">bronze, 3 tabelas</span><span class="n">2.285</span></div>
+            <div class="li"><span class="t">PR ainda não aberto</span><span class="n"></span></div>
+          </div>
+          <div class="list log">
+            <div class="h">Agora</div>
+            <div class="li"><span class="n">13:02</span><span class="t">rodando o backfill de 2019 a 2021</span></div>
+            <div class="li"><span class="n">12:48</span><span class="t">override novo pros tipos de permit</span></div>
+            <div class="li"><span class="n">12:31</span><span class="t">smoke passou, 430 linhas válidas</span></div>
+            <div class="li"><span class="n">11:10</span><span class="t">QA pediu o override de novo</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notes">
+  <p>Na barra, uma linha por sessão e por subagente: o logo da AI que roda ali (Claude, Codex ou OpenCode, os mesmos ícones do app), o nome, o estado à direita e o tempo. O QA Memphis b aparece como Codex só pra mostrar uma sessão mista.</p>
+  <p>A setinha expande o subagente ali mesmo: aparece o computador dele (miniatura pequena da tela e se está ao vivo ou desligado) e os dados que ele criou, com o número de linhas. Clicar no computador abre a tela; clicar num dataset abre a tabela. Fechado, ele volta a ser uma linha só. Os que terminaram somem numa linha "2 terminaram", que abre se clicar.</p>
+  <p>Clicar num subagente abre a aba dele ao lado do terminal do orquestrador: em cima, o que ele está fazendo e os botões; à esquerda, o computador ao vivo (ou "desligado", se já acabou); à direita, o que ele entregou (datasets, PR) e as últimas linhas do diário dele. Clicar num dataset abre a tabela numa aba, igual hoje.</p>
+  <p>Pedido de computador ("QA Salt Lake City" com o ponto azul) abre a aba dele com Allow e Deny no topo.</p>
+</div>
+
+</div>
+</body>
+</html>

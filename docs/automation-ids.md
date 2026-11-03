@@ -85,6 +85,7 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 - `sidebar.session.<id>.agent.<terminalId>.children.toggle`
 - `sidebar.session.<id>.agent.<terminalId>.control`
 - `sidebar.session.<id>.agent.<terminalId>.handBack`
+- `sidebar.session.<id>.agent.<terminalId>.finished`
 - `sidebar.session.<id>.child.<childId>`
 - `sidebar.session.<id>.child.<childId>.status`
 - `sidebar.session.<id>.child.<childId>.glyph`
@@ -96,7 +97,11 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 - `sidebar.session.<id>.child.<childId>.openViewer`
 - `sidebar.session.<id>.child.<childId>.control`
 - `sidebar.session.<id>.child.<childId>.handBack`
+- `sidebar.session.<id>.child.<childId>.toggle`
+- `sidebar.session.<id>.child.<childId>.computer`
+- `sidebar.session.<id>.child.<childId>.dataset.<datasetId>`
 - `sidebar.session.<id>.dataset.<datasetId>`
+- `sidebar.session.<id>.tables`
 - `sidebar.pending.<id>`
 - `sidebar.pending.<id>.cancel`
 - `sidebar.cleanSessions`
@@ -125,6 +130,8 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 - `pane.<id>`
 - `pane.<id>.terminal`
 - `pane.<id>.header`
+- `pane.<id>.delivered`
+- `pane.<id>.delivered.<datasetId>`
 - `pane.<id>.status`
 - `pane.<id>.splitRight`
 - `pane.<id>.splitDown`
@@ -809,6 +816,9 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 | `session.setSubagentComputers` | Subagent computers (card, header do pane) | — | slice3 |
 | `session.setSubagentHarness` | Subagents run as (card, header do pane) | — | slice3 |
 | `agent.toggleChildren` | Collapse / Expand Subagents (chevron da linha do agente) | — | slice3 |
+| `subagent.toggleDetails` | Show / Hide Subagent Details (setinha da linha do subagente) | — | slice1 |
+| `agent.toggleFinished` | Show / Hide Finished Subagents | — | slice1 |
+| `session.toggleTables` | Show / Hide Session Tables | — | slice1 |
 | `session.restartToApply` | Restart to apply | — | slice3 |
 | `project.cloneFromGitHub` | Clone from GitHub… | — | slice1 |
 | `sidebar.sortFilter` | Sort and Filter | — | slice1 |

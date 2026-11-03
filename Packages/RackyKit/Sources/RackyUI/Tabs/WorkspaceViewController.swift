@@ -270,8 +270,9 @@ final class WorkspaceViewController: NSViewController {
                 guard let viewer = env.computers.ensureViewer(name) else {
                     // O computador já foi encerrado e limpo: em vez de um pane preto e mudo, diz o que houve e oferece fechar a tab.
                     let workspace = env.workspace
+                    let (computers, datasets) = (env.computers, env.datasets)
                     return ChromeHostingView(
-                        content: GoneComputerPane(
+                        content: SubagentTabLayout(paneID: pane.id, computer: name, computers: computers, datasets: datasets) { GoneComputerPane(
                             name: name, close: { workspace.closePane(id: pane.id) },
                             showAgent: workspace.terminalsInCurrentSession.first(where: { $0.provider.isAgent }).map { agent in
                                 { workspace.show(terminalID: agent.id) }
@@ -280,14 +281,17 @@ final class WorkspaceViewController: NSViewController {
                                 let runs = StorePaths.default(environment: ProcessInfo.processInfo.environment).root
                                     .appendingPathComponent("computers/runs", isDirectory: true)
                                 NSWorkspace.shared.open(runs)
-                            })
-                            .environment(\.elementStore, env.elements).environment(\.a11yParent, .windowMain))
+                            }) }
+                            .environment(\.elementStore, env.elements).environment(\.actionRegistry, env.registry)
+                            .environment(\.a11yParent, .windowMain))
                 }
                 let workspace = env.workspace
                 let host = ChromeHostingView(
-                    content: ComputerViewerView(
-                        controller: viewer, computers: env.computers, backTitle: nil, showsStrip: false, showsHeader: true,
-                        pane: ViewerPane(id: pane.id, drag: workspace.dragController, title: workspace.computerTitle(name), close: { workspace.closePane(id: pane.id) }))
+                    content: SubagentTabLayout(paneID: pane.id, computer: name, computers: env.computers, datasets: env.datasets) {
+                        ComputerViewerView(
+                            controller: viewer, computers: env.computers, backTitle: nil, showsStrip: false, showsHeader: true,
+                            pane: ViewerPane(id: pane.id, drag: workspace.dragController, title: workspace.computerTitle(name), close: { workspace.closePane(id: pane.id) }))
+                    }
                         .environment(\.elementStore, env.elements).environment(\.actionRegistry, env.registry)
                         .environment(\.overlayRouter, env.overlays).environment(\.a11yParent, .windowMain))
                 host.inputBlocked = { [overlays = env.overlays] in overlays.blocksTerminalInput }

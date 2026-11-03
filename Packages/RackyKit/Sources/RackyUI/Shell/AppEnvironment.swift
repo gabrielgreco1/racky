@@ -469,7 +469,7 @@ public final class AppEnvironment {
         datasets.hideDataPanel = { [rightPanel] in rightPanel.hide(.data) }
         datasets.computerLabel = { [weak model = computers.model] name in model?.computerAgentNames[name] }
         sidebar.sessionDatasets = { [datasets] sid in
-            datasets.summaries.filter { $0.dataset.sessionID == sid }.map { SessionDatasetRow(id: $0.dataset.id, name: datasets.displayName($0), rows: $0.rowCount) }
+            datasets.summaries.filter { $0.dataset.sessionID == sid }.map { SessionDatasetRow(id: $0.dataset.id, name: datasets.displayName($0), rows: $0.rowCount, computer: $0.computer) }
         }
         // Tela do computador como tab da sessão: o título é o subagente ("Codex 1 · computer") e abrir leva para a sessão dona.
         workspace.computerTitle = { [weak model = computers.model] name in

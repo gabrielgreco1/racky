@@ -53,14 +53,24 @@ enum SubagentCardMetrics {
 
 // MARK: Linha do subagente
 
+/// v6 (03/11): uma linha limpa por subagente (setinha, logo da AI, nome, estado e tempo). A setinha abre ali mesmo o computador dele
+/// (miniatura pequena, ao vivo ou desligado) e as tabelas que ele gravou; o clique na linha abre a aba do subagente no centro.
 struct SubagentRowView: View {
+    let model: SidebarModel
     let sessionID: UUID
     let terminalID: UUID
+    /// CLI do agente pai: um subagente comum roda no mesmo CLI; um worker de app tem o dele (`child.worker`).
+    let provider: TerminalProvider
     let child: SubagentRowData
+    /// Tabelas gravadas pelo computador deste subagente.
+    var tables: [SessionDatasetRow] = []
     @Environment(\.actionRegistry) private var registry
     @Environment(\.subagentHoverCards) private var hoverCards
     @Environment(\.computersController) private var computers
     @State private var hovering = false
+
+    private var expandable: Bool { child.computer != nil || !tables.isEmpty }
+    private var expanded: Bool { expandable && model.expandedSubagents.contains(SidebarModel.subagentKey(terminal: terminalID, child: child.id)) }
 
     var body: some View {
         let sid = sessionID.uuidString, cid = child.id
@@ -70,28 +80,26 @@ struct SubagentRowView: View {
                 HumanControlLine(computer: computer, controlID: .sidebarSessionChildControl(sid, cid), handBackID: .sidebarSessionChildHandBack(sid, cid))
                     .transition(.opacity)
             }
+            if expanded {
+                details(sid: sid, cid: cid)
+                    .transition(MotionPolicy.shared.reduceMotion ? .opacity : .opacity.combined(with: .offset(y: -DS.Space.s1)))
+            }
         }
+        .animation(MotionPolicy.shared.animation(MotionTokens.Springs.snappy), value: expanded)
     }
+
+    private var logo: DSAgentKind { QuickLaunchModel.kind(child.worker ?? provider) }
 
     @ViewBuilder
     private func rowBody(sid: String, cid: String) -> some View {
         TimelineView(.periodic(from: .now, by: SubagentMetrics.elapsedTick)) { context in
             let screen = child.computer.flatMap { name in computers?.model.rows.first { $0.id == name } }
-            let line = HStack(spacing: screen == nil ? SidebarMetrics.agentRowGap : SidebarMetrics.statusGap) {
-                // v5: com computador, a linha mostra o último quadro dele no lugar do indicador.
-                if let screen {
-                    SidebarComputerThumb(data: screen.thumbnail, needsYou: screen.needsYou)
-                        .a11y(.sidebarSessionChildStatus(sid, cid), kind: "image", label: child.stateLabel)
-                } else {
-                    DSAgentIndicator(child.glyph, size: .sm)
-                        .a11y(.sidebarSessionChildStatus(sid, cid), kind: "image", label: child.stateLabel)
-                }
-                if let worker = child.worker {
-                    DSAgentLogo(QuickLaunchModel.kind(worker), size: DS.Space.s3)
-                }
+            let needsYou = screen?.needsYou == true
+            let line = HStack(spacing: SidebarMetrics.agentRowGap + DS.Space.s0_5) {
+                DSAgentLogo(logo, size: SidebarMetrics.agentLogo, dimmed: child.phase == .done)
                 Text(verbatim: child.title)
                     .dsFont(DS.Font.sidebarMeta)
-                    .foregroundStyle(child.phase == .done ? DS.Color.textTertiary : DS.Color.textSecondary)
+                    .foregroundStyle(child.phase == .done ? DS.Color.textTertiary : DS.Color.textPrimary.opacity(0.88))
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .a11y(.sidebarSessionChildTitle(sid, cid), kind: "text", label: child.title)
@@ -103,38 +111,112 @@ struct SubagentRowView: View {
                         .truncationMode(.tail)
                 }
                 Spacer(minLength: DS.Space.s1)
-                Text(verbatim: screen?.needsYou == true ? String(localized: "Needs You", bundle: .module) : child.elapsedText(now: context.date))
+                DSAgentIndicator(needsYou ? .needsInput : child.glyph, size: .sm)
+                    .a11y(.sidebarSessionChildStatus(sid, cid), kind: "image", label: needsYou ? String(localized: "Needs You", bundle: .module) : child.stateLabel)
+                Text(verbatim: child.elapsedText(now: context.date))
                     .dsFont(DS.Font.sidebarMetaNumeric)
-                    .foregroundStyle(screen?.needsYou == true ? DS.Color.agentNeedsInputText : DS.Color.textTertiary)
+                    .foregroundStyle(DS.Color.textTertiary)
                     .fixedSize()
                     .a11y(.sidebarSessionChildElapsed(sid, cid), kind: "text", label: child.elapsedText(now: context.date))
             }
-            .padding(.horizontal, SidebarMetrics.agentRowPaddingH)
-            .frame(height: screen == nil ? SidebarMetrics.agentRowHeight : SubagentMetrics.thumbRowHeight)
+            .padding(.trailing, SidebarMetrics.agentRowPaddingH)
+            .frame(height: SidebarMetrics.agentRowHeight)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(RoundedRectangle(cornerRadius: SidebarMetrics.agentRowRadius).fill(hovering ? DS.Color.hoverAgentRow : Color.clear))
             .contentShape(Rectangle())
             .background { SubagentHoverTracker(child: child, sessionID: sessionID, controller: hoverCards, hovering: $hovering) }
             .accessibilityElement(children: .combine)
             .accessibilityLabel(Text(verbatim: "\(child.title)\(child.task.map { ", \($0)" } ?? ""), \(child.stateLabel), \(child.elapsedText(now: context.date))"))
-            Group {
-                if let workerTerminal = child.workerTerminalID, let registry, registry.isOffered(.paneShow) {
-                    // Worker de app: o clique leva ao pane dele (a sessão separada ao lado do agente).
-                    ActionButton(.paneShow, id: .sidebarSessionChild(sid, cid), argument: .select(workerTerminal.uuidString)) { line }
-                        .buttonStyle(.plain)
-                } else if let computer = child.computer, let registry, registry.isOffered(.computerOpenViewer) {
-                    ActionButton(.computerOpenViewer, id: .sidebarSessionChild(sid, cid), argument: .select(computer)) { line }
-                        .buttonStyle(.plain)
-                } else if let registry, registry.isOffered(.paneShow) {
-                    ActionButton(.paneShow, id: .sidebarSessionChild(sid, cid), argument: .select(terminalID.uuidString)) { line }
-                        .buttonStyle(.plain)
-                } else {
-                    line.a11y(.sidebarSessionChild(sid, cid), kind: "row", label: child.title)
+            HStack(spacing: 0) {
+                disclosure(sid: sid, cid: cid)
+                Group {
+                    if let workerTerminal = child.workerTerminalID, let registry, registry.isOffered(.paneShow) {
+                        // Worker de app: o clique leva ao pane dele (a sessão separada ao lado do agente).
+                        ActionButton(.paneShow, id: .sidebarSessionChild(sid, cid), argument: .select(workerTerminal.uuidString)) { line }
+                            .buttonStyle(.plain)
+                    } else if let computer = child.computer, let registry, registry.isOffered(.computerOpenViewer) {
+                        // A aba do subagente: a tela do computador dele com o que ele entregou ao lado.
+                        ActionButton(.computerOpenViewer, id: .sidebarSessionChild(sid, cid), argument: .select(computer)) { line }
+                            .buttonStyle(.plain)
+                    } else if let registry, registry.isOffered(.paneShow) {
+                        ActionButton(.paneShow, id: .sidebarSessionChild(sid, cid), argument: .select(terminalID.uuidString)) { line }
+                            .buttonStyle(.plain)
+                    } else {
+                        line.a11y(.sidebarSessionChild(sid, cid), kind: "row", label: child.title)
+                    }
                 }
             }
+            .background(RoundedRectangle(cornerRadius: SidebarMetrics.agentRowRadius).fill(hovering ? DS.Color.hoverAgentRow : Color.clear))
         }
         .animation(MotionPolicy.shared.animation(MotionTokens.Easing.ease, MotionTokens.Duration.hover), value: hovering)
         .transition(MotionPolicy.shared.reduceMotion ? .opacity : .opacity.combined(with: .offset(y: -DS.Space.s1)))
+    }
+
+    /// Setinha que abre o computador e as tabelas na barra; sem nada para mostrar, só o espaço (as linhas ficam alinhadas).
+    @ViewBuilder
+    private func disclosure(sid: String, cid: String) -> some View {
+        if expandable {
+            ActionButton(
+                .subagentToggleDetails, id: .sidebarSessionChildToggle(sid, cid), argument: .select("\(terminalID.uuidString)/\(child.id)"),
+                tooltip: expanded ? String(localized: "Hide computer and data", bundle: .module) : String(localized: "Show computer and data", bundle: .module)
+            ) {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: SidebarMetrics.chevron - DS.Space.s0_5, weight: .medium))
+                    .foregroundStyle(DS.Color.textTertiary)
+                    .rotationEffect(.degrees(expanded ? 90 : 0))
+                    .frame(width: SubagentMetrics.toggleBox, height: SidebarMetrics.agentRowHeight)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityValue(Text(verbatim: expanded ? "expanded" : "collapsed"))
+        } else {
+            Color.clear.frame(width: SubagentMetrics.toggleBox, height: SidebarMetrics.agentRowHeight)
+        }
+    }
+
+    /// O que abre embaixo da linha: o computador (miniatura pequena e se está ao vivo) e as tabelas que ele gravou.
+    @ViewBuilder
+    private func details(sid: String, cid: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if let name = child.computer {
+                let row = computers?.model.rows.first { $0.id == name }
+                let line = HStack(spacing: SidebarMetrics.agentRowGap + DS.Space.s0_5) {
+                    if let row, row.snapshot.display != "http", row.snapshot.state.isLive {
+                        SidebarComputerThumb(data: row.thumbnail, needsYou: row.needsYou)
+                    } else {
+                        Image(systemName: "desktopcomputer")
+                            .font(.system(size: SidebarMetrics.line2Icon + DS.Space.s0_5))
+                            .foregroundStyle(DS.Color.textQuaternary)
+                            .frame(width: SidebarMetrics.agentLogo)
+                    }
+                    Text(verbatim: name).dsFont(DS.Font.small).foregroundStyle(DS.Color.textSecondary).lineLimit(1).truncationMode(.middle)
+                    Spacer(minLength: DS.Space.s1)
+                    Text(verbatim: Self.computerState(row))
+                        .dsFont(DS.Font.small).foregroundStyle(DS.Color.textTertiary).lineLimit(1).fixedSize()
+                }
+                .padding(.horizontal, SidebarMetrics.agentRowPaddingH)
+                .frame(height: row?.snapshot.state.isLive == true && row?.snapshot.display != "http" ? SubagentMetrics.thumbRowHeight : SidebarMetrics.agentRowHeight)
+                .contentShape(Rectangle())
+                if let registry, registry.isOffered(.computerOpenViewer) {
+                    ActionButton(.computerOpenViewer, id: .sidebarSessionChildComputer(sid, cid), argument: .select(name)) { line }
+                        .buttonStyle(.plain)
+                } else {
+                    line.a11y(.sidebarSessionChildComputer(sid, cid), kind: "row", label: name)
+                }
+            }
+            ForEach(tables) { table in
+                SessionDatasetRowView(sessionID: sessionID, row: table, id: .sidebarSessionChildDataset(sid, cid, table.id), stripPrefix: child.computer)
+            }
+        }
+        .padding(.leading, SubagentMetrics.toggleBox + SidebarMetrics.agentLogo + SidebarMetrics.agentRowGap - SidebarMetrics.agentRowPaddingH)
+        .padding(.bottom, DS.Space.s1)
+    }
+
+    /// `ao vivo`, `sem tela`, `desligado`: o que a linha do computador diz à direita.
+    static func computerState(_ row: ComputerRow?) -> String {
+        guard let row else { return String(localized: "Off", bundle: .module) }
+        if row.snapshot.control == .human { return String(localized: "You have control", bundle: .module) }
+        guard row.snapshot.state.isLive else { return String(localized: "Off", bundle: .module) }
+        return row.snapshot.display == "http" ? String(localized: "No screen", bundle: .module) : String(localized: "Live", bundle: .module)
     }
 }
 
@@ -411,4 +493,9 @@ struct SubagentHoverCardView: View {
         .clipped()
         .animation(MotionPolicy.shared.animation(MotionTokens.Easing.ease, MotionTokens.Duration.fast), value: row?.thumbnail)
     }
+}
+
+extension BoxState {
+    /// O computador está ligado (a tela pode mostrar algo); `queued`/`provisioning` ainda não, `stopped`/`failed` já não.
+    var isLive: Bool { self == .ready || self == .inUse }
 }

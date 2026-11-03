@@ -185,6 +185,8 @@ public actor ComputerScheduler: ComputerLifecycle, ParentOrchestrating {
         var keepUntil: Date?
         var failure: String?
         var startedAt: Date?
+        /// Guardado com keep: a VM foi desligada e só a pasta (`/work`, logs, diário) fica; o próximo `box_claim` religa (03/11).
+        var parked = false
     }
 
     public static let defaultMaxParallelCreations = 4
@@ -221,6 +223,7 @@ public actor ComputerScheduler: ComputerLifecycle, ParentOrchestrating {
     public func setBatchObserver(_ observer: (@Sendable (BatchSummary) -> Void)?) { onBatchFinished = observer }
 
     public func childClaimed(_ child: String, computer: String) async {
+        if entries[computer]?.parked == true { await unpark(computer) }
         guard entries[computer]?.childID == child else { return }
         try? await store?.updateOrchestrationChild(id: child, state: .claimed, computerName: .some(computer), at: now())
         await persist(computer)
@@ -528,13 +531,40 @@ public actor ComputerScheduler: ComputerLifecycle, ParentOrchestrating {
             entry.keepUntil = now().addingTimeInterval(Self.keepDuration)
             entries[computer.name] = entry
             try? await store?.updateOrchestrationChild(id: entry.childID, state: .released, at: now())
-            await persist(computer.name)
+            await park(computer.name)
+            await drain()
             await checkBatches()
             return
         }
         await discard(computer.name, childState: .released)
         await drain()
         await checkBatches()
+    }
+
+    /// Keep (skill: "stop the box, keep its volume"): desliga a VM e guarda só o que fica no Mac (`/work`, logs, diário). Antes a VM
+    /// inteira ficava ligada as 24 h (~1,9 GB cada no Mac, 03/11). O mesmo nome volta no próximo `box_claim`, com a mesma pasta.
+    func park(_ name: String) async {
+        guard var entry = entries[name], entry.phase == .active, let handle = entry.handle else { return }
+        entry.lazy.detach()
+        entry.handle = nil
+        entry.phase = .queued
+        entry.parked = true
+        entries[name] = entry
+        await entry.computer.setState(.stopped)
+        await handle.teardown()
+        await persist(name)
+        log.info("computer \(name) kept: VM stopped, its folder stays until the keep expires")
+    }
+
+    /// Um filho pegou um computador estacionado: volta para a fila e sobe de novo com a mesma pasta.
+    private func unpark(_ name: String) async {
+        guard var entry = entries[name], entry.parked else { return }
+        entry.parked = false
+        entries[name] = entry
+        await entry.computer.setState(.queued)
+        queue.append(name)
+        await persistQueue()
+        await drain()
     }
 
     func discard(_ name: String, childState: OrchestrationChildState = .idle) async {

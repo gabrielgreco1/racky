@@ -369,12 +369,15 @@ struct SchedulerRig {
         _ = await rig.parentCall("boxes_reserve", ["names": ["keeper"]])
         #expect(await rig.wait("keeper", .ready))
         _ = await rig.parentCall("boxes_release", ["names": ["keeper"], "keep": "24h"])
-        #expect(await rig.provisioning.tornDown.isEmpty)
+        // Keep guarda a pasta, não a VM: ela desliga na hora (03/11) e o computador segue reservado com o nome.
+        #expect(await rig.provisioning.tornDown == ["keeper"])
+        #expect(await rig.hub.computer(named: "keeper")?.state == .stopped)
         clock.set(Date(timeIntervalSince1970: 2_000_000 + 23 * 3600))
         #expect(await rig.scheduler.sweep().released.isEmpty)
         clock.set(Date(timeIntervalSince1970: 2_000_000 + 24 * 3600 + 1))
         #expect(await rig.scheduler.sweep().released == ["keeper"])
-        #expect(await rig.provisioning.tornDown == ["keeper"])
+        #expect(await rig.provisioning.tornDown == ["keeper"], "nothing left to tear down at expiry")
+        #expect(await rig.hub.computer(named: "keeper") == nil)
     }
 
     @Test func keepAskedOnAnExistingReservationSurvivesTheWorkersEnd() async throws {
@@ -385,7 +388,28 @@ struct SchedulerRig {
         #expect(await rig.wait("resume-me", .ready))
         _ = await rig.parentCall("boxes_reserve", ["names": ["resume-me"], "keep": "24h"])
         _ = await rig.parentCall("boxes_release", ["names": ["resume-me"]])
-        #expect(await rig.provisioning.tornDown.isEmpty, "the computer stays for the resumed worker")
+        #expect(await rig.hub.computer(named: "resume-me") != nil, "the computer stays reserved for the resumed worker")
+    }
+
+    @Test func aKeptComputerStopsItsVMAndBootsAgainWithTheSameFolderWhenClaimed() async throws {
+        let rig = try await SchedulerRig.make(workers: 2)
+        defer { rig.cleanup() }
+        let reply = await rig.parentCall("boxes_reserve", ["names": ["builder"], "keep": "24h"])
+        let child = try #require(reply.json["boxes"]?.array?.first?["child_id"]?.string)
+        #expect(await rig.wait("builder", .ready))
+        let first = await rig.parentCall("box_claim", ["name": "builder", "wait_s": 1], as: child)
+        let work = try #require(first.json["work_path_host"]?.string)
+        try Data("progress".utf8).write(to: URL(fileURLWithPath: work).appendingPathComponent("notes.txt"))
+        _ = await rig.parentCall("box_release", ["keep": "24h"], as: child)
+        #expect(await rig.provisioning.tornDown == ["builder"], "the VM is off while kept")
+        #expect(await rig.scheduler.activeCount == 0, "a kept computer doesn't hold memory")
+        // O worker retomado pega o mesmo nome: a VM sobe de novo, com a mesma pasta.
+        let again = await rig.parentCall("box_claim", ["name": "builder", "wait_s": 5], as: child)
+        #expect(!again.isError)
+        #expect(again.json["work_path_host"]?.string == work)
+        #expect(await rig.wait("builder", .ready))
+        #expect(await rig.provisioning.provisioned.filter { $0 == "builder" }.count == 2)
+        #expect(FileManager.default.fileExists(atPath: URL(fileURLWithPath: work).appendingPathComponent("notes.txt").path))
     }
 
     @Test func concurrentReserveCallsFromManyParentsStayConsistent() async throws {
