@@ -67,7 +67,8 @@ public final class ComputerOrchestrator: Sendable {
             gate: SubagentComputersGate(
                 parents: parents, approvals: approvals, waitSeconds: waitSeconds,
                 effectiveProxy: { parent, requested in await scheduler.effectiveProxy(parent: parent, requested: requested) },
-                effectiveLeftovers: { parent in await scheduler.leftovers(parent: parent) }),
+                effectiveLeftovers: { parent in await scheduler.leftovers(parent: parent) },
+                liveMode: { [store] session in try? await store?.session(id: session)?.subagentComputers }),
             datasets: datasets)
         server = ComputerMCPServer(tools: tools)
         var append: ComputerDatabaseWatcher.Append?

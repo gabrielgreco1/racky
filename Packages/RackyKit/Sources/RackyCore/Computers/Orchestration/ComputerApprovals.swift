@@ -310,19 +310,31 @@ public struct SubagentComputersGate: ReserveGating {
     public var effectiveProxy: (@Sendable (_ parent: String, _ requested: String?) async -> String)?
     /// A escolha de limpeza que o computador receberia (o card mostra; o scheduler grava a mesma no `box.json`).
     public var effectiveLeftovers: (@Sendable (_ parent: String) async -> LeftoversPolicy)?
+    /// Modo atual da sessão (Store). Ask e Full trocam sem reiniciar o agente, então vale o que a sessão diz agora, não o do
+    /// lançamento (03/11: a sessão em Full seguia pedindo aceite porque o pai tinha subido em Ask).
+    public var liveMode: (@Sendable (_ session: UUID) async -> SubagentComputersMode?)?
 
     public init(
         parents: ParentDirectory, approvals: ComputerApprovalCenter, waitSeconds: TimeInterval = 45,
         spawnWaitSeconds: TimeInterval = TimeInterval(SubagentSpawnGuard.appBudgetSeconds),
         effectiveProxy: (@Sendable (_ parent: String, _ requested: String?) async -> String)? = nil,
-        effectiveLeftovers: (@Sendable (_ parent: String) async -> LeftoversPolicy)? = nil
+        effectiveLeftovers: (@Sendable (_ parent: String) async -> LeftoversPolicy)? = nil,
+        liveMode: (@Sendable (_ session: UUID) async -> SubagentComputersMode?)? = nil
     ) {
-        self.effectiveProxy = effectiveProxy; self.effectiveLeftovers = effectiveLeftovers
+        self.effectiveProxy = effectiveProxy; self.effectiveLeftovers = effectiveLeftovers; self.liveMode = liveMode
         self.parents = parents; self.approvals = approvals; self.waitSeconds = waitSeconds; self.spawnWaitSeconds = spawnWaitSeconds
     }
 
+    /// O pai como vale agora: o modo de lançamento trocado pelo modo atual da sessão quando o agente subiu com as ferramentas
+    /// (Off → On ainda precisa de "Restart to apply"; aí as ferramentas nem existem).
+    func currentInfo(_ parent: String) async -> ParentInfo? {
+        guard var info = await parents.info(parent) else { return nil }
+        if info.mode.isOn, let session = info.sessionID, let live = await liveMode?(session) { info.mode = live }
+        return info
+    }
+
     public func spawnGuard(parent: String, _ input: SubagentSpawnGuard.Input) async -> SpawnVerdict {
-        guard let info = await parents.info(parent) else { return .allow }
+        guard let info = await currentInfo(parent) else { return .allow }
         switch SubagentSpawnGuard.decide(mode: info.mode, input) {
         case .allow: return .allow
         case .block(let reason): return .block(reason: reason)
@@ -344,7 +356,7 @@ public struct SubagentComputersGate: ReserveGating {
     }
 
     public func authorize(parent: String, _ request: ReserveRequest) async throws -> ReserveAuthorization {
-        guard let info = await parents.info(parent), info.mode != .off else {
+        guard let info = await currentInfo(parent), info.mode != .off else {
             throw ToolError(.blockedByPolicy, "Subagent computers is off for this session; use normal subagents. The user can turn it on in the session settings.")
         }
         if info.mode == .full { return .proceed }
