@@ -270,6 +270,12 @@ class BrokenBrowser:
 class Display:
     mode = "headless"
 
+    async def start_xvfb(self):
+        pass
+
+    async def ensure_vnc(self):
+        pass
+
 
 async def ws_connect(port, ticket, protocols="binary"):
     r, w = await asyncio.open_connection("127.0.0.1", port)

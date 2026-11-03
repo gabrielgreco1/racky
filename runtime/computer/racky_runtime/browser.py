@@ -44,11 +44,25 @@ def launch_args(env: dict[str, str]) -> list[str]:
     lang = env.get("RACKY_LOCALE") or "en-US"
     base = lang.split("-")[0]
     accept = ",".join(dict.fromkeys([lang, base, "en-US", "en"]))
+    disabled = ["Translate"]
+    lean: list[str] = []
+    if env.get("RACKY_CHROMIUM_LEAN", "1") != "0":
+        # Backlog 20: menos processos e menos memória, nada que a página consiga ver. Sem renderer reserva, sem cache de
+        # voltar/avançar, iframes de outros sites no mesmo renderer, GPU (SwiftShader, só software) dentro do processo do browser e
+        # sem os dois zygotes.
+        disabled += ["SpareRendererForSitePerProcess", "BackForwardCache", "IsolateOrigins", "site-per-process",
+                     "OptimizationHints", "MediaRouter", "DialMediaRouteProvider", "LensOverlay", "InterestFeedContentSuggestions",
+                     "CertificateTransparencyComponentUpdater", "AutofillServerCommunication"]
+        lean = ["--disable-site-isolation-trials", "--renderer-process-limit=2", "--in-process-gpu", "--no-zygote",
+                "--disk-cache-size=33554432", "--disable-breakpad"]
+    extra = [a for a in env.get("RACKY_CHROMIUM_EXTRA", "").split() if a.startswith("--")]  # só para medir variantes
+    lean += extra
+    # Um `--disable-features` só: o Chromium usa o último que aparece e ignoraria os anteriores.
     return ["--no-sandbox", "--disable-dev-shm-usage", "--no-first-run", "--no-default-browser-check",
             "--disable-background-networking", "--disable-component-update", "--disable-sync", "--disable-default-apps",
-            "--disable-domain-reliability", "--no-pings", "--disable-features=Translate",
+            "--disable-domain-reliability", "--no-pings", f"--disable-features={','.join(disabled)}",
             "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
-            f"--window-size={SCREEN[0]},{SCREEN[1]}", "--window-position=0,0", f"--lang={lang}", f"--accept-lang={accept}"]
+            f"--window-size={SCREEN[0]},{SCREEN[1]}", "--window-position=0,0", f"--lang={lang}", f"--accept-lang={accept}", *lean]
 
 class OpError(Exception):
     def __init__(self, code: str, message: str, status: int = 400, details: dict | None = None):
@@ -146,6 +160,14 @@ class BrowserSession:
     @property
     def ready(self) -> bool:
         return self.ctx is not None and self.page is not None
+
+    def has_saved_cookies(self) -> bool:
+        """O perfil persistente já tem cookies (login de uma sessão anterior)? Então ler cookies precisa ligar o navegador."""
+        jar = self.profile / "Default" / "Cookies"
+        try:
+            return jar.stat().st_size > 20 * 1024  # o banco vazio do Chromium tem ~20 KB
+        except OSError:
+            return False
 
     # ----- observador de rede (reqlog `observed`) -----------------------------------------------------------------------
     def _on_request(self, request) -> None:

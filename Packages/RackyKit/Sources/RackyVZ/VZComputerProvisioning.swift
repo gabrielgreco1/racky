@@ -1,5 +1,6 @@
 import Foundation
 import RackyCore
+import RackyPlatform
 import RackyDocker
 import RackyProtocol
 
@@ -37,6 +38,10 @@ public struct VZComputerProvisioning: ComputerProvisioning {
     public static func containerSpec(_ request: ComputerProvisionRequest, work: URL, logs: URL, taskSecrets: URL) -> ContainerSpec {
         var spec = ComputerProvisioner.containerSpec(request, work: work, logs: logs, taskSecrets: taskSecrets, volume: nil)
         spec.environment += ["RACKY_ADMIN_BIND=127.0.0.1", "RACKY_VSOCK_PORT=\(vsockPort)"]
+        // Só para medir variantes (backlog 20): `RACKY_VZ_DEV_GUEST_ENV="RACKY_CHROMIUM_LEAN=0;RACKY_BROWSER_EAGER=1"`.
+        if let extra = ProcessInfo.processInfo.environment["RACKY_VZ_DEV_GUEST_ENV"] {
+            spec.environment += extra.split(separator: ";").map(String.init).filter { $0.hasPrefix("RACKY_") && $0.contains("=") }
+        }
         return spec
     }
 
@@ -88,6 +93,10 @@ public struct VZComputerProvisioning: ComputerProvisioning {
             let dial = try VZPortBridge(dial: { try await started.dialVsock(port: Self.vsockPort) })
             bridge = dial
             let port = try await dial.start()
+            if ProcessInfo.processInfo.environment["RACKY_VZ_DEV_NO_SWAP"] != "1",
+               let problem = await VZSwap.enable(on: started, bytes: spec.display == .http ? 1 << 30 : 2 << 30) {
+                LogFacade(.app, category: "vz").error("\(spec.name): \(problem)")
+            }
             try await VZProvisionPayload.deliver(config: config, proxyCA: proxyCA, token: token, to: started)
             let admin = EgressAdminClient(port: port, token: token)
             try await admin.waitUntilHealthy()

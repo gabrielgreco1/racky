@@ -93,7 +93,9 @@ public struct VZVMPlan: Sendable, Equatable {
         shares.sort { (depth($0.guestPath), $0.guestPath) < (depth($1.guestPath), $1.guestPath) }
 
         let cpus = max(1, Int((spec.resources.cpus ?? 1).rounded(.up)))
-        let memory = UInt64(max(spec.resources.memoryBytes ?? (1 << 30), 256 << 20))
+        var memory = UInt64(max(spec.resources.memoryBytes ?? (1 << 30), 256 << 20))
+        // Só para medir contra o tamanho antigo (backlog 20).
+        if let mb = UInt64(ProcessInfo.processInfo.environment["RACKY_VZ_DEV_MEMORY_MB"] ?? ""), memory > 1 << 30 { memory = mb << 20 }
         // `CapDrop ALL` + `CapAdd`: sobra só a lista. Sem `CapDrop ALL`, usa as padrão do runtime (nunca acontece nos computadores).
         self.init(
             vmID: vmID, hostname: spec.hostname ?? "computer", cpus: cpus, memoryBytes: memory, environment: spec.environment,

@@ -64,7 +64,7 @@ struct EgressUnitTests {
         #expect(spec.tmpfs["/run/racky"]?.contains("uid=10003") == true && spec.tmpfs["/run/racky"]?.contains("mode=0700") == true)
         #expect(spec.binds.contains("/tmp/run/logs:/run/racky/logs") && spec.binds.contains("/tmp/s:/run/abx-secrets:ro"))
         #expect(!String(describing: spec.body()).contains("T0KEN") && spec.environment.allSatisfy { !$0.contains("T0KEN") })
-        #expect(request.display.computerMemory >= 4 << 30, "pytest + Chromium sem swap travou com 2,5 GiB (02/11)")
+        #expect(request.display.computerMemory == 3 << 30, "teto do headless; o swap da VM cobre o pico")
     }
 
     // MARK: segredos em arquivo

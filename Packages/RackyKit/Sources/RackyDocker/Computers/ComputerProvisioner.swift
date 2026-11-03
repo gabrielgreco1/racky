@@ -1,14 +1,15 @@
 import Foundation
 
 extension ComputerDisplay {
-    /// Limite de memória do computador: Chromium + o trabalho do agente (pytest, crawler, pandas) + proxy. Com 2,5 GiB e sem swap,
-    /// um builder rodando a suíte de testes junto do Chromium esgotou a memória da VM (02/11): o kernel não alocava mais para o
-    /// virtio-fs, a pasta de trabalho parou de responder e a VM ficou girando a 200% de CPU. 4 GiB dá folga para esse caso.
+    /// Teto de memória do computador: Chromium (só quando o agente usa, backlog 20) + o trabalho do agente + proxy. Em 02/11 dois
+    /// builders com pytest e Chromium esgotaram 2,5 GiB SEM swap e a VM travou girando a 200% de CPU. Agora a VM tem 2 GiB de swap
+    /// em arquivo (VZSwap): passar do teto deixa o computador lento, não travado. É um teto, não uma reserva: a VM só ocupa no
+    /// Mac o que de fato usa (130 MB parada, sem navegador).
     var computerMemory: Int64 {
         switch self {
         case .http: 1 << 30
-        case .desktop: 5 << 30
-        default: 4 << 30
+        case .desktop: 4 << 30
+        default: 3 << 30
         }
     }
     var computerCPUs: Double {

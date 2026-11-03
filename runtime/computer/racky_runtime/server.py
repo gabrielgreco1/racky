@@ -30,6 +30,39 @@ class RuntimeServer:
         self.lease = Lease(browser.write_lock)
         self.tickets = Tickets()
         self.bridge = VncBridge(self.lease, self.tickets)
+        self._launching = asyncio.Lock()
+
+    @property
+    def browser_state(self) -> str:
+        return "on" if self.browser.ready else ("starting" if self._launching.locked() else "off")
+
+    async def ensure_browser(self) -> None:
+        """Liga a tela e o Chromium na primeira vez que alguém precisa deles; chamadas simultâneas esperam o mesmo início."""
+        if self.browser.ready:
+            return
+        async with self._launching:
+            if self.browser.ready:
+                return
+            await self.display.start_xvfb()
+            await self.browser.start()
+            print("runtime: browser ligado sob demanda", flush=True)
+
+    def passive_when_off(self, op: str, args: dict) -> dict | None:
+        """Consultas de fundo do app (miniatura, status, abas, cookies, seleção) não acordam o navegador desligado."""
+        if self.browser.ready:
+            return None
+        action = args.get("action")
+        if op == "status":
+            return {"ready": False, "browser": self.browser_state}
+        if op == "frame":
+            return {"browser": self.browser_state}
+        if op == "selection":
+            return {"text": ""}
+        if op == "tabs" and action == "list":
+            return {"tabs": []}
+        if op == "cookies" and action in ("get", "export") and not self.browser.has_saved_cookies():
+            return {"cookies": []}
+        return None
 
     def _authorized(self, headers: dict[str, str]) -> bool:
         supplied = headers.get("authorization", "")
@@ -88,7 +121,8 @@ class RuntimeServer:
 
     async def route(self, method: str, path: str, headers: dict[str, str], body: bytes) -> tuple[int, Any]:
         if method == "GET" and path == "/v1/health":
-            return 200, {"ok": True, "ready": self.browser.ready, "display": self.display.mode, "api": API_VERSION}
+            # `ready`: a API responde e o navegador sobe quando pedirem. `browser` diz se ele está ligado de fato.
+            return 200, {"ok": True, "ready": True, "browser": self.browser_state, "display": self.display.mode, "api": API_VERSION}
         if not self._authorized(headers):
             return 401, {"error": "unauthorized", "message": "missing or invalid token"}
         if method != "POST" or not path.startswith("/v1/"):
@@ -104,11 +138,19 @@ class RuntimeServer:
             return 400, {"error": "invalid_argument", "message": str(exc)}
         try:
             if op == "mode":
+                if args.get("display") == "desktop":
+                    await self.ensure_browser()
                 return 200, await self.display.set_mode(args.get("display"))
             if op == "vnc_ticket":
+                await self.ensure_browser()  # quem abre a tela ao vivo quer ver (e poder assumir) o navegador
+                await self.display.ensure_vnc()
                 return 200, self.tickets.issue()
             if op == "lease":
                 return 200, await self._lease(args)
+            passive = self.passive_when_off(op, args)
+            if passive is not None:
+                return 200, passive
+            await self.ensure_browser()
             fn = getattr(self.browser, op)
             if op in READS or (op == "tabs" and args.get("action") == "list") or (op == "cookies" and args.get("action") in ("get", "export")):
                 result = await fn(args)

@@ -93,7 +93,8 @@ public struct DockerComputerBackend: ComputerBackend {
 
     public func vncEndpoint() async throws -> URL {
         guard computer.display != .http else { throw ToolError(.notSupported, "this computer is in HTTP mode and has no screen") }
-        let out = try await runtime("vnc_ticket", [:], timeout: 10)
+        // O ticket pode ligar a tela e o Chromium na hora (sobem sob demanda): dá tempo para o navegador abrir.
+        let out = try await runtime("vnc_ticket", [:], timeout: 45)
         guard let ticket = out["ticket"]?.string, let url = URL(string: "ws://127.0.0.1:\(computer.adminPort)/vnc?ticket=\(ticket)") else {
             throw ToolError(.boxRestarted, "the runtime did not issue a viewer ticket", retryAfterS: 5)
         }

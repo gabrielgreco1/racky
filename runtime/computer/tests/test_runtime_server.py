@@ -62,6 +62,14 @@ class FakeBrowser:
 
 class FakeDisplay:
     mode = "headless"
+    xvfb_starts = 0
+    vnc_starts = 0
+
+    async def start_xvfb(self):
+        self.xvfb_starts += 1
+
+    async def ensure_vnc(self):
+        self.vnc_starts += 1
 
     async def set_mode(self, display):
         if display not in ("headless", "desktop"):
@@ -228,3 +236,83 @@ class UlidTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LazyBrowser(FakeBrowser):
+    """Navegador que começa desligado: `start` conta quantas vezes subiu."""
+    ready = False
+
+    def __init__(self, saved_cookies=False):
+        super().__init__()
+        self.starts = 0
+        self.saved_cookies = saved_cookies
+
+    async def start(self):
+        await asyncio.sleep(0.05)
+        self.starts += 1
+        self.ready = True
+
+    def has_saved_cookies(self):
+        return self.saved_cookies
+
+
+class LazyBrowserTests(unittest.TestCase):
+    """Backlog 20: o computador nasce sem tela nem Chromium; só o agente (ou a tela ao vivo) liga."""
+
+    def run_lazy(self, fn, saved_cookies=False):
+        async def body():
+            b, display = LazyBrowser(saved_cookies), FakeDisplay()  # dentro do loop: o asyncio.Lock do 3.9 exige
+            server = RuntimeServer(b, TOKEN, display)
+            listener = await asyncio.start_server(server.handle, "127.0.0.1", 0)
+            try:
+                await fn(listener.sockets[0].getsockname()[1], b, display)
+            finally:
+                listener.close()
+
+        asyncio.run(body())
+
+    def test_health_is_ready_with_the_browser_off(self):
+        async def fn(port, browser, display):
+            _, _, payload = await call(port, "GET", "/v1/health", token=None)
+            self.assertEqual((payload["ready"], payload["browser"]), (True, "off"))
+            self.assertEqual((browser.starts, display.xvfb_starts, display.vnc_starts), (0, 0, 0))
+
+        self.run_lazy(fn)
+
+    def test_background_polls_never_wake_the_browser(self):
+        async def fn(port, browser, display):
+            polls = [("status", {}), ("frame", {"quality": 40}), ("tabs", {"action": "list"}), ("cookies", {"action": "get"}),
+                     ("selection", {}), ("lease", {"action": "status"})]
+            for op, args in polls:
+                status, _, payload = await call(port, "POST", f"/v1/{op}", payload=args)
+                self.assertEqual(status, 200, (op, payload))
+            self.assertEqual(browser.starts, 0)
+            self.assertNotIn("jpeg_b64", (await call(port, "POST", "/v1/frame", payload={}))[2])
+
+        self.run_lazy(fn)
+
+    def test_first_agent_command_starts_screen_and_browser_once(self):
+        async def fn(port, browser, display):
+            results = await asyncio.gather(*[call(port, "POST", "/v1/open", payload={"url": f"http://x/{i}"}) for i in range(3)])
+            self.assertTrue(all(r[0] == 200 for r in results))
+            self.assertEqual((browser.starts, display.xvfb_starts, display.vnc_starts), (1, 1, 0))
+            _, _, payload = await call(port, "GET", "/v1/health", token=None)
+            self.assertEqual(payload["browser"], "on")
+
+        self.run_lazy(fn)
+
+    def test_live_screen_starts_the_vnc_and_the_browser(self):
+        async def fn(port, browser, display):
+            status, _, payload = await call(port, "POST", "/v1/vnc_ticket", payload={})
+            self.assertEqual(status, 200)
+            self.assertIn("ticket", payload)
+            self.assertEqual((browser.starts, display.vnc_starts), (1, 1))
+
+        self.run_lazy(fn)
+
+    def test_saved_login_cookies_are_read_from_the_real_browser(self):
+        async def fn(port, browser, display):
+            status, _, _ = await call(port, "POST", "/v1/cookies", payload={"action": "get"})
+            self.assertEqual((status, browser.starts), (200, 1))
+
+        self.run_lazy(fn, saved_cookies=True)

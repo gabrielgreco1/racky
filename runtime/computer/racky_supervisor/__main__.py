@@ -59,6 +59,9 @@ def service_env(name: str) -> dict[str, str]:
             env[key] = os.environ[key]
     if name == "runtime":
         env["RACKY_PROFILE_DIR"] = "/profile"
+        for key in ("RACKY_CHROMIUM_LEAN", "RACKY_BROWSER_EAGER", "RACKY_CHROMIUM_EXTRA"):  # variantes do navegador (backlog 20)
+            if os.environ.get(key):
+                env[key] = os.environ[key]
     # Runtime sem Docker (VM): admin API só em loopback e o encaminhador vsock (o app chega nela pelo vsock, não pelo IP da VM).
     for key in ("RACKY_ADMIN_BIND", "RACKY_VSOCK_PORT", "RACKY_ADMIN_PORT"):
         if os.environ.get(key) and name in ("egress", "vsock"):

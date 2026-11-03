@@ -16,9 +16,13 @@ public struct VZExecRequest: Sendable, Equatable {
     public var workingDirectory: String?
     /// Com `false`, o stdin do processo já nasce fechado (como `docker exec` sem `-i`).
     public var attachStdin: Bool
+    /// Só para tarefas do próprio app (nunca para comandos do agente): root com CAP_SYS_ADMIN, por exemplo para ligar o swap da VM.
+    public var systemAdmin: Bool
 
-    public init(command: [String], environment: [String] = [], user: String? = nil, workingDirectory: String? = nil, attachStdin: Bool = false) {
+    public init(command: [String], environment: [String] = [], user: String? = nil, workingDirectory: String? = nil, attachStdin: Bool = false,
+                systemAdmin: Bool = false) {
         self.command = command; self.environment = environment; self.user = user; self.workingDirectory = workingDirectory; self.attachStdin = attachStdin
+        self.systemAdmin = systemAdmin
     }
 }
 

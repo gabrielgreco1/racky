@@ -24,7 +24,7 @@ import Testing
     @Test func resourcesRoundCpusUpAndKeepTheDockerMemoryCeiling() throws {
         let headless = try Self.plan(display: .headless)
         #expect(headless.cpus == 2)  // 1,75 -> 2
-        #expect(headless.memoryBytes == 4 << 30)
+        #expect(headless.memoryBytes == 3 << 30)
         let http = try Self.plan(display: .http)
         #expect(http.cpus == 1)  // 0,75 -> 1
         #expect(http.memoryBytes == 1 << 30)

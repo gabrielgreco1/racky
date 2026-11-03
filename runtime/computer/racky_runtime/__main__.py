@@ -1,4 +1,6 @@
-"""Ponto de entrada do papel `runtime`: Xvfb sempre, Chromium headed, API de ações em :8765 (07 CS-190)."""
+"""Ponto de entrada do papel `runtime`: API de ações em :8765 (07 CS-190). Tela (Xvfb), VNC e Chromium sobem sob demanda
+(backlog 20): o computador nasce só com o proxy e esta API; o primeiro comando de navegador liga a tela e o Chromium, e o VNC só
+sobe quando alguém abre a tela ao vivo. Crawler que só faz HTTP nunca paga o navegador."""
 from __future__ import annotations
 
 import asyncio
@@ -43,17 +45,35 @@ class Display:
         self.mode = "headless"
 
     async def start_xvfb(self) -> None:
+        if self.xvfb is not None and self.xvfb.poll() is None:
+            return
         self.xvfb = subprocess.Popen(["Xvfb", DISPLAY, "-screen", "0", "1440x900x24", "-nolisten", "tcp", "-ac"],
                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, **as_agent())
         socket = Path(f"/tmp/.X11-unix/X{DISPLAY.lstrip(':')}")
         for _ in range(100):
             if socket.exists():
-                self.start_vnc()
                 return
             if self.xvfb.poll() is not None:
                 raise RuntimeError("Xvfb exited during startup")
             await asyncio.sleep(0.1)
         raise RuntimeError("Xvfb did not become ready")
+
+    async def ensure_vnc(self) -> None:
+        """Só para a tela ao vivo: sem viewer aberto, ninguém precisa do x11vnc. Espera ele aceitar conexão: o app conecta logo
+        depois de receber o ticket."""
+        if self.vnc is not None and self.vnc.poll() is None:
+            return
+        self.start_vnc()
+        for _ in range(100):
+            try:
+                _, writer = await asyncio.open_connection("127.0.0.1", 5900)
+                writer.close()
+                return
+            except OSError:
+                if self.vnc.poll() is not None:
+                    raise RuntimeError("x11vnc exited during startup")
+                await asyncio.sleep(0.05)
+        raise RuntimeError("x11vnc did not start listening")
 
     def start_vnc(self) -> None:
         """x11vnc só em 127.0.0.1 (ninguém fora deste container o alcança); a ponte do servidor de controle faz o upgrade
@@ -88,12 +108,12 @@ async def main() -> int:
         await asyncio.sleep(0.2)
         token = load_token()
     display = Display()
-    await display.start_xvfb()
     browser = BrowserSession(Ingestor(token))
     server = RuntimeServer(browser, token, display)
     listener = await asyncio.start_server(server.handle, "127.0.0.1", PORT, limit=1 << 20)  # P24: só loopback do container
-    await browser.start()
-    print(f"runtime: API em :{PORT}, display {DISPLAY}, browser headed pronto", flush=True)
+    if os.environ.get("RACKY_BROWSER_EAGER") == "1":  # comportamento antigo, para comparar nas medições
+        await server.ensure_browser()
+    print(f"runtime: API em :{PORT}, display {DISPLAY}, browser sob demanda", flush=True)
 
     stop = asyncio.Event()
     loop = asyncio.get_running_loop()

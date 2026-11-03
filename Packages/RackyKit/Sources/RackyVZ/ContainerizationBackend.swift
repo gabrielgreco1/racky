@@ -14,6 +14,8 @@ import Synchronization
 @available(macOS 26, *)
 public actor ContainerizationBackend: VZBackend {
     private let manager: ContainerManager
+    /// Cria as VMs; cada container ganha um embrulho com o balão de memória (VZBalloon).
+    private let vmm: VZVirtualMachineManager
     /// A alocação de IPs é do actor (sem passar pelo `ContainerManager`, que copiaria o estado através de awaits): sempre síncrona.
     private var network: VmnetNetwork
     private let paths: VZPaths
@@ -22,12 +24,18 @@ public actor ContainerizationBackend: VZBackend {
 
     public init(paths: VZPaths, assets: VZReadyAssets) throws {
         self.paths = paths
-        let kernel = Kernel(path: assets.kernel, platform: .linuxArm)
+        // Sem `init_on_free=1` (medido em 02/11): o kernel zera toda a memória no boot e cada VM nasce ocupando o teto inteiro no Mac.
+        // O ajuste do balão lê a memória da VM a cada 3 s por um exec curto; com o log do vminitd em `info`, cada um grava três
+        // linhas no bootlog. `warning` mantém erros e as mensagens do kernel (o OOM de 02/11 foi achado por elas).
+        var commandLine = Kernel.CommandLine(debug: false, panic: 0)
+        commandLine.setAgentLogLevel(level: .warning)
+        let kernel = Kernel(path: assets.kernel, platform: .linuxArm, commandline: commandLine)
         let initfs = Mount.block(format: "ext4", source: assets.initfs.path, destination: "/", options: ["ro"])
         let network = try VmnetNetwork()
         self.network = network
         subnetText = "\(network.subnet)"
         manager = try ContainerManager(kernel: kernel, initfs: initfs, root: paths.store, network: nil)
+        vmm = VZVirtualMachineManager(kernel: kernel, initialFilesystem: initfs)
     }
 
     public var internalSubnet: String { subnetText }
@@ -48,8 +56,10 @@ public actor ContainerizationBackend: VZBackend {
             let resources = VMResources(cpus: plan.cpus, memoryInBytes: plan.memoryBytes + VMResources.guestMemoryOverhead)
             interface = try network.createInterface(plan.vmID)
             guard let nic = interface, let gateway = nic.ipv4Gateway else { throw VZError.bootFailed("no vmnet interface") }
-            var creator = manager
-            let container = try await creator.create(plan.vmID, image: containerImage, rootfs: rootfs, networking: false, vm: resources) { config in
+            let imageConfig = try await containerImage.config(for: .current).config
+            let balloon = VZBalloonHandle()
+            let container = try LinuxContainer(plan.vmID, rootfs: rootfs, vmm: VZBalloonVMM(base: vmm, handle: balloon), vm: resources) { config in
+                if let imageConfig { config.process = .init(from: imageConfig) }
                 config.interfaces = [nic]
                 config.dns = .init(nameservers: [gateway.description])
                 config.bootLog = BootLog.file(path: directory.appendingPathComponent("bootlog.log"))
@@ -79,8 +89,9 @@ public actor ContainerizationBackend: VZBackend {
             }
             let vm = ContainerizationVM(
                 vmID: plan.vmID, container: container, baseEnvironment: environment, ipAddress: container.interfaces.first.map { "\($0.ipv4Address.address)" },
-                rootfs: rootfsURL, release: { [weak self] id in await self?.release(id) })
+                rootfs: rootfsURL, balloon: balloon, memoryBytes: resources.memoryInBytes, release: { [weak self] id in await self?.release(id) })
             live[plan.vmID] = vm
+            if ProcessInfo.processInfo.environment["RACKY_VZ_DEV_NO_BALLOON"] != "1" { vm.startReclaiming() }
             return vm
         } catch let error as VZError {
             release(plan.vmID)
@@ -137,11 +148,16 @@ final class ContainerizationVM: RunningVM {
     private let stopped = Mutex(false)
     /// O disco da VM: identifica o processo do framework que roda esta VM, para o desligamento forçado.
     private let rootfs: URL
+    private let balloon: VZBalloonHandle
+    private let memoryBytes: UInt64
+    private let reclaimer = Mutex<Task<Void, Never>?>(nil)
 
-    init(vmID: String, container: LinuxContainer, baseEnvironment: [String], ipAddress: String?, rootfs: URL,
-         release: @escaping @Sendable (String) async -> Void) {
+    init(vmID: String, container: LinuxContainer, baseEnvironment: [String], ipAddress: String?, rootfs: URL, balloon: VZBalloonHandle,
+         memoryBytes: UInt64, release: @escaping @Sendable (String) async -> Void) {
         self.vmID = vmID
         self.rootfs = rootfs
+        self.balloon = balloon
+        self.memoryBytes = memoryBytes
         self.container = container
         self.baseEnvironment = baseEnvironment
         self.ipAddress = ipAddress
@@ -162,6 +178,8 @@ final class ContainerizationVM: RunningVM {
                 // Como `docker exec -u agent`: sem capacidade nenhuma e sem ganhar privilégio.
                 config.capabilities = LinuxCapabilities(capabilities: [])
                 config.noNewPrivileges = true
+            } else if request.systemAdmin {
+                config.capabilities = LinuxCapabilities(capabilities: [.sysAdmin, .dacOverride, .chown, .fowner])
             }
             config.stdout = FrameWriter(kind: .stdout, continuation: continuation)
             config.stderr = FrameWriter(kind: .stderr, continuation: continuation)
@@ -193,8 +211,37 @@ final class ContainerizationVM: RunningVM {
         try await container.copyOut(from: URL(fileURLWithPath: guestPath), to: destination)
     }
 
+    /// Ajusta o balão a cada poucos segundos (VZBalloonPolicy). Lê o `/proc/meminfo` da VM por um exec curto de root.
+    func startReclaiming(every interval: Duration = .seconds(3)) {
+        let task = Task { [weak self] in
+            var current: UInt64?
+            while !Task.isCancelled {
+                try? await Task.sleep(for: interval)
+                guard let self, !Task.isCancelled else { return }
+                current = await self.adjustBalloon(current: current ?? self.memoryBytes)
+            }
+        }
+        reclaimer.withLock { $0?.cancel(); $0 = task }
+    }
+
+    /// Um passo do ajuste; devolve o tamanho em vigor depois dele.
+    func adjustBalloon(current: UInt64) async -> UInt64 {
+        guard balloon.isAttached,
+              let out = try? await run(VZExecRequest(command: ["cat", "/proc/meminfo"], user: "root"), timeout: .seconds(10)),
+              let info = VZBalloonPolicy.parse(out.stdoutString) else { return current }
+        let next = VZBalloonPolicy.next(current: current, configured: memoryBytes, info: info)
+        if next != current {
+            await balloon.setTarget(bytes: next)
+            if ProcessInfo.processInfo.environment["RACKY_VZ_DEV_BALLOON_LOG"] == "1" {
+                FileHandle.standardError.write(Data("balloon \(vmID): \(current >> 20) -> \(next >> 20) MiB of \(memoryBytes >> 20)\n".utf8))
+            }
+        }
+        return next
+    }
+
     func stop() async {
         guard stopped.withLock({ let first = !$0; $0 = true; return first }) else { return }
+        reclaimer.withLock { $0?.cancel(); $0 = nil }
         let container = container
         // VM travada não responde ao desligamento educado; sem prazo, ela seguia ligada (e o registro preso) para sempre.
         if await !VZForceStop.finishes(within: .seconds(30), { try? await container.stop() }) {

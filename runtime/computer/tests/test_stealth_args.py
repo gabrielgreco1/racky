@@ -18,6 +18,16 @@ class StealthArgsTests(unittest.TestCase):
         self.assertIn("--accept-lang=pt-BR,pt,en-US,en", args)
         self.assertIn("--lang=en-US", launch_args({}))
 
+    def test_lean_flags_are_on_by_default_and_never_disable_webgl(self):
+        args = launch_args({})
+        self.assertIn("--in-process-gpu", args)
+        self.assertEqual(sum(a.startswith("--disable-features=") for a in args), 1)
+        self.assertIn("SpareRendererForSitePerProcess", next(a for a in args if a.startswith("--disable-features=")))
+        self.assertNotIn("--disable-gpu", args)
+        off = launch_args({"RACKY_CHROMIUM_LEAN": "0"})
+        self.assertNotIn("--in-process-gpu", off)
+        self.assertIn("--disable-features=Translate", off)
+
 
 if __name__ == "__main__":
     unittest.main()

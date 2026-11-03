@@ -63,12 +63,16 @@ if CommandLine.arguments.count == 4, CommandLine.arguments[1] == "export-image" 
 var home: URL?
 var manifest: String?
 var hold = false
+var measure = false
+var load = 0
 var arguments = CommandLine.arguments.dropFirst()
 while let flag = arguments.popFirst() {
     switch flag {
     case "--home": home = arguments.popFirst().map { URL(fileURLWithPath: $0, isDirectory: true) }
     case "--manifest": manifest = arguments.popFirst()
     case "--hold": hold = true
+    case "--measure": measure = true
+    case "--load": load = Int(arguments.popFirst() ?? "") ?? 4
     default:
         emit("usage: racky-vz-selftest --home <dir> --manifest <vz-manifest.json>")
         exit(2)
@@ -113,6 +117,169 @@ if hold {
     _ = await step("provision (hold)") { _ = try await runtime.provision(spec) }
     emit("HOLDING pid=\(getpid())")
     try await Task.sleep(for: .seconds(300))
+    exit(0)
+}
+
+// `--measure`: quanto um computador ocupa (backlog 20). Sobe um headless e um http, e em cada fase imprime a memória da VM,
+// os processos que mais ocupam lá dentro e o RSS do processo da VM no Mac. Não roda o resto do autoteste.
+// `--load N`: teste pesado (backlog 20). N computadores headless ao mesmo tempo, cada um abre páginas no navegador, roda um job de
+// ~900 MB com CPU e escreve na pasta de trabalho; um amostrador soma a memória (phys_footprint) de todas as VMs no Mac e mede quanto
+// cada VM demora para responder a um comando. Termina com 90 s parado para ver quanto volta.
+if load > 0 {
+    func footprints() -> [String: Int] {
+        let containers = home.appendingPathComponent("vz/store/containers")
+        var out: [String: Int] = [:]
+        for d in (try? FileManager.default.contentsOfDirectory(atPath: containers.path)) ?? [] {
+            let lsof = Process(); lsof.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof")
+            lsof.arguments = ["-t", "--", containers.appendingPathComponent(d).appendingPathComponent("rootfs.ext4").path]
+            let pipe = Pipe(); lsof.standardOutput = pipe; try? lsof.run(); lsof.waitUntilExit()
+            guard let pid = String(decoding: pipe.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self).split(separator: "\n").first else { continue }
+            let fp = Process(); fp.executableURL = URL(fileURLWithPath: "/usr/bin/footprint"); fp.arguments = ["-p", String(pid)]
+            let o = Pipe(); fp.standardOutput = o; fp.standardError = Pipe(); try? fp.run(); fp.waitUntilExit()
+            let text = String(decoding: o.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+            if let m = text.firstMatch(of: /Footprint: ([0-9]+) (KB|MB|GB)/) {
+                let n = Int(m.1) ?? 0
+                out[d] = m.2 == "GB" ? n * 1024 : (m.2 == "KB" ? n / 1024 : n)
+            }
+        }
+        return out
+    }
+    let started = Date()
+    func t() -> String { String(format: "%5.0fs", Date().timeIntervalSince(started)) }
+    var handles: [(String, ProvisionedHandle)] = []
+    await withTaskGroup(of: (String, ProvisionedHandle?).self) { group in
+        for i in 1...load {
+            group.addTask {
+                let name = "load-\(i)"
+                let spec = ComputerSpec(name: name, parent: "selftest", display: .headless, profile: nil, proxy: "direct", proxiesAllowed: [],
+                                        allowHosts: [], batch: nil, run: RunFolder(root: home.appendingPathComponent("runs/\(name)", isDirectory: true)))
+                return (name, try? await runtime.provision(spec))
+            }
+        }
+        for await (name, handle) in group {
+            if let handle { handles.append((name, handle)) } else { emit("FAIL provision \(name)") }
+        }
+    }
+    emit("\(t()) provisioned \(handles.count)/\(load)")
+    let sampling = Task {
+        var peak = 0
+        while !Task.isCancelled {
+            let fps = footprints()
+            let total = fps.values.reduce(0, +)
+            peak = max(peak, total)
+            var latencies: [String] = []
+            for (name, handle) in handles {
+                let clock = ContinuousClock.now
+                let ok = (try? await handle.backend.execRun(BackendExec(argv: ["true"], cwd: "/work"), timeout: .seconds(20)))?.exitCode == 0
+                let ms = (ContinuousClock.now - clock).components
+                latencies.append("\(name)=\(ok ? "\(ms.seconds * 1000 + ms.attoseconds / 1_000_000_000_000_000)ms" : "NO-ANSWER")")
+            }
+            emit("\(t()) SAMPLE total=\(total)MB peak=\(peak)MB per-vm=\(fps.values.sorted()) exec: \(latencies.joined(separator: " "))")
+            try? await Task.sleep(for: .seconds(10))
+        }
+    }
+    let job = "python3 - <<'PY'\nimport time, os, hashlib\nblob=[bytearray(1024*1024) for _ in range(900)]\n"
+        + "end=time.time()+25\nh=hashlib.sha256()\nwhile time.time()<end: h.update(blob[int(time.time()*1000)%900])\n"
+        + "os.makedirs('/work/out', exist_ok=True)\nopen('/work/out/data.bin','wb').write(os.urandom(50*1024*1024))\nprint('job ok', h.hexdigest()[:8])\nPY"
+    await withTaskGroup(of: String.self) { group in
+        for (name, handle) in handles {
+            group.addTask {
+                var notes: [String] = []
+                // `RACKY_LOAD_BROWSER_EVERY=2`: só um em cada dois usa o navegador (o resto é crawler HTTP + testes, como um builder).
+                let every = Int(ProcessInfo.processInfo.environment["RACKY_LOAD_BROWSER_EVERY"] ?? "") ?? 1
+                let index = Int(name.split(separator: "-").last ?? "") ?? 0
+                let urls = index % every == 0 ? ["https://en.wikipedia.org/wiki/Web_scraping", "https://en.wikipedia.org/wiki/Virtual_machine", "https://example.com"] : []
+                if urls.isEmpty {
+                    let http = try? await handle.backend.execRun(BackendExec(argv: ["bash", "-lc", "curl -s -o /dev/null -w '%{http_code}' https://en.wikipedia.org/wiki/Web_scraping"], cwd: "/work"), timeout: .seconds(60))
+                    notes.append("http-only \(String(decoding: http?.stdout ?? Data(), as: UTF8.self))")
+                }
+                for url in urls {
+                    do { _ = try await handle.backend.runtime("open", ["url": .string(url)], timeout: 90); notes.append("open ok") }
+                    catch { notes.append("open FAIL \(error)") }
+                }
+                let o = try? await handle.backend.execRun(BackendExec(argv: ["bash", "-lc", job], cwd: "/work"), timeout: .seconds(180))
+                notes.append("job exit=\(o?.exitCode.map(String.init) ?? "nil") \(String(decoding: o?.stdout ?? Data(), as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines))")
+                return "\(name): \(notes.joined(separator: ", "))"
+            }
+        }
+        for await line in group { emit("\(t()) DONE \(line)") }
+    }
+    emit("\(t()) workload finished; idling 90s")
+    try await Task.sleep(for: .seconds(90))
+    sampling.cancel()
+    let final = footprints()
+    emit("\(t()) FINAL total=\(final.values.reduce(0, +))MB per-vm=\(final.values.sorted())")
+    for (_, handle) in handles { await handle.teardown() }
+    emit("LOAD done")
+    exit(0)
+}
+
+if measure {
+    func hostRSS(_ root: URL) -> String {
+        let containers = home.appendingPathComponent("vz/store/containers")
+        let dirs = (try? FileManager.default.contentsOfDirectory(atPath: containers.path)) ?? []
+        var lines: [String] = []
+        for d in dirs {
+            let rootfs = containers.appendingPathComponent(d).appendingPathComponent("rootfs.ext4").path
+            let lsof = Process(); lsof.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof"); lsof.arguments = ["-t", "--", rootfs]
+            let pipe = Pipe(); lsof.standardOutput = pipe; try? lsof.run(); lsof.waitUntilExit()
+            for pid in String(decoding: pipe.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self).split(separator: "\n") {
+                let ps = Process(); ps.executableURL = URL(fileURLWithPath: "/bin/ps"); ps.arguments = ["-o", "rss=,%cpu=", "-p", String(pid)]
+                let out = Pipe(); ps.standardOutput = out; try? ps.run(); ps.waitUntilExit()
+                lines.append("host vm \(d) pid \(pid): rss_kb,cpu = \(String(decoding: out.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines))")
+                // phys_footprint: o que o Activity Monitor mostra como "Memória" (inclui o comprimido, no tamanho comprimido).
+                let fp = Process(); fp.executableURL = URL(fileURLWithPath: "/usr/bin/footprint"); fp.arguments = ["-p", String(pid)]
+                let fpOut = Pipe(); fp.standardOutput = fpOut; fp.standardError = Pipe(); try? fp.run(); fp.waitUntilExit()
+                let summary = String(decoding: fpOut.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+                    .split(separator: "\n").filter { $0.contains("Footprint:") || $0.contains("TOTAL") || $0.contains("VM_ALLOCATE") }
+                    .joined(separator: " | ")
+                lines.append("host vm \(d) pid \(pid): \(summary.trimmingCharacters(in: .whitespaces))")
+            }
+        }
+        return lines.joined(separator: "\n")
+    }
+    let probe = "echo '--- meminfo'; grep -E 'MemTotal|MemFree|MemAvailable|^Cached|Shmem:' /proc/meminfo; "
+        + "echo '--- top rss (kb) cpu args'; ps -eo rss=,pcpu=,args= --sort=-rss | head -22 | cut -c1-160; "
+        + "echo '--- processes'; ps -e --no-headers | wc -l; echo '--- sum rss kb'; ps -eo rss= | awk '{s+=$1} END {print s}'; "
+        + "echo '--- swap'; cat /proc/swaps; df -h / | tail -1; ls /sys/class/zram-control 2>&1 | head -2; (zcat /proc/config.gz 2>/dev/null | grep -E 'ZRAM|ZSWAP|CONFIG_SWAP=') || echo no-config.gz"
+    for display in [ComputerDisplay.headless, .http] {
+        let run = home.appendingPathComponent("runs/measure-\(display.rawValue)", isDirectory: true)
+        let spec = ComputerSpec(name: "measure-\(display.rawValue)", parent: "selftest", display: display, profile: nil, proxy: "direct",
+                                proxiesAllowed: [], allowHosts: [], batch: nil, run: RunFolder(root: run))
+        guard let handle = await step("provision \(display.rawValue)", { try await runtime.provision(spec) }) else { continue }
+        func snap(_ phase: String) async {
+            emit("===== \(display.rawValue) · \(phase)")
+            if let o = try? await handle.backend.execRun(BackendExec(argv: ["bash", "-lc", probe], cwd: "/work"), timeout: .seconds(30)) {
+                emit(String(decoding: o.stdout, as: UTF8.self))
+            }
+            emit(hostRSS(home))
+        }
+        try await Task.sleep(for: .seconds(20))
+        await snap("idle 20s after boot")
+        if display != .http {
+            _ = try? await handle.backend.runtime("open", ["url": "https://example.com"], timeout: 60)
+            try await Task.sleep(for: .seconds(5))
+            await snap("after example.com")
+            _ = try? await handle.backend.runtime("open", ["url": "https://en.wikipedia.org/wiki/Web_scraping"], timeout: 90)
+            try await Task.sleep(for: .seconds(8))
+            await snap("after a wikipedia article")
+        }
+        // Pico acima do teto da VM (3 GiB com o navegador aberto): sem swap a VM travava; com swap ela tem de seguir respondendo.
+        let heldMB = ProcessInfo.processInfo.environment["RACKY_MEASURE_HOLD_MB"] ?? "600"
+        let work = "python3 - <<'PY'\nimport time\nblob=[bytearray(1024*1024) for _ in range(\(heldMB))]\nfor b in blob: b[::4096]=b'x'*len(b[::4096])\ntime.sleep(15)\nprint('held', len(blob))\nPY"
+        let job = Task { try? await handle.backend.execRun(BackendExec(argv: ["bash", "-lc", work], cwd: "/work"), timeout: .seconds(60)) }
+        try await Task.sleep(for: .seconds(8))
+        await snap("python job holding \(heldMB) MB")
+        let finished = await job.value
+        emit("job outcome: exit=\(finished.map { "\($0.exitCode.map(String.init) ?? "nil") timedOut=\($0.timedOut)" } ?? "error") \(finished.map { String(decoding: $0.stdout, as: UTF8.self) } ?? "")")
+        await snap("after the job")
+        for t in [30, 60, 90, 120, 150] {
+            try await Task.sleep(for: .seconds(30))
+            await snap("\(t)s after the job (balloon reclaim)")
+        }
+        await handle.teardown()
+    }
+    emit("MEASURE done")
     exit(0)
 }
 
