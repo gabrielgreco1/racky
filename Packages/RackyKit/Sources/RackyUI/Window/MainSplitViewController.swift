@@ -89,6 +89,7 @@ final class MainSplitViewController: NSSplitViewController {
         let rightVC = NSViewController()
         let rightHost = RightPanelHostView(
             content: RightPanelView(controller: env.rightPanel).environment(\.elementStore, env.elements).environment(\.actionRegistry, env.registry)
+                .environment(\.overlayRouter, env.overlays)  // sem ele, seletor e menu do painel não abrem nada
                 .environment(\.a11yParent, .windowMain))
         rightHost.hosting.inputBlocked = { [overlays = env.overlays] in overlays.blocksTerminalInput }
         rightVC.view = rightHost

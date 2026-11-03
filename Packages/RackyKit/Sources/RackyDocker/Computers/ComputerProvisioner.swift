@@ -1,13 +1,14 @@
 import Foundation
 
 extension ComputerDisplay {
-    /// Limite de memória do container único (P24): Chromium headed + utilitários de trabalho + proxy. Antes eram três containers
-    /// (runtime 2 GiB, work 1 GiB, egress 128 MiB); o uso real somado era ~0,75 GiB, então o teto único é menor que a soma.
+    /// Limite de memória do computador: Chromium + o trabalho do agente (pytest, crawler, pandas) + proxy. Com 2,5 GiB e sem swap,
+    /// um builder rodando a suíte de testes junto do Chromium esgotou a memória da VM (02/11): o kernel não alocava mais para o
+    /// virtio-fs, a pasta de trabalho parou de responder e a VM ficou girando a 200% de CPU. 4 GiB dá folga para esse caso.
     var computerMemory: Int64 {
         switch self {
         case .http: 1 << 30
-        case .desktop: 7 << 29  // 3,5 GiB
-        default: 5 << 29  // 2,5 GiB
+        case .desktop: 5 << 30
+        default: 4 << 30
         }
     }
     var computerCPUs: Double {

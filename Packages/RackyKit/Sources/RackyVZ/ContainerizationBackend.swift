@@ -79,7 +79,7 @@ public actor ContainerizationBackend: VZBackend {
             }
             let vm = ContainerizationVM(
                 vmID: plan.vmID, container: container, baseEnvironment: environment, ipAddress: container.interfaces.first.map { "\($0.ipv4Address.address)" },
-                release: { [weak self] id in await self?.release(id) })
+                rootfs: rootfsURL, release: { [weak self] id in await self?.release(id) })
             live[plan.vmID] = vm
             return vm
         } catch let error as VZError {
@@ -135,9 +135,13 @@ final class ContainerizationVM: RunningVM {
     private let baseEnvironment: [String]
     private let release: @Sendable (String) async -> Void
     private let stopped = Mutex(false)
+    /// O disco da VM: identifica o processo do framework que roda esta VM, para o desligamento forçado.
+    private let rootfs: URL
 
-    init(vmID: String, container: LinuxContainer, baseEnvironment: [String], ipAddress: String?, release: @escaping @Sendable (String) async -> Void) {
+    init(vmID: String, container: LinuxContainer, baseEnvironment: [String], ipAddress: String?, rootfs: URL,
+         release: @escaping @Sendable (String) async -> Void) {
         self.vmID = vmID
+        self.rootfs = rootfs
         self.container = container
         self.baseEnvironment = baseEnvironment
         self.ipAddress = ipAddress
@@ -191,7 +195,11 @@ final class ContainerizationVM: RunningVM {
 
     func stop() async {
         guard stopped.withLock({ let first = !$0; $0 = true; return first }) else { return }
-        try? await container.stop()
+        let container = container
+        // VM travada não responde ao desligamento educado; sem prazo, ela seguia ligada (e o registro preso) para sempre.
+        if await !VZForceStop.finishes(within: .seconds(30), { try? await container.stop() }) {
+            await VZForceStop.killVM(holding: rootfs)
+        }
         await release(vmID)
     }
 }
