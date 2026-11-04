@@ -7,7 +7,7 @@ import Foundation
 // Nenhum valor passa por log, descrição, evento ou erro.
 
 public enum SecretKind: String, Sendable, CaseIterable {
-    case proxyCredential, envVar, claudeSetupToken, codexBoxIdentity, githubPAT, boxMasterKey, siteSession
+    case proxyCredential, envVar, claudeSetupToken, codexBoxIdentity, githubPAT, boxMasterKey
 }
 public enum SecretScope: String, Sendable { case global, project }
 /// `sidecarOnly`: nunca chega ao terminal do agente. `profileEnv`: injetável no env por opt-in.

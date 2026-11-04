@@ -235,3 +235,138 @@ struct AgentsLibraryTests {
         #expect(AgentsController.agentName(fromDrag: "something else") == nil)
     }
 }
+
+private struct ScriptedRunner: AuthoringRunner {
+    var answer: @Sendable (String, String) throws -> String
+    func complete(system: String, prompt: String) async throws -> String { try answer(system, prompt) }
+}
+
+@MainActor
+@Suite("Backlog 25 - Create agent and skill", .serialized, .offscreenAppKit)
+struct AgentCreateTests {
+    private func fixture(runner: ScriptedRunner? = nil) async throws -> (AgentsFixture, AgentCreateController) {
+        let f = try await AgentsFixture(seed: false)
+        let c = AgentCreateController(agents: f.controller)
+        c.skills = SkillStore(root: f.base.appendingPathComponent("skills"))
+        if let runner { c.runner = runner }
+        try c.register(in: f.registry)
+        await c.begin(kind: .agent, mode: .description)
+        return (f, c)
+    }
+
+    @Test func chatFillsTheDraftAndCreateWritesTheAgentWithItsFilesAndFace() async throws {
+        let seen = SeenPrompts()
+        let (f, c) = try await fixture(runner: ScriptedRunner { system, prompt in
+            seen.add(system, prompt)
+            return "Got it, short reviews.\n```draft\n{\"name\": \"PR Swift\", \"description\": \"Reviews Swift PRs\", \"instructions\": \"Review the diff, one line per finding.\", \"tone\": \"short\", \"skills\": [\"code-review\"], \"computer\": false}\n```"
+        })
+        defer { f.remove() }
+        let example = f.base.appendingPathComponent("review-pr-212.md")
+        try "Verdict: ship it\nfile.swift:12 nit".write(to: example, atomically: true, encoding: .utf8)
+        let sheet = f.base.appendingPathComponent("cases.xlsx")
+        try Data([0x50, 0x4b, 0, 3]).write(to: sheet)
+        _ = try await f.registry.perform(.agentsCreateAttach, .select(example.path))
+        _ = try await f.registry.perform(.agentsCreateAttach, .select(sheet.path))
+        _ = try await f.registry.perform(.agentsCreateAttach, .select("computer|wi-milwaukee|wi-milwaukee"))
+        _ = try await f.registry.perform(.agentsCreateSend, .set("Review my Swift PRs, short and in Portuguese"))
+        #expect(c.draft.name == "pr-swift" && c.draft.skills == ["code-review"] && c.draft.instructions.hasPrefix("Review the diff"))
+        #expect(c.messages.map(\.role) == [.assistant, .user, .assistant] && c.messages[1].fileNames == ["review-pr-212.md", "cases.xlsx"])
+        #expect(seen.prompts[0].contains("Verdict: ship it") && seen.prompts[0].contains("cases.xlsx") && seen.systems[0].contains("```draft"))
+        #expect(c.input.isEmpty && c.pendingUploads.isEmpty && !c.isSending)
+        _ = try await f.registry.perform(.agentsCreatePickAvatar, .select("3"))
+        _ = try await f.registry.perform(.agentsCreateSetField, .set("tone=Seco e direto"))
+        _ = try await f.registry.perform(.agentsCreateSetField, .select("computer=on"))
+        _ = try await f.registry.perform(.agentsCreateConfirm, .press)
+        let a = try f.controller.store.load("pr-swift")
+        #expect(a.avatar == AgentAvatar(kind: .generated, variant: 3) && a.tone == "Seco e direto" && a.computer != nil && a.skills == ["code-review"])
+        #expect(try String(contentsOf: f.controller.store.avatarURL("pr-swift")!, encoding: .utf8) == AgentAvatarGenerator.svg(name: "pr-swift", variant: 3))
+        let manifest = try f.controller.store.attachments("pr-swift").attachments
+        #expect(manifest.map(\.kind) == [.file, .spreadsheet, .computer])
+        #expect(FileManager.default.fileExists(atPath: manifest[0].reference) && manifest[0].reference.contains("/pr-swift/files/"))
+        #expect(f.pages.last == .agent("pr-swift"), "depois de criar abre a página do agente")
+    }
+
+    @Test func createRejectsMissingAndDuplicateNamesAndRunnerErrorsShowInTheChat() async throws {
+        let (f, c) = try await fixture(runner: ScriptedRunner { _, _ in throw AuthoringError.claudeNotFound })
+        defer { f.remove() }
+        await #expect(throws: ActionError.self) { _ = try await f.registry.perform(.agentsCreateConfirm, .press) }
+        try f.controller.store.create(AgentDefinition(name: "taken"))
+        _ = try await f.registry.perform(.agentsCreateSetField, .set("name=Taken"))
+        await #expect(throws: ActionError.self) { _ = try await f.registry.perform(.agentsCreateConfirm, .press) }
+        await #expect(throws: ActionError.self) { _ = try await f.registry.perform(.agentsCreateSend, .set("hello")) }
+        #expect(c.error?.contains("Claude Code isn't installed") == true && !c.isSending)
+        await #expect(throws: ActionError.self) { _ = try await f.registry.perform(.agentsCreateSend, .set("   ")) }
+        await #expect(throws: ActionError.self) { _ = try await f.registry.perform(.agentsCreatePickAvatar, .select("9")) }
+        await #expect(throws: ActionError.self) { _ = try await f.registry.perform(.agentsCreateUploadPhoto, .select(f.base.appendingPathComponent("x.exe").path)) }
+        #expect(AgentCreateController.typingSlug("My Agent ") == "my-agent-")
+    }
+
+    @Test func importingAMarkdownFillsTheDraftWithoutCallingClaude() async throws {
+        let (f, c) = try await fixture(runner: ScriptedRunner { _, _ in Issue.record("Claude must not be called"); return "" })
+        defer { f.remove() }
+        let md = f.base.appendingPathComponent("reviewer.md")
+        try "---\nname: reviewer\ndescription: Reviews diffs\nskills: tdd\n---\nReview carefully.\n".write(to: md, atomically: true, encoding: .utf8)
+        await c.importFile(md)
+        #expect(c.draft.name == "reviewer" && c.draft.description == "Reviews diffs" && c.draft.instructions == "Review carefully." && c.draft.skills == ["tdd"])
+        _ = try await f.registry.perform(.agentsCreateUploadPhoto, .select(try photo(f.base)))
+        #expect(c.photo != nil)
+        _ = try await f.registry.perform(.agentsCreateConfirm, .press)
+        #expect(f.controller.agent("reviewer")?.avatar.kind == .photo)
+    }
+
+    @Test func createSkillStoresSkillMdWithExamplesAndReferences() async throws {
+        let (f, c) = try await fixture(runner: ScriptedRunner { _, _ in
+            "Saved.\n```draft\n{\"name\": \"silver-permits\", \"description\": \"Builds the silver table\", \"instructions\": \"1. Compare with references/schema.json\", \"skills\": []}\n```"
+        })
+        defer { f.remove() }
+        await c.begin(kind: .skill, mode: .scratch)
+        var created: [String] = []
+        c.skillCreated = { created.append($0) }
+        let schema = f.base.appendingPathComponent("schema.json"), example = f.base.appendingPathComponent("silver-austin.csv")
+        try "{}".write(to: schema, atomically: true, encoding: .utf8)
+        try "a,b".write(to: example, atomically: true, encoding: .utf8)
+        _ = try await f.registry.perform(.agentsCreateAttach, .select(schema.path))
+        _ = try await f.registry.perform(.agentsCreateAttach, .select(example.path))
+        _ = try await f.registry.perform(.agentsCreateSend, .set("Build silver permits from bronze"))
+        _ = try await f.registry.perform(.agentsCreateConfirm, .press)
+        let dir = f.base.appendingPathComponent("skills/silver-permits")
+        #expect(FileManager.default.fileExists(atPath: dir.appendingPathComponent("references/schema.json").path))
+        #expect(FileManager.default.fileExists(atPath: dir.appendingPathComponent("examples/silver-austin.csv").path))
+        #expect(try c.skills.load("silver-permits").body.contains("references/schema.json") && created == ["silver-permits"])
+        let entry = try #require(f.controller.libraryEntries(skills: c.skills).first)
+        #expect(entry.kind == .skill && entry.activation(sessionFolder: nil, added: []) == .off)
+        let injection = try #require(SessionLibraryBuilder.build([ActivationRef(entry)]))
+        #expect(injection.skillNames == ["silver-permits"] && injection.pluginFiles.contains { $0.name.hasSuffix("references/schema.json") })
+        await #expect(throws: ActionError.self) { _ = try await f.registry.perform(.agentsCreateConfirm, .press) }
+    }
+
+    @Test func createPageSnapshots() async throws {
+        let (f, c) = try await fixture(runner: ScriptedRunner { _, _ in
+            "Peguei o formato: veredito em uma linha e depois os achados com arquivo e linha. Quer que ele use computador?\n```draft\n{\"name\": \"pr-swift\", \"description\": \"Reviews Swift PRs of Racky\", \"instructions\": \"Revise o diff. Comece com um veredito de uma linha e liste cada achado como arquivo:linha.\", \"tone\": \"Curto, em portugues\", \"skills\": [\"code-review\"], \"computer\": false}\n```"
+        })
+        defer { f.remove() }
+        let example = f.base.appendingPathComponent("review-pr-212.md")
+        try "Verdict".write(to: example, atomically: true, encoding: .utf8)
+        _ = try await f.registry.perform(.agentsCreateAttach, .select(example.path))
+        _ = try await f.registry.perform(.agentsCreateSend, .set("Quero um agente que revisa PRs de Swift, fala curto e aponta arquivo e linha."))
+        _ = try await f.registry.perform(.agentsCreateAttach, .select("computer|wi-milwaukee|wi-milwaukee"))
+        f.render(AgentCreatePageView(controller: c), size: CGSize(width: 1200, height: 800), name: "createAgent", test: "agentsCreate")
+        await c.begin(kind: .skill, mode: .scratch)
+        f.render(AgentCreatePageView(controller: c), size: CGSize(width: 1200, height: 640), name: "createSkill", test: "agentsCreate")
+    }
+
+    private func photo(_ dir: URL) throws -> String {
+        let url = dir.appendingPathComponent("me.png")
+        let png = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 4, pixelsHigh: 4, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+        try png.representation(using: .png, properties: [:])!.write(to: url)
+        return url.path
+    }
+}
+
+private nonisolated final class SeenPrompts: @unchecked Sendable { // SAFETY: gravado pelo runner de mentira, lido depois do `await`.
+    private let lock = NSLock()
+    private var s: [String] = [], p: [String] = []
+    func add(_ system: String, _ prompt: String) { lock.lock(); s.append(system); p.append(prompt); lock.unlock() }
+    var systems: [String] { lock.lock(); defer { lock.unlock() }; return s }
+    var prompts: [String] { lock.lock(); defer { lock.unlock() }; return p }
+}

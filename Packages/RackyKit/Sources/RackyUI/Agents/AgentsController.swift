@@ -239,6 +239,16 @@ final class AgentsController {
 
     var libraryEntries: [LibraryEntry] { agents.map(libraryEntry) }
 
+    /// Skills do Racky (`~/Racky/skills`) como itens da Library: ligar na sessão copia a pasta para o plugin do lançamento.
+    func libraryEntries(skills store: SkillStore) -> [LibraryEntry] {
+        store.list().compactMap { skill in
+            guard let url = try? store.skillURL(skill.name) else { return nil }
+            return LibraryEntry(
+                id: "racky:skill:\(skill.name)", kind: .skill, name: skill.name, summary: skill.description.isEmpty ? nil : skill.description, path: url.path,
+                category: .racky, source: "racky", scope: "racky", clients: [.claude, .codex, .opencode])
+        }
+    }
+
     // MARK: Drag
 
     static let dragPrefix = "racky-agent:"

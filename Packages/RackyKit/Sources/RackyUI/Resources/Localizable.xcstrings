@@ -14829,3 +14829,388 @@
   },
   "version": "1.0"
 }
+    },
+    "A skill with this name already exists.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A skill with this name already exists."
+          }
+        }
+      }
+    },
+    "Add Files…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Files…"
+          }
+        }
+      }
+    },
+    "An agent with this name already exists.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An agent with this name already exists."
+          }
+        }
+      }
+    },
+    "Answer Claude, or paste an example": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Answer Claude, or paste an example"
+          }
+        }
+      }
+    },
+    "Claude is still answering.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claude is still answering."
+          }
+        }
+      }
+    },
+    "Claude is writing…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claude is writing…"
+          }
+        }
+      }
+    },
+    "Create Agent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create Agent"
+          }
+        }
+      }
+    },
+    "Examples and references you drop in the chat are saved with the skill.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Examples and references you drop in the chat are saved with the skill."
+          }
+        }
+      }
+    },
+    "Filled in as you talk": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filled in as you talk"
+          }
+        }
+      }
+    },
+    "From a description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From a description"
+          }
+        }
+      }
+    },
+    "From scratch": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From scratch"
+          }
+        }
+      }
+    },
+    "Give it a name first.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Give it a name first."
+          }
+        }
+      }
+    },
+    "Here are the files.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Here are the files."
+          }
+        }
+      }
+    },
+    "I read %@. Tell me what to change, or create it as it is.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I read %@. Tell me what to change, or create it as it is."
+          }
+        }
+      }
+    },
+    "Import a .md": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import a .md"
+          }
+        }
+      }
+    },
+    "New Skill": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Skill"
+          }
+        }
+      }
+    },
+    "Racky couldn't read that file.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Racky couldn't read that file."
+          }
+        }
+      }
+    },
+    "Send": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send"
+          }
+        }
+      }
+    },
+    "Short and direct, with the number and the file": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Short and direct, with the number and the file"
+          }
+        }
+      }
+    },
+    "Tell me what this agent does and how you want it to talk. Drop in any example of the result you want and it will always do it the same way.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tell me what this agent does and how you want it to talk. Drop in any example of the result you want and it will always do it the same way."
+          }
+        }
+      }
+    },
+    "Tell me what this skill teaches and how you will know it came out right. Drop in examples of the result and the files it should follow.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tell me what this skill teaches and how you will know it came out right. Drop in examples of the result and the files it should follow."
+          }
+        }
+      }
+    },
+    "That file doesn't exist.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That file doesn't exist."
+          }
+        }
+      }
+    },
+    "Updated the draft.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updated the draft."
+          }
+        }
+      }
+    },
+    "Use letters, numbers and dashes in the name.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use letters, numbers and dashes in the name."
+          }
+        }
+      }
+    },
+    "Write a message first.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Write a message first."
+          }
+        }
+      }
+    },
+    "kept, not read": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kept, not read"
+          }
+        }
+      }
+    },
+    "tdd, qa": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tdd, qa"
+          }
+        }
+      }
+    },
+    "Create Skill": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create Skill"
+          }
+        }
+      }
+    },
+    "Face": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face"
+          }
+        }
+      }
+    },
+    "Fixed attachments": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fixed attachments"
+          }
+        }
+      }
+    },
+    "Files that go with it": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Files that go with it"
+          }
+        }
+      }
+    },
+    "SKILL.md": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SKILL.md"
+          }
+        }
+      }
+    },
+    "kebab-case-name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kebab-case-name"
+          }
+        }
+      }
+    },
+    "When Claude should use this skill": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When Claude should use this skill"
+          }
+        }
+      }
+    },
+    "read by Claude": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "read by Claude"
+          }
+        }
+      }

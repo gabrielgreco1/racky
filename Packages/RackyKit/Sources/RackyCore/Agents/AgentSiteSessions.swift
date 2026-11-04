@@ -68,7 +68,7 @@ public enum AgentSiteSessions {
         if let existing = try await vault.list().first(where: { $0.name == name }) {
             try await vault.rotate(id: existing.id, newValue: value)
         } else {
-            try await vault.create(NewSecret(name: name, value: value, kind: .siteSession, delivery: .sidecarOnly, note: "Logged-in session for \(host)"))
+            try await vault.create(NewSecret(name: name, value: value, delivery: .sidecarOnly, note: "Logged-in session for \(host)"))
         }
         return expiry(of: mine)
     }

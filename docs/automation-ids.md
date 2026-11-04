@@ -583,6 +583,8 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 - `data.connect.form`
 - `data.connect.name`
 - `data.connect.url`
+- `data.connect.host`
+- `data.connect.database`
 - `data.connect.auth`
 - `data.connect.user`
 - `data.connect.secret`
@@ -836,6 +838,13 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 - `agents.create.upload.<index>`
 - `agents.create.draft`
 - `agents.create.name`
+- `agents.create.description`
+- `agents.create.tone`
+- `agents.create.instructions`
+- `agents.create.skills`
+- `agents.create.computer`
+- `agents.create.attachments`
+- `agents.create.attachment.add`
 - `agents.create.avatar.<index>`
 - `agents.create.photo`
 - `agents.create.confirm`

@@ -564,6 +564,10 @@ extension A11yID {
     public static let dataConnectName = A11yID(unchecked: "data.connect.name")
     /// `data.connect.url`
     public static let dataConnectUrl = A11yID(unchecked: "data.connect.url")
+    /// `data.connect.host`
+    public static let dataConnectHost = A11yID(unchecked: "data.connect.host")
+    /// `data.connect.database`
+    public static let dataConnectDatabase = A11yID(unchecked: "data.connect.database")
     /// `data.connect.auth`
     public static let dataConnectAuth = A11yID(unchecked: "data.connect.auth")
     /// `data.connect.user`
@@ -958,6 +962,20 @@ extension A11yID {
     public static let agentsCreateDraft = A11yID(unchecked: "agents.create.draft")
     /// `agents.create.name`
     public static let agentsCreateName = A11yID(unchecked: "agents.create.name")
+    /// `agents.create.description`
+    public static let agentsCreateDescription = A11yID(unchecked: "agents.create.description")
+    /// `agents.create.tone`
+    public static let agentsCreateTone = A11yID(unchecked: "agents.create.tone")
+    /// `agents.create.instructions`
+    public static let agentsCreateInstructions = A11yID(unchecked: "agents.create.instructions")
+    /// `agents.create.skills`
+    public static let agentsCreateSkills = A11yID(unchecked: "agents.create.skills")
+    /// `agents.create.computer`
+    public static let agentsCreateComputer = A11yID(unchecked: "agents.create.computer")
+    /// `agents.create.attachments`
+    public static let agentsCreateAttachments = A11yID(unchecked: "agents.create.attachments")
+    /// `agents.create.attachment.add`
+    public static let agentsCreateAttachmentAdd = A11yID(unchecked: "agents.create.attachment.add")
     /// `agents.create.photo`
     public static let agentsCreatePhoto = A11yID(unchecked: "agents.create.photo")
     /// `agents.create.confirm`
@@ -2841,6 +2859,8 @@ extension A11yID {
         A11yIDSpec(pattern: "data.connect.form", surface: "Páginas"),
         A11yIDSpec(pattern: "data.connect.name", surface: "Páginas"),
         A11yIDSpec(pattern: "data.connect.url", surface: "Páginas"),
+        A11yIDSpec(pattern: "data.connect.host", surface: "Páginas"),
+        A11yIDSpec(pattern: "data.connect.database", surface: "Páginas"),
         A11yIDSpec(pattern: "data.connect.auth", surface: "Páginas"),
         A11yIDSpec(pattern: "data.connect.user", surface: "Páginas"),
         A11yIDSpec(pattern: "data.connect.secret", surface: "Páginas"),
@@ -3070,6 +3090,13 @@ extension A11yID {
         A11yIDSpec(pattern: "agents.create.upload.<index>", surface: "Agents"),
         A11yIDSpec(pattern: "agents.create.draft", surface: "Agents"),
         A11yIDSpec(pattern: "agents.create.name", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.description", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.tone", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.instructions", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.skills", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.computer", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.attachments", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.attachment.add", surface: "Agents"),
         A11yIDSpec(pattern: "agents.create.avatar.<index>", surface: "Agents"),
         A11yIDSpec(pattern: "agents.create.photo", surface: "Agents"),
         A11yIDSpec(pattern: "agents.create.confirm", surface: "Agents"),

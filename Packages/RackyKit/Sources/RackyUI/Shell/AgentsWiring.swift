@@ -17,18 +17,25 @@ extension AppEnvironment {
         agents.pickFile = { extensions in await AgentFilePicker.pick(extensions: extensions) }
         agents.openCreate = { [weak self] kind, mode in self?.showAgentCreate(kind: kind, mode: mode) }
         agents.attachables = { [weak self] in self?.attachableItems() ?? [] }
-        library.rackyAgents = { [agents] in agents.libraryEntries }
+        library.rackyAgents = { [agents, agentCreate] in agents.libraryEntries + agents.libraryEntries(skills: agentCreate!.skills) }
         agents.addToSession = { [weak self] name, session in try await self?.addAgent(name, toSession: session) }
         sidebar.agents = agents
         do {
             try agents.register(in: registry)
+            try agentCreate.register(in: registry)
+            agentCreate.closePage = { [computers] in computers.closePage() }
+            agentCreate.skillCreated = { [weak self] _ in
+                guard let self else { return }
+                self.library.setSection(.skills)
+                self.computers.show(.library)
+            }
         } catch { LogFacade(.app, category: "agents").publicError("duplicate agents registration") }
     }
 
     /// Chamado quando o Store abre: carrega a lista e liga a leitura dos nomes do cofre.
     func attachAgents(store: RackyStore) async {
         let vault = SecretVault(store: store, keyring: VaultKeyring(backend: SystemKeychainBackend.system()))
-        agents.loadSecretNames = { ((try? await vault.list()) ?? []).filter { $0.kind == SecretKind.envVar.rawValue }.map(\.name).sorted() }
+        agents.loadSecretNames = { ((try? await vault.list()) ?? []).filter { $0.delivery == SecretDelivery.profileEnv.rawValue }.map(\.name).sorted() }
         await agents.reload()
         composer?.agentChoices = { [agents] in agents.agents.map(\.name) }
         composer?.addAgent = { [weak self] name, session in try? await self?.addAgent(name, toSession: session) }
@@ -56,7 +63,7 @@ extension AppEnvironment {
     func showAgentCreate(kind: AgentCreateKind, mode: AgentCreateMode) {
         agentCreate.kind = kind
         agentCreate.mode = mode
-        Task { await agentCreate.begin() }
+        Task { await agentCreate.begin(kind: kind, mode: mode) }
         sidebar.setInbox(open: false)
         computers.show(.agentCreate)
     }

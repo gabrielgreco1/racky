@@ -13,7 +13,7 @@ public enum AgentStoreError: Error, Equatable, Sendable {
 /// `attachments.json`, e `memory.sqlite` (ver `AgentMemoryStore`).
 public struct AgentStore: Sendable {
     public static let maxPhotoBytes = 5_000_000
-    static let photoExtensions: Set<String> = ["png", "jpg", "jpeg", "heic", "webp"]
+    public static let photoExtensions: Set<String> = ["png", "jpg", "jpeg", "heic", "webp"]
 
     public let root: URL
     public init(root: URL) { self.root = root }
