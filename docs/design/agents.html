@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentes</title>
+<style>
+  :root {
+    --canvas: #0e0f11; --sidebar: #141518; --selected: #23252a; --hover: rgba(35,37,42,.55); --panel: #17181b;
+    --t1: #ecedef; --t2: #a4a7ae; --t3: rgba(164,167,174,.62); --t4: rgba(164,167,174,.4);
+    --line: rgba(255,255,255,.07); --blue: #8ab4ff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #08090a; color: var(--t1); font: 13.5px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
+  .page { max-width: 1240px; margin: 0 auto; padding: 28px 16px 60px; }
+  p.lead { color: var(--t2); max-width: 780px; margin: 56px 0 18px; font-size: 14px; }
+  p.lead:first-child { margin-top: 0; }
+  .win { display: flex; height: 800px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--canvas); }
+  .win.tall { height: 820px; }
+  .av { width: 18px; height: 18px; border-radius: 50%; flex: none; display: block; overflow: hidden; }
+  .av svg { width: 100%; height: 100%; display: block; }
+  .av.l { width: 72px; height: 72px; } .av.m { width: 30px; height: 30px; } .av.xl { width: 84px; height: 84px; }
+
+  /* barra */
+  .side { width: 268px; flex: none; background: var(--sidebar); padding: 14px 10px; display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
+  .nav { display: flex; align-items: center; gap: 10px; padding: 6px 10px; color: var(--t2); border-radius: 8px; }
+  .nav .i { width: 16px; color: var(--t3); text-align: center; }
+  .sp { height: 12px; }
+  .label { display: flex; align-items: center; gap: 6px; color: var(--t4); font-size: 12px; padding: 4px 10px; }
+  .label .n { margin-left: auto; font-variant-numeric: tabular-nums; }
+  .label .plus { margin-left: auto; color: var(--t4); }
+  .row { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 8px; color: var(--t1); white-space: nowrap; }
+  .row:hover { background: var(--hover); }
+  .row.sel { background: var(--selected); }
+  .row .t { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .row .m { color: var(--t4); font-size: 12px; }
+  .row.dim .t { color: var(--t2); }
+  .logo { width: 16px; height: 16px; flex: none; border-radius: 4px; }
+  .chev { width: 10px; flex: none; color: var(--t4); font-size: 9px; text-align: center; }
+  .stt { width: 12px; height: 12px; flex: none; display: grid; place-items: center; }
+  .stt.spin { border-radius: 50%; border: 1.6px solid var(--t4); border-top-color: var(--t1); }
+  .stt.blue::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+  .stt.done::after { content: "✓"; color: var(--t3); font-size: 10px; }
+
+  /* centro */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .tabs { display: flex; gap: 2px; padding: 8px 10px 0; border-bottom: 1px solid var(--line); }
+  .tab { padding: 7px 14px; color: var(--t3); border-radius: 8px 8px 0 0; white-space: nowrap; font-size: 13px; display: flex; gap: 8px; align-items: center; }
+  .tab.on { color: var(--t1); background: var(--sidebar); }
+  .body { flex: 1; overflow: hidden; padding: 22px 26px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+  .btn { padding: 5px 12px; border-radius: 7px; border: 1px solid var(--line); color: var(--t1); font-size: 12.5px; white-space: nowrap; }
+  .btn.solid { background: var(--t1); color: #0e0f11; border-color: var(--t1); }
+  .btn.sm { padding: 2px 9px; font-size: 12px; color: var(--t2); }
+  .muted { color: var(--t3); } .t2 { color: var(--t2); }
+
+  /* página do agente */
+  .who { display: flex; gap: 18px; align-items: center; }
+  .who .nm { font-size: 20px; font-weight: 600; }
+  .who .tone { color: var(--t2); margin-top: 2px; max-width: 520px; }
+  .who .meta { display: flex; gap: 8px; align-items: center; margin-top: 8px; color: var(--t3); font-size: 12px; }
+  .who .grow { flex: 1; }
+  .cols { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; flex: 1; min-height: 0; overflow: hidden; }
+  .col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+  .h { color: var(--t3); font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .h a { color: var(--t4); }
+  .box { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); padding: 12px 14px; color: var(--t2); font-size: 12.5px; line-height: 1.55; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: 12px; color: var(--t2); }
+  .li { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; align-items: center; }
+  .li:last-child { border-bottom: 0; }
+  .li .ic { width: 16px; text-align: center; color: var(--t4); font-size: 12px; flex: none; }
+  .li .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .li .n { color: var(--t3); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .li .n.need { color: var(--blue); }
+  .kv { display: grid; grid-template-columns: 110px 1fr; row-gap: 6px; font-size: 13px; }
+  .kv .k { color: var(--t3); }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
+  .mask { letter-spacing: 1px; color: var(--t3); }
+  .mem { font-size: 12.5px; color: var(--t2); }
+  .mem .li { align-items: flex-start; } .mem .n { width: 40px; }
+  .search { border: 1px solid var(--line); border-radius: 7px; padding: 4px 10px; color: var(--t4); font-size: 12.5px; margin-bottom: 4px; }
+
+  /* biblioteca + arrastar */
+  .lib { display: grid; grid-template-columns: 1fr 340px; gap: 0; flex: 1; min-height: 0; }
+  .lib .list { padding: 14px 18px; border-right: 1px solid var(--line); overflow: hidden; }
+  .lib .li { padding: 8px 4px; }
+  .grip { color: var(--t4); width: 12px; flex: none; font-size: 11px; }
+  .logos { display: flex; gap: 4px; }
+  .drag { position: relative; margin: 6px 0 0 120px; width: 250px; display: flex; gap: 10px; align-items: center; padding: 7px 12px; border-radius: 9px; background: var(--selected); border: 1px solid var(--line); box-shadow: 0 6px 20px rgba(0,0,0,.4); }
+  .comp { margin-top: auto; border: 1px dashed rgba(138,180,255,0); border: 1px dashed var(--t4); border-radius: 10px; padding: 12px 14px; color: var(--t2); }
+  .comp .tg { display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 1px 10px 1px 3px; margin-right: 6px; font-size: 12px; }
+  .drop { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* criar: chat + rascunho */
+  .split { display: grid; grid-template-columns: 1fr 1.05fr; flex: 1; min-height: 0; }
+  .chat { padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid var(--line); min-height: 0; overflow: hidden; }
+  .msg { max-width: 92%; font-size: 13px; color: var(--t2); line-height: 1.5; }
+  .msg.me { align-self: flex-end; background: var(--selected); color: var(--t1); padding: 8px 12px; border-radius: 10px; }
+  .msg .who2 { display: flex; align-items: center; gap: 8px; color: var(--t4); font-size: 12px; margin-bottom: 3px; }
+  .file { display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; font-size: 12px; color: var(--t2); margin: 4px 6px 0 0; }
+  .input { margin-top: auto; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; color: var(--t4); display: flex; justify-content: space-between; }
+  .draft { padding: 18px 24px; display: flex; flex-direction: column; gap: 16px; overflow: hidden; background: var(--sidebar); }
+  .filling { color: var(--t4); }
+  .filling::after { content: "▍"; color: var(--t3); }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field .v { color: var(--t1); }
+  .pick { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .pick .o { border-radius: 50%; padding: 3px; border: 1.5px solid transparent; }
+  .pick .o.on { border-color: var(--t2); }
+  .up { width: 54px; height: 54px; border-radius: 50%; border: 1px dashed var(--t4); display: grid; place-items: center; color: var(--t3); font-size: 10.5px; text-align: center; line-height: 1.15; }
+  .foot { margin-top: auto; display: flex; gap: 8px; justify-content: flex-end; }
+  .sk { white-space: pre-wrap; }
+
+  .notes { margin-top: 26px; max-width: 780px; color: var(--t2); font-size: 13.5px; }
+  .notes p { margin: 0 0 10px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<p class="lead">A barra agora começa pelos agentes, cada um com o rosto que ele tem (foto sua ou um avatar gerado pelo nome). Agents, Projects e Sessions fecham com a setinha e lembram como ficaram. O ponto azul é só para o agente que precisa de você, aqui o web-scraper com um login vencido.</p>
+
+<div class="win">
+  <div class="side">
+    <div class="nav"><span class="i">⌕</span>Search</div>
+    <div class="nav"><span class="i">▭</span>Computers</div>
+    <div class="nav"><span class="i">▦</span>Data</div>
+    <div class="nav"><span class="i">▤</span>Library</div>
+    <div class="sp"></div>
+    <div class="label"><span class="chev">▾</span>Agents<span class="plus">＋</span></div>
+    <div class="row"><span class="av" data-name="data-engineer"></span><span class="t">data-engineer</span><span class="stt spin"></span><span class="m">2h</span></div>
+    <div class="row sel"><span class="av" data-name="qa-engineer"></span><span class="t">qa-engineer</span><span class="stt spin"></span><span class="m">14m</span></div>
+    <div class="row"><span class="av" data-name="web-scraper"></span><span class="t">web-scraper</span><span class="stt blue"></span></div>
+    <div class="row dim"><span class="av" data-name="swiftui-ux-designer"></span><span class="t">swiftui-ux-designer</span><span class="m">3d</span></div>
+    <div class="row dim"><span class="av" data-name="security-diff-reviewer"></span><span class="t">security-diff-reviewer</span><span class="m">6d</span></div>
+    <div class="row dim"><span class="av" data-name="rti-analyst"></span><span class="t">rti-analyst</span><span class="m">9d</span></div>
+    <div class="sp"></div>
+    <div class="label"><span class="chev">▾</span>Projects</div>
+    <div class="row dim"><span class="chev">▸</span><span class="t">rti-platform</span><span class="m">4</span></div>
+    <div class="row dim"><span class="chev">▸</span><span class="t">agent-box</span><span class="m">2</span></div>
+    <div class="sp"></div>
+    <div class="label"><span class="chev">▸</span>Sessions<span class="n">14</span></div>
+  </div>
+
+  <div class="main">
+    <div class="tabs">
+      <div class="tab on"><span class="av" data-name="qa-engineer" style="width:14px;height:14px"></span>qa-engineer</div>
+      <div class="tab">✳ steady-kettle</div>
+    </div>
+    <div class="body">
+      <div class="who">
+        <span class="av xl" data-name="qa-engineer"></span>
+        <div>
+          <div class="nm">qa-engineer</div>
+          <div class="tone">Seco e direto. Resume em duas frases, sempre com o número e o arquivo. Nunca elogia o próprio trabalho.</div>
+          <div class="meta"><span class="logos"><img class="logo" src="logos/claude@2x.png" alt=""><img class="logo" src="logos/codex@2x.png" alt=""></span><span>Claude Code e Codex</span><span>·</span><span>12 tarefas feitas</span></div>
+        </div>
+        <span class="grow"></span>
+        <span class="btn">Regerar avatar</span>
+        <span class="btn">Subir foto</span>
+        <span class="btn solid">Nova tarefa</span>
+      </div>
+
+      <div class="cols">
+        <div class="col">
+          <div>
+            <div class="h"><span>Instruções</span><a>editar</a></div>
+            <div class="box">Você é um QA sênior de pipelines de IA e geração de documentos regulatórios. Escreve testes pytest para todos os componentes, roda a suíte e valida a saída contra a rubrica de 30 tópicos. Não corrige os bugs que acha: descreve e entrega para quem cuida daquela parte.</div>
+          </div>
+          <div>
+            <div class="h"><span>Skills</span><a>adicionar</a></div>
+            <div class="chips"><span class="chip">tdd</span><span class="chip">qa</span><span class="chip">diagnosing-bugs</span><span class="chip">triage-validation</span></div>
+          </div>
+          <div>
+            <div class="h"><span>Anexos fixos, em toda tarefa</span><a>adicionar</a></div>
+            <div class="li"><span class="ic">▢</span><span class="t">sessão steady-kettle</span><span class="n">sessão</span></div>
+            <div class="li"><span class="ic">▭</span><span class="t">wi-milwaukee</span><span class="n">computer</span></div>
+            <div class="li"><span class="ic">▦</span><span class="t">silver permits</span><span class="n">430 linhas</span></div>
+            <div class="li"><span class="ic">▤</span><span class="t">casos-de-teste.xlsx</span><span class="n">planilha</span></div>
+            <div class="li"><span class="ic">▤</span><span class="t">rubrica-30-topicos.md</span><span class="n">arquivo</span></div>
+          </div>
+          <div>
+            <div class="h"><span>Memória</span><a>abrir tudo</a></div>
+            <div class="search">buscar na memória</div>
+            <div class="mem">
+              <div class="li"><span class="n">02/11</span><span class="t">milwaukee: smoke falha se tipo de permit vem vazio, override em <span class="mono">overrides.yaml</span></span></div>
+              <div class="li"><span class="n">31/10</span><span class="t">rubrica topico 14 mede só seção References, ignora boilerplate</span></div>
+              <div class="li"><span class="n">29/10</span><span class="t">acreage: 1 casa decimal sempre, checar antes do QAA</span></div>
+              <div class="li"><span class="n muted">+ 41</span><span class="t muted">mais antigas, comprimidas</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div>
+            <div class="h"><span>Computador pronto</span><a>editar</a></div>
+            <div class="kv">
+              <span class="k">Tela</span><span>ligada</span>
+              <span class="k">Memória</span><span>4 GB</span>
+              <span class="k">Proxy</span><span>Estados Unidos · Texas, residencial</span>
+              <span class="k">Pacotes</span><span class="mono">python 3.12, pytest, playwright</span>
+            </div>
+          </div>
+          <div>
+            <div class="h"><span>Variáveis, só dentro do computador</span><a>adicionar</a></div>
+            <div class="li"><span class="t mono">STAGING_DB_URL</span><span class="mask">••••••••••••</span><span class="btn sm">ver</span></div>
+            <div class="li"><span class="t mono">ACCELA_USER</span><span class="mask">••••••••</span><span class="btn sm">ver</span></div>
+            <div class="li"><span class="t mono">ZYTE_API_KEY</span><span class="mask">••••••••••••••</span><span class="btn sm">ver</span></div>
+            <div class="muted" style="font-size:12px;margin-top:4px">Nunca vão para o prompt e aparecem como ••• nos logs.</div>
+          </div>
+          <div>
+            <div class="h"><span>Sites logados</span><a>logar em outro</a></div>
+            <div class="li"><span class="t">aca-prod.accela.com</span><span class="n">logado há 2 dias</span></div>
+            <div class="li"><span class="t">github.com</span><span class="n">logado há 11 dias</span></div>
+            <div class="li"><span class="t">app.hubspot.com</span><span class="n need">venceu, logar de novo</span></div>
+            <div class="muted" style="font-size:12px;margin-top:4px">Cookies guardados cifrados no cofre e carregados no computador antes de começar.</div>
+          </div>
+          <div>
+            <div class="h"><span>Como ele chega no CLI</span></div>
+            <div class="li"><span class="logos"><img class="logo" src="logos/claude@2x.png" alt=""></span><span class="t">gerado ao lançar em Racky, nada escrito em ~/.claude</span></div>
+            <div class="li"><span class="logos"><img class="logo" src="logos/codex@2x.png" alt=""></span><span class="t">gerado ao lançar em Racky, nada escrito em ~/.codex</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="lead">Na Library cada agente aparece uma vez só, com os logos dos CLIs onde ele existe. Dá para arrastar a linha para uma sessão aberta ou para o campo de mensagem, e ele entra como etiqueta.</p>
+
+<div class="win" style="height:430px">
+  <div class="main">
+    <div class="lib">
+      <div class="list">
+        <div class="li"><span class="grip">⋮⋮</span><span class="av m" data-name="data-engineer"></span><span class="t">data-engineer<br><span class="muted" style="font-size:12px">Ingestão, vetores, chunks e embeddings</span></span><span class="logos"><img class="logo" src="logos/claude@2x.png" alt=""><img class="logo" src="logos/codex@2x.png" alt=""></span></div>
+        <div class="li"><span class="grip">⋮⋮</span><span class="av m" data-name="qa-engineer"></span><span class="t">qa-engineer<br><span class="muted" style="font-size:12px">Testes, validação de saída e regressão</span></span><span class="logos"><img class="logo" src="logos/claude@2x.png" alt=""><img class="logo" src="logos/codex@2x.png" alt=""></span></div>
+        <div class="li"><span class="grip">⋮⋮</span><span class="av m" data-name="swiftui-ux-designer"></span><span class="t">swiftui-ux-designer<br><span class="muted" style="font-size:12px">Revisão de layout e polimento em SwiftUI</span></span><span class="logos"><img class="logo" src="logos/claude@2x.png" alt=""></span></div>
+        <div class="drag"><span class="grip">⋮⋮</span><span class="av" data-name="web-scraper"></span>web-scraper</div>
+        <div class="li"><span class="grip">⋮⋮</span><span class="av m" data-name="rti-analyst"></span><span class="t">rti-analyst<br><span class="muted" style="font-size:12px">Metodologia e rankings RTI</span></span><span class="logos"><img class="logo" src="logos/claude@2x.png" alt=""><img class="logo" src="logos/codex@2x.png" alt=""></span></div>
+      </div>
+      <div class="drop">
+        <div class="muted" style="font-size:12px">sessão steady-kettle</div>
+        <div class="muted">…</div>
+        <div class="comp"><span class="tg"><span class="av" data-name="web-scraper" style="width:16px;height:16px"></span>web-scraper</span>raspa o portal de Memphis e devolve em silver</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="lead">Criar um agente é uma conversa: à esquerda você fala com o Claude e sobe o que quiser (um exemplo de saída, um documento, uma planilha), à direita o rascunho vai se preenchendo ao vivo. O rosto vem de seis avatares gerados pelo nome, e dá para trocar por uma foto.</p>
+
+<div class="win tall">
+  <div class="main">
+    <div class="tabs"><div class="tab on">Novo agente</div></div>
+    <div class="split">
+      <div class="chat">
+        <div class="msg"><div class="who2">Claude</div>Me conta o que esse agente faz e como você quer que ele fale. Se tiver um exemplo do resultado ideal, joga aqui.</div>
+        <div class="msg me">Quero um agente que revisa PRs de Swift do Racky. Fala curto, em português, e sempre aponta o arquivo e a linha.</div>
+        <div class="msg me">Aqui o último review que eu gostei.<br><span class="file">▤ review-pr-212.md</span><span class="file">▤ guia-de-estilo.pdf</span></div>
+        <div class="msg"><div class="who2">Claude</div>Peguei o formato: veredito em uma linha, depois lista de achados com arquivo:linha, e o que não é problema no fim. Ele precisa de computador? Eu diria que não, só lê o repo. E dos seus logins, nenhum.</div>
+        <div class="msg me">Sem computador. Pode chamar de pr-swift.</div>
+        <div class="msg"><div class="who2">Claude</div><span class="filling">Montando as instruções com o formato do review-pr-212</span></div>
+        <div class="input"><span>Responder ao Claude</span><span>＋  ↑</span></div>
+      </div>
+      <div class="draft">
+        <div class="field">
+          <div class="h"><span>Rosto</span></div>
+          <div class="pick">
+            <span class="o on"><span class="av" style="width:54px;height:54px" data-name="pr-swift" data-v="0"></span></span>
+            <span class="o"><span class="av" style="width:54px;height:54px" data-name="pr-swift" data-v="1"></span></span>
+            <span class="o"><span class="av" style="width:54px;height:54px" data-name="pr-swift" data-v="2"></span></span>
+            <span class="o"><span class="av" style="width:54px;height:54px" data-name="pr-swift" data-v="3"></span></span>
+            <span class="o"><span class="av" style="width:54px;height:54px" data-name="pr-swift" data-v="4"></span></span>
+            <span class="o"><span class="av" style="width:54px;height:54px" data-name="pr-swift" data-v="5"></span></span>
+            <span class="up">subir<br>foto</span>
+          </div>
+        </div>
+        <div class="field"><div class="h"><span>Nome</span></div><div class="v">pr-swift</div></div>
+        <div class="field"><div class="h"><span>Jeito de falar</span></div><div class="v">Curto, em português. Veredito em uma linha, depois os achados.</div></div>
+        <div class="field"><div class="h"><span>Instruções</span></div>
+          <div class="box">Revise o diff de Swift do Racky. Comece com um veredito de uma linha. Liste cada achado como <span class="mono">arquivo:linha</span> e a razão em uma frase. Termine com o que você olhou e não é problema.<span class="filling"></span></div>
+        </div>
+        <div class="field"><div class="h"><span>Anexos fixos</span></div><div class="chips"><span class="chip">review-pr-212.md</span><span class="chip">guia-de-estilo.pdf</span></div></div>
+        <div class="field"><div class="h"><span>Skills</span></div><div class="chips"><span class="chip">code-review</span><span class="chip muted">sugerida: simplify</span></div></div>
+        <div class="field"><div class="h"><span>Computador</span></div><div class="v t2">Sem computador, só lê o repositório</div></div>
+        <div class="foot"><span class="btn">Descartar</span><span class="btn solid">Criar agente</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="lead">Criar uma skill usa a mesma tela. O que você sobe vira parte da skill, em exemplos e referências, para o agente fazer sempre do mesmo jeito.</p>
+
+<div class="win tall" style="height:700px">
+  <div class="main">
+    <div class="tabs"><div class="tab on">Nova skill</div></div>
+    <div class="split">
+      <div class="chat">
+        <div class="msg"><div class="who2">Claude</div>Qual tarefa essa skill ensina, e como você sabe que ficou boa?</div>
+        <div class="msg me">Montar a tabela silver de permits de uma cidade a partir do bronze. Boa é quando as colunas batem com o schema e não sobra linha sem data.</div>
+        <div class="msg me">Esses dois são o resultado que eu quero.<br><span class="file">▤ silver-austin.parquet</span><span class="file">▤ silver-memphis.parquet</span><span class="file">▤ schema-permits.json</span></div>
+        <div class="msg"><div class="who2">Claude</div>Vou guardar os dois parquets como exemplos e o schema como referência. A skill vai mandar o agente comparar as colunas com o schema antes de entregar. Quer que ela rode um check de linhas sem data?</div>
+        <div class="input"><span>Responder ao Claude</span><span>＋  ↑</span></div>
+      </div>
+      <div class="draft">
+        <div class="field"><div class="h"><span>Nome</span></div><div class="v">silver-permits</div></div>
+        <div class="field"><div class="h"><span>SKILL.md</span><a>editar</a></div>
+          <div class="box mono sk">---
+name: silver-permits
+description: Monta a silver de permits de uma cidade a partir do bronze
+---
+1. Leia exemplos/ e compare com referencias/schema-permits.json
+2. Normalize as colunas e tipos
+3. Confira: nenhuma linha sem data de emissão<span class="filling"></span></div>
+        </div>
+        <div class="field"><div class="h"><span>O que vai junto</span></div>
+          <div class="li"><span class="ic">▦</span><span class="t">exemplos/silver-austin.parquet</span><span class="n">exemplo</span></div>
+          <div class="li"><span class="ic">▦</span><span class="t">exemplos/silver-memphis.parquet</span><span class="n">exemplo</span></div>
+          <div class="li"><span class="ic">▤</span><span class="t">referencias/schema-permits.json</span><span class="n">referência</span></div>
+        </div>
+        <div class="field"><div class="h"><span>Quem usa</span></div><div class="chips"><span class="chip">data-engineer</span><span class="chip">rti-crawler-builder</span><span class="chip muted">＋</span></div></div>
+        <div class="foot"><span class="btn">Descartar</span><span class="btn solid">Criar skill</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notes">
+  <p>O avatar é um desenho de 64 por 64 feito só de formas simples (cabeça, ombros, olhos, um acessório), sorteado pelo nome do agente, então o mesmo nome dá sempre o mesmo rosto. As seis opções do criar agente são o mesmo nome com variações 0 a 5, e Regerar avatar escolhe outra. A mesma função vai para o Swift.</p>
+  <p>O Racky guarda cada agente em ~/Racky/agents e só gera a versão de cada CLI na hora de lançar. Nada é escrito em ~/.claude, ~/.codex ou ~/.config/opencode.</p>
+</div>
+
+</div>
+<script>
+// Avatar determinístico. Só inteiros, para o Swift gerar exatamente a mesma string.
+function avatar(name, v) {
+  v = v || 0;
+  const bytes = new TextEncoder().encode(name + "#" + v);
+  let h = 2166136261;
+  for (const b of bytes) { h ^= b; h = Math.imul(h, 16777619) >>> 0; }
+  let s = h || 1;
+  const next = () => { s ^= (s << 13) >>> 0; s >>>= 0; s ^= s >>> 17; s ^= (s << 5) >>> 0; s >>>= 0; return s; };
+  next(); next(); next();
+  const pick = n => next() % n;
+  const BG = ["#4a4038", "#3c4a41", "#4a3c42", "#46463a", "#3a4348", "#4d4338", "#40384a", "#44403c"];
+  const SKIN = ["#e8d9c4", "#d9c3a5", "#c9b79c", "#e4cfc0", "#b8a58f", "#d6d0c4"];
+  const INK = "#22201e";
+  const bg = BG[pick(8)], skin = SKIN[pick(6)];
+  const shoulders = pick(3), head = pick(4), eyes = pick(4), acc = pick(6), mouth = pick(3);
+  const cx = 32 + pick(5) - 2;
+  let o = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="' + bg + '"/>';
+  if (shoulders === 0) o += '<ellipse cx="32" cy="68" rx="26" ry="20" fill="' + skin + '"/>';
+  else if (shoulders === 1) o += '<rect x="8" y="50" width="48" height="30" rx="14" fill="' + skin + '"/>';
+  else o += '<path d="M4 64L12 53Q32 45 52 53L60 64Z" fill="' + skin + '"/>';
+  if (head === 0) o += '<circle cx="' + cx + '" cy="28" r="13" fill="' + skin + '"/>';
+  else if (head === 1) o += '<rect x="' + (cx - 12) + '" y="15" width="24" height="28" rx="9" fill="' + skin + '"/>';
+  else if (head === 2) o += '<ellipse cx="' + cx + '" cy="29" rx="11" ry="15" fill="' + skin + '"/>';
+  else o += '<path d="M' + (cx - 12) + ' 43V27a12 12 0 0 1 24 0V43Z" fill="' + skin + '"/>';
+  if (eyes === 0) o += '<circle cx="' + (cx - 5) + '" cy="29" r="2" fill="' + INK + '"/><circle cx="' + (cx + 5) + '" cy="29" r="2" fill="' + INK + '"/>';
+  else if (eyes === 1) o += '<rect x="' + (cx - 8) + '" y="28" width="5" height="2" rx="1" fill="' + INK + '"/><rect x="' + (cx + 3) + '" y="28" width="5" height="2" rx="1" fill="' + INK + '"/>';
+  else if (eyes === 2) o += '<rect x="' + (cx - 9) + '" y="27" width="18" height="4" rx="2" fill="' + INK + '"/>';
+  else o += '<circle cx="' + (cx - 5) + '" cy="29" r="2" fill="' + INK + '"/><circle cx="' + (cx + 5) + '" cy="29" r="3" fill="' + INK + '"/>';
+  if (mouth === 1) o += '<rect x="' + (cx - 3) + '" y="37" width="6" height="2" rx="1" fill="' + INK + '"/>';
+  else if (mouth === 2) o += '<path d="M' + (cx - 4) + ' 36Q' + cx + ' 40 ' + (cx + 4) + ' 36" fill="none" stroke="' + INK + '" stroke-width="2"/>';
+  if (acc === 1) o += '<circle cx="' + (cx - 5) + '" cy="29" r="4" fill="none" stroke="' + INK + '" stroke-width="2"/><circle cx="' + (cx + 5) + '" cy="29" r="4" fill="none" stroke="' + INK + '" stroke-width="2"/><rect x="' + (cx - 1) + '" y="28" width="2" height="2" fill="' + INK + '"/>';
+  else if (acc === 2) o += '<rect x="' + (cx - 10) + '" y="25" width="8" height="7" rx="1" fill="none" stroke="' + INK + '" stroke-width="2"/><rect x="' + (cx + 2) + '" y="25" width="8" height="7" rx="1" fill="none" stroke="' + INK + '" stroke-width="2"/>';
+  else if (acc === 3) o += '<ellipse cx="' + cx + '" cy="19" rx="14" ry="7" fill="' + INK + '"/>';
+  else if (acc === 4) o += '<rect x="' + (cx - 13) + '" y="20" width="26" height="4" fill="' + BG[(pick(8))] + '"/>';
+  else if (acc === 5) o += '<path d="M' + (cx - 13) + ' 26V20Q' + cx + ' 8 ' + (cx + 13) + ' 20V24Q' + cx + ' 18 ' + (cx - 13) + ' 26Z" fill="' + INK + '"/>';
+  return o + '</svg>';
+}
+document.querySelectorAll(".av[data-name]").forEach(el => { el.innerHTML = avatar(el.dataset.name, +(el.dataset.v || 0)); });
+if (typeof module !== "undefined") module.exports = avatar;
+</script>
+</body>
+</html>
