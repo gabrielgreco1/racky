@@ -198,3 +198,105 @@ extension DataHubController {
         runs[connection] = state
     }
 }
+
+// MARK: Saúde das conexões
+
+/// Se uma conexão responde, para o explorer mostrar ao lado do nome sem precisar abrir. `short` cabe na linha; `message` vai no tooltip.
+public enum ConnectionHealth: Equatable, Sendable {
+    case checking
+    /// Respondeu; o detalhe é o que vale mostrar ("41 tables").
+    case ok(String?)
+    /// Nada respondeu no endereço (servidor desligado, porta errada, rede).
+    case offline(String)
+    /// Respondeu mas recusou as credenciais.
+    case refused(String)
+    /// Outro erro (TLS, resposta estranha, cofre).
+    case failed(String)
+
+    public var short: String {
+        switch self {
+        case .checking: String(localized: "Checking…", bundle: .module)
+        case .ok(let detail): detail ?? String(localized: "Connected", bundle: .module)
+        case .offline: String(localized: "Not running", bundle: .module)
+        case .refused: String(localized: "Login refused", bundle: .module)
+        case .failed: String(localized: "Error", bundle: .module)
+        }
+    }
+
+    public var message: String {
+        switch self {
+        case .checking: String(localized: "Racky is checking this connection.", bundle: .module)
+        case .ok: String(localized: "This connection answers.", bundle: .module)
+        case .offline(let why), .refused(let why), .failed(let why): why
+        }
+    }
+
+    public var isOK: Bool { if case .ok = self { true } else { false } }
+
+    init(postgres error: Error) {
+        let text = DataHubController.describe(error)
+        switch error as? PostgresConnector.Failure {
+        case .unreachable?, .timeout?: self = .offline(text)
+        case .auth?: self = .refused(text)
+        default: self = .failed(text)
+        }
+    }
+
+    init(prefect error: Error) {
+        switch error as? PrefectClient.Failure {
+        case .unreachable(let why)?: self = .offline(String(localized: "Nothing answers at this address (\(why)). Start the server with prefect server start.", bundle: .module))
+        case .unauthorized?: self = .refused(PrefectClient.Failure.unauthorized.description)
+        case let failure?: self = .failed(failure.description)
+        case nil: self = .failed(error.localizedDescription)
+        }
+    }
+}
+
+extension DataHubController {
+    /// Quanto esperar entre checagens: quem falhou é olhado de novo logo; quem está bem, de vez em quando.
+    static let healthRetry: TimeInterval = 30
+    static let healthRefresh: TimeInterval = 300
+
+    /// Começa a checar as conexões salvas (uma vez agora e depois a cada 30 s, só o que venceu).
+    public func startHealthChecks() {
+        guard healthTask == nil else { return }
+        healthTask = Task { [weak self] in
+            while !Task.isCancelled {
+                await self?.checkConnections()
+                try? await Task.sleep(for: .seconds(Self.healthRetry))
+            }
+        }
+    }
+
+    /// Checa as conexões cuja última checagem venceu. Postgres/Supabase leem o catálogo (o que também enche a árvore); Prefect lê 1 run.
+    func checkConnections() async {
+        let current = now()
+        for entry in saved {
+            let due = (health[entry.id]?.isOK ?? false) ? Self.healthRefresh : Self.healthRetry
+            if let last = healthCheckedAt[entry.id], current.timeIntervalSince(last) < due { continue }
+            healthCheckedAt[entry.id] = current
+            if entry.kind.speaksPostgres {
+                await loadCatalog(entry.id, openFirstSchema: false)
+            } else if entry.kind == .prefect {
+                await checkPrefect(entry)
+            }
+        }
+    }
+
+    func checkPrefect(_ entry: SavedConnection) async {
+        guard let url = URL(string: entry.url) else { health[entry.id] = .failed(PrefectClient.Failure.badURL.description); return }
+        if health[entry.id] == nil { health[entry.id] = .checking }
+        let auth: PrefectClient.Auth
+        if let secretID = entry.secretID, let vault, let value = try? await vault.reveal(id: secretID) {
+            auth = entry.auth == .basic ? .basic(value.text) : .apiKey(value.text)
+        } else {
+            auth = .none
+        }
+        do {
+            try await PrefectClient(baseURL: url, auth: auth, transport: prefectTransport).check()
+            health[entry.id] = .ok(nil)
+        } catch {
+            health[entry.id] = ConnectionHealth(prefect: error)
+        }
+    }
+}

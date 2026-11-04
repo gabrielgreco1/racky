@@ -1037,6 +1037,7 @@ public final class AppEnvironment {
             await attachAgents(store: opened)
             await datasets.attach(store: opened)
             await dataHub?.attach(store: opened)
+            dataHub?.startHealthChecks()
             await startCatalog(store: opened)
             await statusBar.attach(store: opened)
             await insights.service?.attach(

@@ -15,6 +15,8 @@ public final class DataHubController {
     public private(set) var tabs: [DataObject] = []
     public private(set) var active: DataObject?
     public internal(set) var expanded: Set<String> = []
+    /// Texto da busca do explorer: filtra datasets, conexões e tabelas pelo nome.
+    public var explorerFilter = ""
     /// Página da grade de cada tabela de conexão.
     public internal(set) var tablePages: [DataObject: Int] = [:]
     public func tablePage(_ object: DataObject) -> Int { tablePages[object] ?? 0 }
@@ -58,6 +60,10 @@ public final class DataHubController {
     /// Postgres/Supabase de verdade: o catálogo (schemas e tabelas) de cada conexão, a última leitura de cada tabela aberta e o erro
     /// da última consulta de cada query.
     public internal(set) var catalogs: [String: PostgresCatalogState] = [:]
+    /// Se cada conexão salva responde (o explorer mostra ao lado do nome, sem precisar abrir).
+    public internal(set) var health: [String: ConnectionHealth] = [:]
+    @ObservationIgnored var healthTask: Task<Void, Never>?
+    @ObservationIgnored var healthCheckedAt: [String: Date] = [:]
     public internal(set) var tableStates: [DataObject: PostgresTableState] = [:]
     public internal(set) var queryErrors: [DataObject: String] = [:]
     public internal(set) var queryTruncated: Set<DataObject> = []

@@ -279,13 +279,17 @@ struct DataExplorer: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            DSTextField("Filter tables and connections", text: Bindable(hub).explorerFilter, id: .dataExplorerFilter, compact: true)
+                .padding(.horizontal, DS.Space.s2).padding(.top, DS.Space.s2)
             ScrollView {
                 VStack(alignment: .leading, spacing: DS.Space.s1) {
-                    section(String(localized: "On this Mac", bundle: .module), caption: String(localized: "Saved by Racky as your agents collect", bundle: .module), id: "racky")
-                    racky
+                    // Conexões primeiro: são poucas, e o estado delas (conectado, desligado, senha recusada) tem que aparecer sem rolar
+                    // por dezenas de tabelas dos agentes.
                     section(String(localized: "Connections", bundle: .module), caption: String(localized: "Your databases and services", bundle: .module), id: "connections")
-                        .padding(.top, DS.Space.s3)
                     connections
+                    section(String(localized: "On this Mac", bundle: .module), caption: String(localized: "Saved by Racky as your agents collect", bundle: .module), id: "racky")
+                        .padding(.top, DS.Space.s3)
+                    racky
                 }
                 .padding(.horizontal, DS.Space.s2)
                 .padding(.vertical, DS.Space.s3)
@@ -322,16 +326,25 @@ struct DataExplorer: View {
     // MARK: Racky
 
     @ViewBuilder private var racky: some View {
-        let groups = hub.rackyGroups
-        if groups.isEmpty {
+        let query = filterText
+        let groups = hub.rackyGroups.compactMap { group -> (session: String, datasets: [DatasetSummary])? in
+            guard !query.isEmpty else { return group }
+            if group.session.localizedCaseInsensitiveContains(query) { return group }
+            let hits = group.datasets.filter { hub.datasets.displayName($0).localizedCaseInsensitiveContains(query) || $0.dataset.name.localizedCaseInsensitiveContains(query) }
+            return hits.isEmpty ? nil : (group.session, hits)
+        }
+        if groups.isEmpty, !query.isEmpty {
+            Text("No tables match.", bundle: .module).dsFont(DS.Font.small).foregroundStyle(DS.Color.textTertiary).padding(.horizontal, DS.Space.s2)
+        } else if groups.isEmpty {
             Text("No datasets yet. Agents create them when they collect data.", bundle: .module)
                 .dsFont(DS.Font.small).foregroundStyle(DS.Color.textTertiary)
                 .padding(.horizontal, DS.Space.s2)
         }
         ForEach(groups, id: \.session) { group in
             let node = "racky/\(group.session)"
-            let open = !hub.expanded.contains(node)  // sessões abertas por padrão
-            row(id: node, depth: 0, mark: .agent(QuickLaunchModel.kind(group.datasets.first.flatMap { hub.datasets.sessionAgent($0.dataset.sessionID) } ?? .claude)), title: group.session, detail: nil, chevron: open, toggle: node, live: false, selected: false, open: nil)
+            // Sessões fechadas por padrão (com dezenas de tabelas a lista empurrava tudo para baixo); a do dataset aberto e a busca abrem.
+            let open = hub.expanded.contains(node) || !query.isEmpty || group.datasets.contains { hub.active == .dataset($0.dataset.id) }
+            row(id: node, depth: 0, mark: .agent(QuickLaunchModel.kind(group.datasets.first.flatMap { hub.datasets.sessionAgent($0.dataset.sessionID) } ?? .claude)), title: group.session, detail: group.datasets.count.formatted(), chevron: open, toggle: node, live: group.datasets.contains { hub.datasets.isCollecting($0) }, selected: false, open: nil)
             if open {
                 ForEach(group.datasets, id: \.dataset.id) { summary in
                     let object = DataObject.dataset(summary.dataset.id)
@@ -364,17 +377,19 @@ struct DataExplorer: View {
                 .dsFont(DS.Font.small).foregroundStyle(DS.Color.textTertiary)
                 .padding(.horizontal, DS.Space.s2)
         }
-        ForEach(hub.connections) { connection in
-            let open = hub.expanded.contains(connection.id)
+        let query = filterText
+        ForEach(hub.connections.filter { query.isEmpty || $0.name.localizedCaseInsensitiveContains(query) || $0.children.contains { Self.matches($0, query) } }) { connection in
+            let named = query.isEmpty || connection.name.localizedCaseInsensitiveContains(query)
+            let open = hub.expanded.contains(connection.id) || !named
             let target: DataObject? = connection.kind == .webhook ? .webhook(connection: connection.id) : nil
             HStack(spacing: 0) {
                 row(id: connection.id, depth: 0, mark: .brand(connection.kind.brand), title: connection.name, detail: nil,
                     chevron: connection.kind.canBrowse ? open : nil, toggle: connection.kind.canBrowse ? connection.id : nil,
                     live: target.map(hub.isLive) ?? false, selected: target != nil && hub.active == target, open: target,
-                    badge: connection, subtitle: connection.kind.title == connection.name ? nil : connection.kind.title)
+                    badge: connection, subtitle: connection.kind.title == connection.name ? nil : connection.kind.title, health: hub.health[connection.id])
             }
             if open {
-                ForEach(connection.children) { child in nodeRows(child, connection: connection, depth: 1, path: []) }
+                ForEach(connection.children.filter { named || Self.matches($0, query) }) { child in nodeRows(child, connection: connection, depth: 1, path: [], query: named ? "" : query) }
                 if let status = catalogStatus(connection) {
                     Text(verbatim: status.text).dsFont(DS.Font.small).foregroundStyle(status.error ? DS.Color.warning : DS.Color.textTertiary)
                         .lineLimit(3).fixedSize(horizontal: false, vertical: true)
@@ -402,8 +417,15 @@ struct DataExplorer: View {
         return nil
     }
 
-    private func nodeRows(_ node: DataNode, connection: DataConnection, depth: Int, path: [String]) -> AnyView {
-        let open = hub.expanded.contains(node.id)
+    private var filterText: String { hub.explorerFilter.trimmingCharacters(in: .whitespaces) }
+
+    /// O nó ou algum filho tem o texto no nome.
+    static func matches(_ node: DataNode, _ query: String) -> Bool {
+        node.name.localizedCaseInsensitiveContains(query) || node.children.contains { matches($0, query) }
+    }
+
+    private func nodeRows(_ node: DataNode, connection: DataConnection, depth: Int, path: [String], query: String = "") -> AnyView {
+        let open = hub.expanded.contains(node.id) || (!query.isEmpty && !node.children.isEmpty)
         let object = Self.object(for: node, connection: connection, path: path)
         let expandable = node.lazy || !node.children.isEmpty
         let liveS3 = hub.isLiveS3(connection.id)
@@ -412,7 +434,9 @@ struct DataExplorer: View {
                 chevron: expandable ? open : nil, toggle: expandable && (object == nil || liveS3) ? node.id : nil,
                 live: object.map(hub.isLive) ?? false, selected: object != nil && hub.active == object, open: object)
             if open {
-                ForEach(node.children) { child in nodeRows(child, connection: connection, depth: depth + 1, path: path + [node.name]) }
+                ForEach(node.children.filter { query.isEmpty || node.name.localizedCaseInsensitiveContains(query) || Self.matches($0, query) }) { child in
+                    nodeRows(child, connection: connection, depth: depth + 1, path: path + [node.name], query: node.name.localizedCaseInsensitiveContains(query) ? "" : query)
+                }
             }
         })
     }
@@ -431,9 +455,10 @@ struct DataExplorer: View {
     @ViewBuilder
     private func row(
         id: String, depth: Int, mark: DataMark, title: String, detail: String?, chevron: Bool?, toggle: String?, live: Bool, selected: Bool,
-        open: DataObject?, badge: DataConnection? = nil, subtitle: String? = nil
+        open: DataObject?, badge: DataConnection? = nil, subtitle: String? = nil, health: ConnectionHealth? = nil
     ) -> some View {
-        let label = rowLabel(depth: depth, mark: mark, title: title, detail: detail, chevron: chevron, live: live, selected: selected, badge: badge, subtitle: subtitle)
+        let label = rowLabel(depth: depth, mark: mark, title: title, detail: detail, chevron: chevron, live: live, selected: selected, badge: badge, subtitle: subtitle,
+                             health: health, healthID: id)
         HStack(spacing: 0) {
             if let open {
                 ActionButton(.dataOpen, id: .dataExplorerNode(id), argument: .select(open.key)) { label }
@@ -450,7 +475,7 @@ struct DataExplorer: View {
 
     private func rowLabel(
         depth: Int, mark: DataMark, title: String, detail: String?, chevron: Bool?, live: Bool, selected: Bool, badge: DataConnection?,
-        subtitle: String?, muted: Bool = false
+        subtitle: String?, muted: Bool = false, health: ConnectionHealth? = nil, healthID: String = ""
     ) -> some View {
         HStack(spacing: DS.Space.s1_5) {
             Group {
@@ -476,6 +501,7 @@ struct DataExplorer: View {
             Spacer(minLength: DS.Space.s1)
             if live { LiveDot() }
             if let detail { Text(verbatim: detail).dsFont(DS.Font.monoMicro).foregroundStyle(DS.Color.textTertiary) }
+            if let health { ConnectionHealthLabel(health: health).a11y(.dataExplorerStatus(healthID), kind: "text", label: health.short) }
         }
         .padding(.leading, DS.Space.s1 + CGFloat(depth) * DataMetrics.indent)
         .padding(.trailing, DS.Space.s2)
@@ -674,6 +700,34 @@ struct ConnectionBadges: View {
             }
         }
         .fixedSize()
+    }
+}
+
+/// Estado de uma conexão ao lado do nome: bolinha e uma palavra ("41 tables", "Not running"); o motivo inteiro no tooltip.
+struct ConnectionHealthLabel: View {
+    let health: ConnectionHealth
+
+    var body: some View {
+        HStack(spacing: DS.Space.s1) {
+            Circle().fill(color).frame(width: DataMetrics.liveDot, height: DataMetrics.liveDot)
+            Text(verbatim: health.short).dsFont(DS.Font.small).foregroundStyle(textColor).lineLimit(1).fixedSize()
+        }
+        .help(health.message)
+    }
+
+    private var color: Color {
+        switch health {
+        case .ok: DS.Color.dataValid
+        case .checking, .offline: DS.Color.textQuaternary
+        case .refused, .failed: DS.Color.warning
+        }
+    }
+
+    private var textColor: Color {
+        switch health {
+        case .refused, .failed: DS.Color.warning
+        default: DS.Color.textTertiary
+        }
     }
 }
 

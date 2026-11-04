@@ -100,7 +100,7 @@ public struct PostgresConnector: PostgresBrowsing {
 
     public let info: PostgresConnectionInfo
     /// Quantas linhas uma consulta devolve no máximo, e quanto o app espera por uma operação inteira.
-    static let operationDeadline: Double = 30
+    public static let operationDeadline: Double = 30
 
     public init(info: PostgresConnectionInfo) { self.info = info }
 
@@ -223,16 +223,23 @@ public struct PostgresConnector: PostgresBrowsing {
         }
     }
 
-    static func withDeadline<T: Sendable>(_ seconds: Double, _ operation: @escaping @Sendable () async throws -> T) async throws -> T {
-        try await withThrowingTaskGroup(of: T.self) { group in
-            group.addTask { try await operation() }
-            group.addTask {
-                try await Task.sleep(for: .seconds(seconds))
-                throw Failure.timeout
+    /// Roda `operation` com prazo. Um task group esperaria a operação terminar mesmo depois de cancelada, e o connect e as leituras do
+    /// NIO nem sempre respondem ao cancelamento: a tela ficava em "Reading schemas…" para sempre. Aqui quem chega primeiro responde;
+    /// a operação atrasada é cancelada e o resultado dela é jogado fora.
+    public static func withDeadline<T: Sendable>(_ seconds: Double, _ operation: @escaping @Sendable () async throws -> T) async throws -> T {
+        let gate = DeadlineGate<T>()
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                gate.install(continuation)
+                let work = Task { do { gate.finish(.success(try await operation())) } catch { gate.finish(.failure(error)) } }
+                let timer = Task {
+                    try? await Task.sleep(for: .seconds(seconds))
+                    gate.finish(.failure(Failure.timeout))
+                }
+                gate.onFinish { work.cancel(); timer.cancel() }
             }
-            defer { group.cancelAll() }
-            guard let first = try await group.next() else { throw Failure.timeout }
-            return first
+        } onCancel: {
+            gate.finish(.failure(CancellationError()))
         }
     }
 
@@ -403,5 +410,46 @@ public enum PostgresCellText {
         let micro = (c.nanosecond ?? 0) / 1000
         if micro > 0 { out += String(format: ".%06d", micro).replacingOccurrences(of: "0+$", with: "", options: .regularExpression) }
         return out + "+00"
+    }
+}
+
+/// Resolve a continuação uma vez só, de quem chegar primeiro (a operação, o prazo ou o cancelamento).
+final class DeadlineGate<T: Sendable>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var continuation: CheckedContinuation<T, Error>?
+    private var early: Result<T, Error>?
+    private var done = false
+    private var cleanup: (() -> Void)?
+
+    func install(_ continuation: CheckedContinuation<T, Error>) {
+        lock.lock()
+        if let early {
+            lock.unlock()
+            continuation.resume(with: early)
+            return
+        }
+        self.continuation = continuation
+        lock.unlock()
+    }
+
+    func onFinish(_ body: @escaping () -> Void) {
+        lock.lock()
+        if done { lock.unlock(); body(); return }
+        cleanup = body
+        lock.unlock()
+    }
+
+    func finish(_ result: Result<T, Error>) {
+        lock.lock()
+        guard !done else { lock.unlock(); return }
+        done = true
+        let continuation = self.continuation
+        self.continuation = nil
+        if continuation == nil { early = result }
+        let cleanup = self.cleanup
+        self.cleanup = nil
+        lock.unlock()
+        continuation?.resume(with: result)
+        cleanup?()
     }
 }

@@ -121,20 +121,27 @@ extension DataHubController {
     // MARK: Catálogo
 
     /// Lê schemas e tabelas (com linhas estimadas) e os põe na árvore do explorer.
-    func loadCatalog(_ connection: String) async {
+    func loadCatalog(_ connection: String, openFirstSchema: Bool = true) async {
         guard isLivePostgres(connection) else { return }
         var state = catalogs[connection] ?? PostgresCatalogState()
+        guard !state.loading else { return }
         state.loading = true
         catalogs[connection] = state
+        if health[connection] == nil { health[connection] = .checking }
         rebuildConnections()
         do {
-            let browser = try await postgresBrowser(for: connection)
-            state.schemas = try await browser.catalog()
+            // O cofre e o servidor juntos têm prazo: nada deixa a conexão em "Reading schemas…" para sempre.
+            let schemas = try await PostgresConnector.withDeadline(PostgresConnector.operationDeadline + 5) { [self] in
+                try await postgresBrowser(for: connection).catalog()
+            }
+            state.schemas = schemas
             state.error = nil
+            health[connection] = .ok(String(localized: "\(schemas.reduce(0) { $0 + $1.tables.count }) tables", bundle: .module))
             // Os schemas que têm tabelas abrem sozinhos; "public" primeiro por já vir na frente.
-            if let first = state.schemas?.first(where: { !$0.tables.isEmpty }) { expanded.insert("\(connection)/\(first.name)") }
+            if openFirstSchema, let first = schemas.first(where: { !$0.tables.isEmpty }) { expanded.insert("\(connection)/\(first.name)") }
         } catch {
             state.error = Self.describe(error)
+            health[connection] = ConnectionHealth(postgres: error)
         }
         state.loading = false
         catalogs[connection] = state
@@ -240,6 +247,7 @@ extension DataHubController {
     /// Esquece o que se leu de uma conexão removida.
     func forgetPostgres(_ connection: String) {
         catalogs[connection] = nil
+        health[connection] = nil
         for object in tableStates.keys where object.connectionID == connection { tableStates[object] = nil; tablePages[object] = nil }
         for object in Array(queryResult.keys) where object.connectionID == connection { queryResult[object] = nil }
         for object in Array(queryErrors.keys) where object.connectionID == connection { queryErrors[object] = nil }

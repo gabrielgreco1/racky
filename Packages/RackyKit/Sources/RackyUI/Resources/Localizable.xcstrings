@@ -3136,6 +3136,94 @@
         }
       }
     },
+    "Filter tables and connections": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter tables and connections"
+          }
+        }
+      }
+    },
+    "No tables match.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No tables match."
+          }
+        }
+      }
+    },
+    "Checking\u2026": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking\u2026"
+          }
+        }
+      }
+    },
+    "Connected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected"
+          }
+        }
+      }
+    },
+    "Login refused": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Login refused"
+          }
+        }
+      }
+    },
+    "Racky is checking this connection.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Racky is checking this connection."
+          }
+        }
+      }
+    },
+    "This connection answers.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This connection answers."
+          }
+        }
+      }
+    },
+    "Nothing answers at this address (%@). Start the server with prefect server start.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing answers at this address (%@). Start the server with prefect server start."
+          }
+        }
+      }
+    },
     "Block": {
       "extractionState": "manual",
       "localizations": {
