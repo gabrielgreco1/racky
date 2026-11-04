@@ -1,4 +1,5 @@
 import Foundation
+import RackyCore
 import RackyDesignSystem
 import RackyStore
 
@@ -8,7 +9,7 @@ import RackyStore
 
 /// Tipo de conexão. A família decide o ícone, o agrupamento no "Add connection" e o que dá para fazer.
 public enum DataConnectionKind: String, CaseIterable, Sendable, Codable {
-    case postgres, supabase, mysql, sqlServer, sqlite
+    case postgres, supabase, mysql, sqlServer, oracle, sqlite
     case bigQuery, snowflake, clickHouse, databricks
     case s3, gcs, r2
     case googleSheets, airtable
@@ -19,7 +20,7 @@ public enum DataConnectionKind: String, CaseIterable, Sendable, Codable {
 
     public var family: Family {
         switch self {
-        case .postgres, .supabase, .mysql, .sqlServer, .sqlite: .database
+        case .postgres, .supabase, .mysql, .sqlServer, .oracle, .sqlite: .database
         case .bigQuery, .snowflake, .clickHouse, .databricks: .warehouse
         case .s3, .gcs, .r2: .storage
         case .googleSheets, .airtable: .spreadsheet
@@ -34,6 +35,7 @@ public enum DataConnectionKind: String, CaseIterable, Sendable, Codable {
         case .supabase: "Supabase"
         case .mysql: "MySQL"
         case .sqlServer: "SQL Server"
+        case .oracle: "Oracle"
         case .sqlite: "SQLite"
         case .bigQuery: "BigQuery"
         case .snowflake: "Snowflake"
@@ -56,6 +58,7 @@ public enum DataConnectionKind: String, CaseIterable, Sendable, Codable {
         case .supabase: .supabase
         case .mysql: .mysql
         case .sqlServer: .sqlServer
+        case .oracle: .oracle
         case .sqlite: .sqlite
         case .bigQuery: .bigQuery
         case .snowflake: .snowflake
@@ -78,6 +81,7 @@ public enum DataConnectionKind: String, CaseIterable, Sendable, Codable {
         case .supabase: String(localized: "Postgres hosted by Supabase", bundle: .module)
         case .mysql: String(localized: "MySQL or MariaDB", bundle: .module)
         case .sqlServer: String(localized: "SQL Server or Azure SQL", bundle: .module)
+        case .oracle: String(localized: "Oracle Database (service name)", bundle: .module)
         case .sqlite: String(localized: "A database file on this Mac", bundle: .module)
         case .bigQuery: String(localized: "Google Cloud data warehouse", bundle: .module)
         case .snowflake: String(localized: "Snowflake data warehouse", bundle: .module)
@@ -96,9 +100,21 @@ public enum DataConnectionKind: String, CaseIterable, Sendable, Codable {
     /// Webhook só recebe; o resto dá para navegar e gravar.
     public var canBrowse: Bool { self != .webhook }
     /// Dá para conectar de verdade hoje (os outros tipos ainda são de exemplo; o card diz "Soon").
-    public var connectable: Bool { self == .prefect || self == .s3 || speaksPostgres }
+    public var connectable: Bool { self == .prefect || self == .s3 || speaksLiveSQL }
     /// Fala o protocolo do Postgres (PostgreSQL puro, RDS, Neon, Supabase): conecta de verdade com uma connection string.
     public var speaksPostgres: Bool { self == .postgres || self == .supabase }
+    /// MySQL/MariaDB, SQL Server e Oracle: conectam de verdade pelo helper `racky-db` (uma URL, ou campos soltos).
+    public var helperEngine: SQLHelperEngine? {
+        switch self {
+        case .mysql: .mysql
+        case .sqlServer: .sqlserver
+        case .oracle: .oracle
+        default: nil
+        }
+    }
+    public var speaksHelper: Bool { helperEngine != nil }
+    /// Tem conexão de verdade com catálogo, tabelas e SQL: Postgres direto ou o helper.
+    public var speaksLiveSQL: Bool { speaksPostgres || speaksHelper }
     public var speaksSQL: Bool { family == .database || family == .warehouse }
 }
 

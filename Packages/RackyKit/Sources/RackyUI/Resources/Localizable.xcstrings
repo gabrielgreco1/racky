@@ -3158,13 +3158,13 @@
         }
       }
     },
-    "Checking\u2026": {
+    "Checking…": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Checking\u2026"
+            "value": "Checking…"
           }
         }
       }
@@ -13416,6 +13416,13 @@
     "No tables in this database.": {},
     "Connection string (required)": {},
     "Fill in the connection string": {},
+    "Host and port (required)": {},
+    "Service name (required)": {},
+    "User (required)": {},
+    "Or paste a connection URL": {},
+    "Fill in the host and user, or paste a URL": {},
+    "Oracle Database (service name)": {},
+    "Racky only reads: every query runs in a read-only transaction. The password stays in this Mac's secure vault.": {},
     "Supabase: Project Settings → Database → Connection string (Session pooler).": {},
     "Any Postgres, RDS included. Add ?sslmode=require (TLS is always on unless the string says sslmode=disable).": {},
     "Racky only reads: every query runs in a read-only transaction. The connection string stays in this Mac's secure vault.": {},
@@ -14825,10 +14832,6 @@
           }
         }
       }
-    }
-  },
-  "version": "1.0"
-}
     },
     "A skill with this name already exists.": {
       "extractionState": "manual",
@@ -15214,3 +15217,7 @@
           }
         }
       }
+    }
+  },
+  "version": "1.0"
+}

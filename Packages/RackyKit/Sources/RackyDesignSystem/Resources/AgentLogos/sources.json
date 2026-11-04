@@ -111,6 +111,12 @@
       "sha256": "67c144cc3e44ad14062a3f20ebe29c5e7eeb2c2c9c0f43cf48d87fe6291a8b2d"
     },
     {
+      "file": "data-oracle.svg",
+      "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/oracle.svg",
+      "member": "Simple Icons oracle (CC0 icon data; mark belongs to its owner, identifies a connection type)",
+      "sha256": "d355bd1561de9aea08928e662bdce5b4834f0dcb6096aa0b04b4eed23fc1fcb9"
+    },
+    {
       "file": "data-sqlite.svg",
       "source": "https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/sqlite.svg",
       "member": "Simple Icons sqlite (CC0 icon data; mark belongs to its owner, identifies a connection type)",

@@ -83,7 +83,7 @@ extension DataHubController {
         var c = s.connection
         if s.kind == .prefect {
             c.children = [DataNode(id: "\(s.id)/runs", kind: .runs, name: String(localized: "Flow runs", bundle: .module))]
-        } else if s.kind.speaksPostgres {
+        } else if s.kind.speaksLiveSQL {
             c.children = postgresChildren(of: s)
         }
         if s.kind == .s3 { c.children = s3RootChildren(s) }
@@ -104,10 +104,13 @@ extension DataHubController {
         var auth: SavedConnection.AuthKind
         var user: String?
         var secret: String?
+        /// MySQL, SQL Server, Oracle: campos soltos (a senha vem em `secret`); `url` colada tem a vez.
+        var host: String?
+        var database: String?
     }
 
     func saveConnection(_ form: ConnectForm) async -> Bool {
-        if let kind = connecting, kind.speaksPostgres { return await savePostgres(form, kind: kind) }
+        if let kind = connecting, kind.speaksLiveSQL { return await savePostgres(form, kind: kind) }
         guard let kind = connecting, kind == .prefect else { connectError = String(localized: "This connection type is not available yet.", bundle: .module); return false }
         guard let url = PrefectClient.apiURL(from: form.url) else { connectError = String(localized: "The server URL is not valid.", bundle: .module); return false }
         let auth: PrefectClient.Auth
@@ -268,14 +271,14 @@ extension DataHubController {
         }
     }
 
-    /// Checa as conexões cuja última checagem venceu. Postgres/Supabase leem o catálogo (o que também enche a árvore); Prefect lê 1 run.
+    /// Checa as conexões cuja última checagem venceu. Postgres/Supabase e os bancos do helper leem o catálogo (o que também enche a árvore); Prefect lê 1 run.
     func checkConnections() async {
         let current = now()
         for entry in saved {
             let due = (health[entry.id]?.isOK ?? false) ? Self.healthRefresh : Self.healthRetry
             if let last = healthCheckedAt[entry.id], current.timeIntervalSince(last) < due { continue }
             healthCheckedAt[entry.id] = current
-            if entry.kind.speaksPostgres {
+            if entry.kind.speaksLiveSQL {
                 await loadCatalog(entry.id, openFirstSchema: false)
             } else if entry.kind == .prefect {
                 await checkPrefect(entry)

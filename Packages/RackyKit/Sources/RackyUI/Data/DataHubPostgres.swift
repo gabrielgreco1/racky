@@ -26,6 +26,35 @@ public struct PostgresTableState: Equatable, Sendable {
 }
 
 enum PostgresStarter {
+    /// O primeiro SQL de uma consulta nova: o que o banco tem, na sintaxe de cada um.
+    static func query(for kind: DataConnectionKind?) -> String {
+        switch kind {
+        case .mysql:
+            return """
+                select table_schema, table_name, table_type
+                from information_schema.tables
+                where table_schema not in ('mysql', 'information_schema', 'performance_schema', 'sys')
+                order by 1, 2
+                limit 50;
+                """
+        case .sqlServer:
+            return """
+                select top 50 table_schema, table_name, table_type
+                from information_schema.tables
+                order by 1, 2;
+                """
+        case .oracle:
+            return """
+                select owner, table_name
+                from all_tables
+                where owner = user
+                order by 1, 2
+                fetch first 50 rows only
+                """
+        default: return query
+        }
+    }
+
     static let query = """
         select table_schema, table_name, table_type
         from information_schema.tables
@@ -44,7 +73,16 @@ extension DataHubController {
     /// A conexão é uma das salvas, do tipo Postgres/Supabase (as de exemplo continuam com dados de exemplo).
     func isLivePostgres(_ connection: String?) -> Bool {
         guard let connection else { return false }
-        return saved.contains { $0.id == connection && $0.kind.speaksPostgres } || computerDatabase(connection) != nil
+        return saved.contains { $0.id == connection && $0.kind.speaksLiveSQL } || computerDatabase(connection) != nil
+    }
+
+    /// A conexão fala o dialeto do Postgres (tem `ctid`, `::text`); as do helper (MySQL, SQL Server, Oracle) não.
+    func isPostgresDialect(_ connection: String) -> Bool {
+        computerDatabase(connection) != nil || saved.contains { $0.id == connection && $0.kind.speaksPostgres }
+    }
+
+    func starterQuery(for connection: String?) -> String {
+        PostgresStarter.query(for: saved.first { $0.id == connection }?.kind)
     }
 
     /// O conector de uma conexão salva: lê a string do cofre. `nil` + erro se o cofre não a tem.
@@ -61,6 +99,7 @@ extension DataHubController {
         do { text = try await vault.reveal(id: secretID).text } catch {
             throw PostgresConnector.Failure.invalidConnectionString(String(localized: "The connection string is not in the vault. Remove the connection and add it again.", bundle: .module))
         }
+        if let engine = entry.kind.helperEngine { return sqlHelperFactory(engine, text) }
         do {
             return postgresFactory(try PostgresConnectionInfo(parsing: text))
         } catch {
@@ -77,12 +116,32 @@ extension DataHubController {
 
     /// Testa a connection string (`SELECT 1` numa transação só de leitura) e, se responder, guarda a string no cofre e a conexão no app.
     func savePostgres(_ form: ConnectForm, kind: DataConnectionKind) async -> Bool {
-        let info: PostgresConnectionInfo
-        do {
-            info = try PostgresConnectionInfo(parsing: form.secret ?? "")
-        } catch {
-            connectError = error.description
-            return false
+        let browser: any PostgresBrowsing
+        let address: String
+        var secret = form.secret ?? ""
+        if let engine = kind.helperEngine {
+            // MySQL, SQL Server, Oracle: a URL canônica (com a senha) é o segredo; o helper recebe a mesma.
+            do {
+                let pasted = form.url.trimmingCharacters(in: .whitespacesAndNewlines)
+                let spec = pasted.isEmpty
+                    ? try SQLConnectionSpec(engine: engine, hostField: form.host ?? "", user: form.user ?? "", password: secret, database: form.database ?? "")
+                    : try SQLConnectionSpec(parsing: pasted, engine: engine)
+                secret = spec.url
+                address = spec.displayAddress
+                browser = sqlHelperFactory(engine, spec.url)
+            } catch {
+                connectError = error.description
+                return false
+            }
+        } else {
+            do {
+                let info = try PostgresConnectionInfo(parsing: secret)
+                address = info.displayAddress
+                browser = postgresFactory(info)
+            } catch {
+                connectError = error.description
+                return false
+            }
         }
         guard let vault else {
             connectError = String(localized: "The secure vault is not available, so the connection string cannot be stored.", bundle: .module)
@@ -91,7 +150,7 @@ extension DataHubController {
         connectBusy = true
         defer { connectBusy = false }
         do {
-            try await postgresFactory(info).check()
+            try await browser.check()
         } catch {
             connectError = Self.describe(error)
             return false
@@ -101,13 +160,13 @@ extension DataHubController {
         let secretID: UUID
         do {
             secretID = try await vault.create(NewSecret(
-                name: "\(name) · \(kind.title) connection (\(id))", value: form.secret ?? "", kind: .envVar, delivery: .sidecarOnly,
+                name: "\(name) · \(kind.title) connection (\(id))", value: secret, kind: .envVar, delivery: .sidecarOnly,
                 note: String(localized: "Data connection credential: only Racky reads it, never an agent's terminal.", bundle: .module))).id
         } catch {
             connectError = String(localized: "The connection string could not be stored in the vault.", bundle: .module)
             return false
         }
-        saved.append(SavedConnection(id: id, kind: kind, name: name, url: info.displayAddress, auth: .connectionString, secretID: secretID))
+        saved.append(SavedConnection(id: id, kind: kind, name: name, url: address, auth: .connectionString, secretID: secretID))
         try? await store?.setUIState(Self.savedKey, saved)
         rebuildConnections()
         connecting = nil
@@ -183,7 +242,7 @@ extension DataHubController {
             // Páginas estáveis: pela chave primária; sem ela, pelo `ctid` (tabelas; uma view não tem).
             let keys = state.columns.filter(\.isKey).map(\.name)
             let isView = catalogTable(connection, schema: schema, name: name)?.isView ?? false
-            let order = keys.isEmpty ? (isView ? [] : ["ctid"]) : keys
+            let order = keys.isEmpty ? (isView || !isPostgresDialect(connection) ? [] : ["ctid"]) : keys
             let result = try await browser.rows(schema: schema, table: name, limit: Self.livePageSize, offset: page * Self.livePageSize, orderBy: order)
             state.rows = result.rows
             state.loaded = true

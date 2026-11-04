@@ -22,6 +22,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 usage() { sed -n '2,/^set -euo/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//'; }
 case "${1:-}" in -h|--help) usage; exit 0 ;; esac
 fail() { echo "ERRO: $*" >&2; exit 1; }
+command -v go >/dev/null 2>&1 || fail "go não encontrado: o helper racky-db (helpers/racky-db) precisa do Go (instale com: brew install go)"
 
 export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
 OUT="${RACKY_BUILD_DIR:-$ROOT/build/Racky}"
@@ -87,6 +88,10 @@ mkdir -p "$APP/Contents/Helpers"
 [ ! -e "$APP/Contents/Helpers/racky" ] || fail "Contents/Helpers/racky já existe antes de embutir o helper"
 install -m 755 "$BIN/racky" "$APP/Contents/Helpers/racky"
 install -m 755 "$BIN/rackyd" "$APP/Contents/MacOS/rackyd"
+# Helper dos bancos MySQL/MariaDB, SQL Server e Oracle (Go, só drivers puros): roda só enquanto há um pedido e sai. Fica em Contents/Helpers.
+echo "build: go build racky-db (arm64)"
+( cd "$ROOT/helpers/racky-db" && CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags "-s -w" -o "$APP/Contents/Helpers/racky-db" . ) || fail "go build do racky-db falhou"
+chmod 755 "$APP/Contents/Helpers/racky-db"
 # Launcher estável do LaunchAgent (T1-24/S-01): o launchd prende o job ao cdhash do BundleProgram, então o job é registrado com
 # este binário minúsculo (só faz exec do rackyd) e as atualizações do daemon não exigem novo registro. Símbolos removidos
 # (strip -S -x) para o cdhash não depender de caminhos de build; o identificador de assinatura é fixo.
@@ -122,13 +127,14 @@ sign() { # path identifier [entitlements.plist]
   fi
 }
 sign "$APP/Contents/Helpers/racky" app.racky.cli
+sign "$APP/Contents/Helpers/racky-db" app.racky.db
 sign "$APP/Contents/MacOS/rackyd" app.racky.ptyd
 sign "$APP/Contents/MacOS/rackyd-launch" app.racky.ptyd.launch
 sign "$APP" app.racky.mac "$ROOT/App/Racky.entitlements"
 
 echo "build: verificando assinatura"
 codesign --verify --strict --verbose=2 "$APP"
-for pair in "$APP/Contents/Helpers/racky:app.racky.cli" "$APP/Contents/MacOS/rackyd:app.racky.ptyd" "$APP/Contents/MacOS/rackyd-launch:app.racky.ptyd.launch" "$APP:app.racky.mac"; do
+for pair in "$APP/Contents/Helpers/racky:app.racky.cli" "$APP/Contents/Helpers/racky-db:app.racky.db" "$APP/Contents/MacOS/rackyd:app.racky.ptyd" "$APP/Contents/MacOS/rackyd-launch:app.racky.ptyd.launch" "$APP:app.racky.mac"; do
   p="${pair%%:*}"; id="${pair##*:}"
   codesign --verify --strict "$p"
   dr="$(codesign -dr - "$p" 2>&1 | grep 'designated =>' || true)"

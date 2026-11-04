@@ -4,7 +4,7 @@ import SwiftUI
 /// Marca de um lugar de dados (banco, warehouse, storage, planilha, webhook): o logo na cor da marca, sozinho ou num ladrilho
 /// neutro. Os SVGs vêm da Simple Icons (CC0) e da Devicon (MIT); `sources.json` guarda a origem.
 public enum DSDataBrand: String, CaseIterable, Sendable {
-    case postgres, supabase, mysql, sqlServer, sqlite
+    case postgres, supabase, mysql, sqlServer, oracle, sqlite
     case bigQuery, snowflake, clickHouse, databricks
     case s3, gcs, r2
     case googleSheets, airtable
@@ -17,6 +17,7 @@ public enum DSDataBrand: String, CaseIterable, Sendable {
         case .supabase: "data-supabase"
         case .mysql: "data-mysql"
         case .sqlServer: "data-microsoftsqlserver"
+        case .oracle: "data-oracle"
         case .sqlite: "data-sqlite"
         case .bigQuery: "data-googlebigquery"
         case .snowflake: "data-snowflake"
@@ -39,6 +40,7 @@ public enum DSDataBrand: String, CaseIterable, Sendable {
         case .supabase: 0x3FCF8E
         case .mysql: 0x5D96C8
         case .sqlServer: 0xE0484B
+        case .oracle: 0xF2594B
         case .sqlite: 0x5AA4D6
         case .bigQuery: 0x669DF6
         case .snowflake: 0x29B5E8

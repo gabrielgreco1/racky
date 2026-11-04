@@ -1039,6 +1039,8 @@ struct ConnectFormView: View {
     @State private var auth = SavedConnection.AuthKind.basic
     @State private var user = ""
     @State private var secret = ""
+    @State private var host = ""
+    @State private var database = ""
 
     private var payload: String {
         let form: [String: String] = ["name": name, "url": url, "auth": auth.rawValue, "user": user, "secret": secret]
@@ -1046,7 +1048,72 @@ struct ConnectFormView: View {
     }
 
     @ViewBuilder var body: some View {
-        if kind.speaksPostgres { postgresBody } else { prefectBody }
+        if kind.speaksPostgres { postgresBody } else if kind.speaksHelper { helperBody } else { prefectBody }
+    }
+
+    /// MySQL/MariaDB, SQL Server e Oracle: campos soltos (host, banco ou service name, usuário, senha) ou uma URL colada. A URL
+    /// canônica com a senha vai para o cofre; o estado do app só guarda host:porta/banco.
+    private var helperBody: some View {
+        let form: [String: String] = [
+            "name": name, "url": url, "auth": SavedConnection.AuthKind.connectionString.rawValue, "user": user, "secret": secret,
+            "host": host, "database": database,
+        ]
+        let payload = (try? String(data: JSONSerialization.data(withJSONObject: form), encoding: .utf8)) ?? "{}"
+        let ready = !url.isEmpty || (!host.isEmpty && !user.isEmpty && (kind != .oracle || !database.isEmpty))
+        let isOracle = kind == .oracle
+        let hostExample = kind == .sqlServer ? "db.company.com:1433" : (isOracle ? "db.company.com:1521" : "db.company.com:3306")
+        let urlExample = switch kind {
+        case .sqlServer: "sqlserver://user:password@host:1433?database=name"
+        case .oracle: "oracle://user:password@host:1521/SERVICE"
+        default: "mysql://user:password@host:3306/database"
+        }
+        return VStack(alignment: .leading, spacing: DS.Space.s4) {
+            HStack(spacing: DS.Space.s2_5) {
+                DSDataLogo(kind.brand, size: DataMetrics.connectLogo, tile: true)
+                VStack(alignment: .leading, spacing: .zero) {
+                    Text(verbatim: kind.title).dsFont(DS.Font.bodyStrong).foregroundStyle(DS.Color.textPrimary)
+                    Text(verbatim: kind.tagline).dsFont(DS.Font.small).foregroundStyle(DS.Color.textTertiary)
+                }
+            }
+            field("Name (optional)") {
+                DSTextField("e.g. \(kind.title) prod", text: $name, id: .dataConnectName, compact: true)
+            }
+            field("Host and port (required)") {
+                DSTextField(LocalizedStringKey(hostExample), text: $host, id: .dataConnectHost, compact: true, mono: true)
+            }
+            field(isOracle ? LocalizedStringKey("Service name (required)") : LocalizedStringKey("Database")) {
+                DSTextField(isOracle ? "FREEPDB1" : "shop", text: $database, id: .dataConnectDatabase, compact: true, mono: true)
+            }
+            HStack(spacing: DS.Space.s2) {
+                field("User (required)") { DSTextField("user", text: $user, id: .dataConnectUser, compact: true) }
+                field("Password") { DSTextField("Password", text: $secret, id: .dataConnectSecret, compact: true, secure: true) }
+            }
+            field("Or paste a connection URL") {
+                DSTextField(LocalizedStringKey(urlExample), text: $url, id: .dataConnectUrl, compact: true, mono: true, secure: true)
+            }
+            Text("Racky only reads: every query runs in a read-only transaction. The password stays in this Mac's secure vault.", bundle: .module)
+                .dsFont(DS.Font.small).foregroundStyle(DS.Color.textTertiary).fixedSize(horizontal: false, vertical: true)
+            if let error = hub.connectError {
+                HStack(spacing: DS.Space.s1_5) {
+                    Image(systemName: "exclamationmark.circle").font(.system(size: DS.Space.s3))
+                    Text(verbatim: error).dsFont(DS.Font.small).fixedSize(horizontal: false, vertical: true)
+                }
+                .foregroundStyle(DS.Color.destructive)
+                .a11y(.dataConnectError, kind: "text", label: error)
+            }
+            HStack(spacing: DS.Space.s2) {
+                DSButton(.dataConnectStart, id: nil, "Back", variant: .ghost, size: .sm, symbol: "chevron.left", argument: .select("close"))
+                Spacer(minLength: 0)
+                if hub.connectBusy { ProgressView().controlSize(.small) }
+                if !ready {
+                    Label { Text("Fill in the host and user, or paste a URL", bundle: .module) } icon: { Image(systemName: "info.circle") }
+                        .dsFont(DS.Font.label).foregroundStyle(DS.Color.textPrimary)
+                }
+                DSButton(.dataConnectSave, id: .dataConnectSave, "Test and connect", variant: .primary, size: .sm, argument: .set(payload))
+                    .disabled(!ready || hub.connectBusy)
+            }
+        }
+        .a11y(.dataConnectForm, kind: "form", label: kind.title)
     }
 
     /// Postgres, RDS e Supabase: uma connection string, que é o segredo inteiro (vai para o cofre; o estado do app só guarda host e banco).

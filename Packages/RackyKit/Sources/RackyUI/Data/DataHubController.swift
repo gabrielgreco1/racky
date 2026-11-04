@@ -70,6 +70,8 @@ public final class DataHubController {
     public internal(set) var queryBusy: Set<DataObject> = []
     /// Abre o conector de uma conexão (trocável nos testes por um servidor falso; nunca toca a rede).
     @ObservationIgnored var postgresFactory: @Sendable (PostgresConnectionInfo) -> any PostgresBrowsing = { PostgresConnector(info: $0) }
+    /// MySQL/MariaDB, SQL Server e Oracle: o conector do helper `racky-db` (a URL canônica vai no stdin; os testes trocam o helper por um script).
+    @ObservationIgnored var sqlHelperFactory: @Sendable (SQLHelperEngine, String) -> any PostgresBrowsing = { SQLHelperConnector(engine: $0, dsn: $1) }
     /// Amazon S3 (conexões de verdade): o que o explorer já listou, cada pasta aberta e as prévias de arquivos.
     var s3Tree: [String: S3Level] = [:]
     var s3Folders: [DataObject: S3FolderState] = [:]
@@ -165,7 +167,7 @@ public final class DataHubController {
         if tableTabs[object] == nil { tableTabs[object] = .data }
         if let feeding = feedingDataset(of: object) { Task { await datasets.prepare(feeding) } }
         if case .query = object, queryText[object] == nil {
-            queryText[object] = isLivePostgres(object.connectionID) ? PostgresStarter.query : DataHubFixtures.sampleQuery
+            queryText[object] = isLivePostgres(object.connectionID) ? starterQuery(for: object.connectionID) : DataHubFixtures.sampleQuery
         }
         if case .table = object, isLivePostgres(object.connectionID) { Task { await loadTable(object) } }
         if case .folder = object, isLiveS3(object.connectionID) { Task { await loadS3Folder(object) } }
