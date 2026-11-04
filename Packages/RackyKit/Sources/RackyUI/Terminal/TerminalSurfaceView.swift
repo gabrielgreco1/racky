@@ -73,6 +73,27 @@ public final class TerminalSurfaceView: TerminalView {
     }()
 
     /// Clique no terminal sempre devolve o foco à superfície (um overlay aberto engole o clique antes, no hit test).
+    /// Scroll liso (backlog 3): o resto de linha do trackpad, em pixels, e se o host deve animar a volta a zero.
+    public var onSmoothOffset: ((_ offset: CGFloat, _ animated: Bool) -> Void)?
+    var smoothScroll = SmoothScrollState()
+    var smoothSettle: DispatchWorkItem?
+
+    var scrollMonitor: Any?
+
+    /// O `scrollWheel` do SwiftTerm não é `open`: um monitor local vê o evento antes dele, guarda a posição e, depois que o
+    /// SwiftTerm rolou, calcula o resto de linha. Só enquanto a view está numa janela.
+    public override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if let scrollMonitor { NSEvent.removeMonitor(scrollMonitor); self.scrollMonitor = nil }
+        guard window != nil else { settleSmoothScroll(animated: false); return }
+        scrollMonitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
+            guard let self, event.window === self.window, self.bounds.contains(self.convert(event.locationInWindow, from: nil)) else { return event }
+            let before = self.scrollPosition
+            DispatchQueue.main.async { [weak self] in self?.trackSmoothScroll(event, before: before) }
+            return event
+        }
+    }
+
     public override func mouseDown(with event: NSEvent) {
         takeFocus()
         if links.claimClick(event) { return }

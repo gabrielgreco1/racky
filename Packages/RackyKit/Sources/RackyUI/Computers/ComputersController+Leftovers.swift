@@ -164,8 +164,25 @@ struct LeftoversSection: View {
             Text(verbatim: item.computer).dsFont(DS.Font.bodyStrong).foregroundStyle(DS.Color.textPrimary).lineLimit(1).truncationMode(.middle)
                 .frame(minWidth: ComputersMetrics.colNameMin, maxWidth: .infinity, alignment: .leading)
             if columns.shows(.session) {
-                Text(verbatim: item.session ?? "—").dsFont(DS.Font.small).foregroundStyle(DS.Color.textSecondary).lineLimit(1)
-                    .frame(width: ComputersMetrics.colSession, alignment: .leading)
+                Group {
+                    if let name = item.session, let id = controller.sessionNamed(name) {
+                        // O run é de uma sessão que ainda existe: um clique abre a sessão.
+                        ActionButton(
+                            .sessionSelect, id: .computersLeftoversRowSession(item.key), argument: .select(id.uuidString),
+                            tooltip: String(localized: "Open the session", bundle: .module)
+                        ) {
+                            HStack(spacing: DS.Space.s1) {
+                                Text(verbatim: name).dsFont(DS.Font.small).foregroundStyle(DS.Color.textPrimary).lineLimit(1)
+                                Image(systemName: "arrow.up.right").font(.system(size: SidebarMetrics.line2Icon)).foregroundStyle(DS.Color.textTertiary)
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        Text(verbatim: item.session ?? "—").dsFont(DS.Font.small).foregroundStyle(DS.Color.textSecondary).lineLimit(1)
+                    }
+                }
+                .frame(width: ComputersMetrics.colSession, alignment: .leading)
             }
             if columns.shows(.age) {
                 HStack(spacing: DS.Space.s2) {

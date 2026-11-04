@@ -43,10 +43,13 @@ public final class TerminalHostView: NSView {
         super.init(frame: NSRect(x: 0, y: 0, width: 640, height: 400))
         wantsLayer = true
         layer?.backgroundColor = DS.Terminal.background.nsColor.cgColor
+        // Scroll liso: a superfície desce/sobe até uma linha dentro do host; o que passa da borda fica recortado.
+        layer?.masksToBounds = true
         surface.translatesAutoresizingMaskIntoConstraints = false
         surface.setAccessibilityIdentifier(A11yID.paneTerminal(terminalID).rawValue)
         addSubview(surface)
         applyInset()
+        surface.onSmoothOffset = { [weak self] offset, animated in self?.applySmoothOffset(offset, animated: animated) }
         findModel.surface = surface
         findModel.onClose = { [weak self] in self?.findClosed() }
         installFindBar(registry: registry, elements: elements)
@@ -57,6 +60,24 @@ public final class TerminalHostView: NSView {
     public override func layout() {
         super.layout()
         surface.syncTerminalSizeToFrame()
+    }
+
+    /// Move a superfície pelo resto de linha do scroll (positivo = para baixo, mostrando a linha de cima do histórico).
+    private func applySmoothOffset(_ offset: CGFloat, animated: Bool) {
+        guard insetConstraints.count == 4, insetConstraints[2].constant != terminalAppearance.padding + offset else { return }
+        let p = terminalAppearance.padding
+        if animated, !MotionPolicy.shared.reduceMotion {
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = MotionTokens.Duration.fast
+                context.allowsImplicitAnimation = true
+                insetConstraints[2].animator().constant = p + offset
+                insetConstraints[3].animator().constant = -p + offset
+                layoutSubtreeIfNeeded()
+            }
+        } else {
+            insetConstraints[2].constant = p + offset
+            insetConstraints[3].constant = -p + offset
+        }
     }
 
     private func applyInset() {

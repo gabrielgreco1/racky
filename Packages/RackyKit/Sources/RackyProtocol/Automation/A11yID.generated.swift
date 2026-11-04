@@ -1931,6 +1931,11 @@ extension A11yID {
         A11yID(unchecked: "computers.leftovers.row.\(A11yID.segment(key)).delete")
     }
 
+    /// `computers.leftovers.row.<key>.session`
+    public static func computersLeftoversRowSession(_ key: String) -> A11yID {
+        A11yID(unchecked: "computers.leftovers.row.\(A11yID.segment(key)).session")
+    }
+
     /// `datasets.row.<id>`
     public static func datasetsRow(_ id: String) -> A11yID {
         A11yID(unchecked: "datasets.row.\(A11yID.segment(id))")
@@ -2564,6 +2569,7 @@ extension A11yID {
         A11yIDSpec(pattern: "computers.leftovers.row.<key>", surface: "Páginas"),
         A11yIDSpec(pattern: "computers.leftovers.row.<key>.keep", surface: "Páginas"),
         A11yIDSpec(pattern: "computers.leftovers.row.<key>.delete", surface: "Páginas"),
+        A11yIDSpec(pattern: "computers.leftovers.row.<key>.session", surface: "Páginas"),
         A11yIDSpec(pattern: "datasets.page", surface: "Páginas"),
         A11yIDSpec(pattern: "datasets.empty", surface: "Páginas"),
         A11yIDSpec(pattern: "datasets.row.<id>", surface: "Páginas"),

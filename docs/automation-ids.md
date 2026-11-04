@@ -484,6 +484,7 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 - `computers.leftovers.row.<key>`
 - `computers.leftovers.row.<key>.keep`
 - `computers.leftovers.row.<key>.delete`
+- `computers.leftovers.row.<key>.session`
 - `datasets.page`
 - `datasets.empty`
 - `datasets.row.<id>`

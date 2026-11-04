@@ -79,6 +79,8 @@ public final class ComputersController {
     var leftoversExpanded = false
     /// `Delete now` liberou isto (o app mostra o toast).
     @ObservationIgnored public var onLeftoversFreed: (Int64) -> Void = { _ in }
+    /// "Left on this Mac": o run guarda o título da sessão; isto acha a sessão aberta com esse título (clique leva até ela).
+    @ObservationIgnored public var sessionNamed: (String) -> UUID? = { _ in nil }
     @ObservationIgnored public var onControlReturned: (_ computer: String, _ agent: String) -> Void = { _, _ in }
     @ObservationIgnored public var onPageChange: () -> Void = {}
     /// Histórico de navegação: a página do centro mudou (independe do `onPageChange`, que a janela já usa).

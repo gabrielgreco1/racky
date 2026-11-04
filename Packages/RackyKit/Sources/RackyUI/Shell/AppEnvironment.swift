@@ -529,6 +529,10 @@ public final class AppEnvironment {
         }
         do { try computers.registerResults(in: registry) } catch { log.publicError("duplicate result action registration") }
         do { try computers.registerLeftovers(in: registry) } catch { log.publicError("duplicate leftovers action registration") }
+        computers.sessionNamed = { [sidebar] title in
+            let open = sidebar.snapshot.sessions.filter { $0.title == title }
+            return (open.first { $0.archivedAt == nil } ?? open.first)?.id
+        }
         computers.onLeftoversFreed = { [toasts] freed in
             let size = ByteCountFormatter.string(fromByteCount: freed, countStyle: .file)
             toasts.show(kind: .success, title: String(localized: "Freed \(size).", bundle: .module))

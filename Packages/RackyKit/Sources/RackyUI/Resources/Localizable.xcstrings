@@ -3125,6 +3125,17 @@
         }
       }
     },
+    "Open the session": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open the session"
+          }
+        }
+      }
+    },
     "Block": {
       "extractionState": "manual",
       "localizations": {
