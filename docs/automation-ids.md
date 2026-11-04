@@ -554,6 +554,8 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 - `data.explorer.resize`
 - `data.explorer.node.<id>`
 - `data.explorer.section.<section>`
+- `data.explorer.filter`
+- `data.explorer.status.<id>`
 - `data.addConnection`
 - `data.tab.<key>`
 - `data.tab.<key>.close`
@@ -775,6 +777,70 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 
 - `toast.<kind>`
 - `toast.<kind>.action`
+
+### Agents
+
+- `sidebar.agents`
+- `sidebar.agents.toggle`
+- `sidebar.agents.new`
+- `sidebar.agents.empty`
+- `sidebar.agent.<id>`
+- `sidebar.projects.toggle`
+- `sidebar.cleanSessions.toggle`
+- `agents.page`
+- `agents.empty`
+- `agents.avatar`
+- `agents.avatar.regenerate`
+- `agents.avatar.upload`
+- `agents.name`
+- `agents.description`
+- `agents.tone`
+- `agents.instructions`
+- `agents.skills`
+- `agents.attachments`
+- `agents.attachment.<id>`
+- `agents.attachment.<id>.remove`
+- `agents.attachment.add`
+- `agents.computer`
+- `agents.computer.screen`
+- `agents.computer.memory`
+- `agents.computer.country`
+- `agents.computer.packages`
+- `agents.variables`
+- `agents.variable.<name>`
+- `agents.variable.<name>.remove`
+- `agents.variable.add`
+- `agents.variable.envName`
+- `agents.variable.secret`
+- `agents.sites`
+- `agents.site.<host>`
+- `agents.site.<host>.remove`
+- `agents.site.add`
+- `agents.memory`
+- `agents.memory.search`
+- `agents.memory.add`
+- `agents.memory.addBody`
+- `agents.memory.entry.<id>`
+- `agents.memory.entry.<id>.body`
+- `agents.memory.entry.<id>.delete`
+- `agents.newSession`
+- `agents.delete`
+- `agents.create.page`
+- `agents.create.mode.<mode>`
+- `agents.create.chat`
+- `agents.create.message.<index>`
+- `agents.create.input`
+- `agents.create.send`
+- `agents.create.attach`
+- `agents.create.upload.<index>`
+- `agents.create.draft`
+- `agents.create.name`
+- `agents.create.avatar.<index>`
+- `agents.create.photo`
+- `agents.create.confirm`
+- `agents.create.cancel`
+- `agents.create.error`
+- `agents.create.import`
 
 ## ActionID (03 §24)
 
@@ -1068,6 +1134,35 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 | `library.newAgent` | Library: New Agent… | — | v11 |
 | `library.importSkill` | Import Skill Folder… | — | v11 |
 | `library.edit` | Edit | — | v11 |
+| `sidebar.toggleSection` | Sidebar: recolher seção | — | slice1 |
+| `agents.open` | Agents: abrir | — | slice1 |
+| `agents.new` | Agents: New Agent… | — | slice1 |
+| `agents.newSkill` | New Skill… | — | slice1 |
+| `agents.setField` | Agents: editar campo | — | slice1 |
+| `agents.delete` | Agents: Delete | — | slice1 |
+| `agents.newSession` | New Session | — | slice1 |
+| `agents.regenerateAvatar` | Agents: Regenerate Avatar | — | slice1 |
+| `agents.setPhoto` | Upload Photo | — | slice1 |
+| `agents.addAttachment` | Agents: anexos fixos | — | slice1 |
+| `agents.removeAttachment` | Agents: anexos fixos | — | slice1 |
+| `agents.setVariable` | Agents: variáveis do cofre | — | slice1 |
+| `agents.removeVariable` | Agents: variáveis do cofre | — | slice1 |
+| `agents.addSite` | Agents: sites logados | — | slice1 |
+| `agents.removeSite` | Agents: sites logados | — | slice1 |
+| `agents.memoryAdd` | Agents: memória | — | slice1 |
+| `agents.memoryEdit` | Agents: memória | — | slice1 |
+| `agents.memoryDelete` | Agents: memória | — | slice1 |
+| `agents.memorySearch` | Agents: memória | — | slice1 |
+| `agents.addToSession` | Agents: arrastar para a sessão ou o composer | — | slice1 |
+| `agents.insertInPrompt` | Agents: arrastar para a sessão ou o composer | — | slice1 |
+| `agents.create.setMode` | Criar agente ou skill: conversa e rascunho | — | slice1 |
+| `agents.create.send` | Criar agente ou skill: conversa e rascunho | — | slice1 |
+| `agents.create.attach` | Criar agente ou skill: conversa e rascunho | — | slice1 |
+| `agents.create.setField` | Criar agente ou skill: conversa e rascunho | — | slice1 |
+| `agents.create.pickAvatar` | Criar agente: avatar e confirmar | — | slice1 |
+| `agents.create.uploadPhoto` | Criar agente: avatar e confirmar | — | slice1 |
+| `agents.create.confirm` | Criar agente: avatar e confirmar | — | slice1 |
+| `agents.create.cancel` | Criar agente: avatar e confirmar | — | slice1 |
 | `conflict.block` | Block in Racky | — | slice2 |
 | `conflict.disableGlobal` | Disable Globally… | — | slice2 |
 | `conflict.keep` | Keep | — | slice2 |

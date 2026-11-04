@@ -16,6 +16,8 @@ nonisolated struct SidebarPersistedState: Codable, Equatable, Sendable {
     var sort: SidebarSort = .recent
     var filters = SidebarFilters()
     var selectedSession: UUID?
+    /// `agents`, `projects` e `sessions` recolhidos (backlog 25 b). Opcional para ler o estado gravado antes de existir.
+    var collapsedSections: [String]?
 }
 
 /// Modelo observável da sidebar. Só a UI muda estas propriedades (no MainActor); a persistência vai ao Store por tarefas
@@ -35,6 +37,10 @@ final class SidebarModel {
     private(set) var collapsedSessions: Set<UUID> = []
     private(set) var expandedSummaries: Set<UUID> = []
     private(set) var collapsedChildren: Set<UUID> = []
+    /// Seções da barra recolhidas pelo cabeçalho: `agents`, `projects`, `sessions`.
+    private(set) var collapsedSections: Set<String> = []
+    /// Agentes do Racky (backlog 25): a seção Agents é a primeira da barra.
+    var agents: AgentsController?
     /// v6: subagentes abertos na barra (computador + tabelas dele); chave `<terminal>/<child>`. Só desta execução.
     private(set) var expandedSubagents: Set<String> = []
     /// v6: agentes com a linha "N finished" aberta (subagentes que já terminaram).
@@ -261,6 +267,7 @@ final class SidebarModel {
         sort = saved.sort
         filters = saved.filters
         selectedSession = saved.selectedSession
+        collapsedSections = Set(saved.collapsedSections ?? [])
     }
 
     private func persist() {
@@ -268,7 +275,7 @@ final class SidebarModel {
         let state = SidebarPersistedState(
             collapsedProjects: Array(collapsedProjects), showMoreOpen: Array(showMoreOpen), hiddenProjects: Array(hiddenProjects),
             collapsedSessions: Array(collapsedSessions), expandedSummaries: Array(expandedSummaries), sort: sort, filters: filters,
-            selectedSession: selectedSession)
+            selectedSession: selectedSession, collapsedSections: Array(collapsedSections).sorted())
         Task { try? await store.scheduleUIState(Self.uiStateKey, state) }
     }
 
@@ -324,6 +331,15 @@ final class SidebarModel {
         guard order.indices.contains(n - 1) else { return nil }
         select(order[n - 1])
         return order[n - 1]
+    }
+
+    // MARK: Seções
+
+    func isCollapsed(section key: String) -> Bool { collapsedSections.contains(key) }
+
+    func toggleSection(_ key: String) {
+        if collapsedSections.contains(key) { collapsedSections.remove(key) } else { collapsedSections.insert(key) }
+        persist()
     }
 
     // MARK: Projetos

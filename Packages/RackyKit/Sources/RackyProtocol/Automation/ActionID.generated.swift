@@ -290,6 +290,35 @@ extension ActionID {
     public static let libraryNewAgent = ActionID(unchecked: "library.newAgent")
     public static let libraryImportSkill = ActionID(unchecked: "library.importSkill")
     public static let libraryEdit = ActionID(unchecked: "library.edit")
+    public static let sidebarToggleSection = ActionID(unchecked: "sidebar.toggleSection")
+    public static let agentsOpen = ActionID(unchecked: "agents.open")
+    public static let agentsNew = ActionID(unchecked: "agents.new")
+    public static let agentsNewSkill = ActionID(unchecked: "agents.newSkill")
+    public static let agentsSetField = ActionID(unchecked: "agents.setField")
+    public static let agentsDelete = ActionID(unchecked: "agents.delete")
+    public static let agentsNewSession = ActionID(unchecked: "agents.newSession")
+    public static let agentsRegenerateAvatar = ActionID(unchecked: "agents.regenerateAvatar")
+    public static let agentsSetPhoto = ActionID(unchecked: "agents.setPhoto")
+    public static let agentsAddAttachment = ActionID(unchecked: "agents.addAttachment")
+    public static let agentsRemoveAttachment = ActionID(unchecked: "agents.removeAttachment")
+    public static let agentsSetVariable = ActionID(unchecked: "agents.setVariable")
+    public static let agentsRemoveVariable = ActionID(unchecked: "agents.removeVariable")
+    public static let agentsAddSite = ActionID(unchecked: "agents.addSite")
+    public static let agentsRemoveSite = ActionID(unchecked: "agents.removeSite")
+    public static let agentsMemoryAdd = ActionID(unchecked: "agents.memoryAdd")
+    public static let agentsMemoryEdit = ActionID(unchecked: "agents.memoryEdit")
+    public static let agentsMemoryDelete = ActionID(unchecked: "agents.memoryDelete")
+    public static let agentsMemorySearch = ActionID(unchecked: "agents.memorySearch")
+    public static let agentsAddToSession = ActionID(unchecked: "agents.addToSession")
+    public static let agentsInsertInPrompt = ActionID(unchecked: "agents.insertInPrompt")
+    public static let agentsCreateSetMode = ActionID(unchecked: "agents.create.setMode")
+    public static let agentsCreateSend = ActionID(unchecked: "agents.create.send")
+    public static let agentsCreateAttach = ActionID(unchecked: "agents.create.attach")
+    public static let agentsCreateSetField = ActionID(unchecked: "agents.create.setField")
+    public static let agentsCreatePickAvatar = ActionID(unchecked: "agents.create.pickAvatar")
+    public static let agentsCreateUploadPhoto = ActionID(unchecked: "agents.create.uploadPhoto")
+    public static let agentsCreateConfirm = ActionID(unchecked: "agents.create.confirm")
+    public static let agentsCreateCancel = ActionID(unchecked: "agents.create.cancel")
     public static let conflictBlock = ActionID(unchecked: "conflict.block")
     public static let conflictDisableGlobal = ActionID(unchecked: "conflict.disableGlobal")
     public static let conflictKeep = ActionID(unchecked: "conflict.keep")
@@ -832,6 +861,35 @@ extension ActionID {
         ActionSpec(id: ActionID(unchecked: "library.newAgent"), label: "Library: New Agent…", shortcut: "", slice: .v11),
         ActionSpec(id: ActionID(unchecked: "library.importSkill"), label: "Import Skill Folder…", shortcut: "", slice: .v11),
         ActionSpec(id: ActionID(unchecked: "library.edit"), label: "Edit", shortcut: "", slice: .v11),
+        ActionSpec(id: ActionID(unchecked: "sidebar.toggleSection"), label: "Sidebar: recolher seção", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.open"), label: "Agents: abrir", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.new"), label: "Agents: New Agent…", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.newSkill"), label: "New Skill…", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.setField"), label: "Agents: editar campo", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.delete"), label: "Agents: Delete", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.newSession"), label: "New Session", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.regenerateAvatar"), label: "Agents: Regenerate Avatar", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.setPhoto"), label: "Upload Photo", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.addAttachment"), label: "Agents: anexos fixos", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.removeAttachment"), label: "Agents: anexos fixos", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.setVariable"), label: "Agents: variáveis do cofre", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.removeVariable"), label: "Agents: variáveis do cofre", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.addSite"), label: "Agents: sites logados", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.removeSite"), label: "Agents: sites logados", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.memoryAdd"), label: "Agents: memória", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.memoryEdit"), label: "Agents: memória", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.memoryDelete"), label: "Agents: memória", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.memorySearch"), label: "Agents: memória", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.addToSession"), label: "Agents: arrastar para a sessão ou o composer", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.insertInPrompt"), label: "Agents: arrastar para a sessão ou o composer", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.create.setMode"), label: "Criar agente ou skill: conversa e rascunho", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.create.send"), label: "Criar agente ou skill: conversa e rascunho", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.create.attach"), label: "Criar agente ou skill: conversa e rascunho", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.create.setField"), label: "Criar agente ou skill: conversa e rascunho", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.create.pickAvatar"), label: "Criar agente: avatar e confirmar", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.create.uploadPhoto"), label: "Criar agente: avatar e confirmar", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.create.confirm"), label: "Criar agente: avatar e confirmar", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.create.cancel"), label: "Criar agente: avatar e confirmar", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "conflict.block"), label: "Block in Racky", shortcut: "", slice: .slice2),
         ActionSpec(id: ActionID(unchecked: "conflict.disableGlobal"), label: "Disable Globally…", shortcut: "", slice: .slice2),
         ActionSpec(id: ActionID(unchecked: "conflict.keep"), label: "Keep", shortcut: "", slice: .slice2),

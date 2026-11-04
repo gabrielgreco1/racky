@@ -14088,6 +14088,633 @@
           }
         }
       }
+    },
+    "1 GB": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 GB"
+          }
+        }
+      }
+    },
+    "2 GB": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 GB"
+          }
+        }
+      }
+    },
+    "4 GB": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4 GB"
+          }
+        }
+      }
+    },
+    "8 GB": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "8 GB"
+          }
+        }
+      }
+    },
+    "A logged-in site expired": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A logged-in site expired"
+          }
+        }
+      }
+    },
+    "Add File…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add File…"
+          }
+        }
+      }
+    },
+    "Add session, computer or dataset…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add session, computer or dataset…"
+          }
+        }
+      }
+    },
+    "After each task the agent saves a short entry here. You can read and edit all of it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After each task the agent saves a short entry here. You can read and edit all of it."
+          }
+        }
+      }
+    },
+    "Delete Agent…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete Agent…"
+          }
+        }
+      }
+    },
+    "Delete Entry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete Entry"
+          }
+        }
+      }
+    },
+    "Delete for good": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete for good"
+          }
+        }
+      }
+    },
+    "Details": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details"
+          }
+        }
+      }
+    },
+    "ENV_NAME": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ENV_NAME"
+          }
+        }
+      }
+    },
+    "Enter a host like github.com.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a host like github.com."
+          }
+        }
+      }
+    },
+    "Expired, log in again": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expired, log in again"
+          }
+        }
+      }
+    },
+    "Fixed attachments, in every task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fixed attachments, in every task"
+          }
+        }
+      }
+    },
+    "How it talks": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How it talks"
+          }
+        }
+      }
+    },
+    "Instructions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instructions"
+          }
+        }
+      }
+    },
+    "Log in once with Take over on the agent's computer. Racky keeps the cookies encrypted in the vault and loads them before the agent starts.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log in once with Take over on the agent's computer. Racky keeps the cookies encrypted in the vault and loads them before the agent starts."
+          }
+        }
+      }
+    },
+    "Logged-in sites": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Logged-in sites"
+          }
+        }
+      }
+    },
+    "New Agent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Agent"
+          }
+        }
+      }
+    },
+    "New Session with Agent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Session with Agent"
+          }
+        }
+      }
+    },
+    "No computer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No computer"
+          }
+        }
+      }
+    },
+    "No such agent.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No such agent."
+          }
+        }
+      }
+    },
+    "No such secret in the vault.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No such secret in the vault."
+          }
+        }
+      }
+    },
+    "Not logged in yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not logged in yet"
+          }
+        }
+      }
+    },
+    "Nothing matches.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing matches."
+          }
+        }
+      }
+    },
+    "Open an agent first.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open an agent first."
+          }
+        }
+      }
+    },
+    "Open the new session composer first.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open the new session composer first."
+          }
+        }
+      }
+    },
+    "Packages (pytest, playwright…)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Packages (pytest, playwright…)"
+          }
+        }
+      }
+    },
+    "Proxy country (US, BR…)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Proxy country (US, BR…)"
+          }
+        }
+      }
+    },
+    "Ready computer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready computer"
+          }
+        }
+      }
+    },
+    "Regenerate Avatar": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regenerate Avatar"
+          }
+        }
+      }
+    },
+    "Search the memory": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search the memory"
+          }
+        }
+      }
+    },
+    "Sessions, computers, datasets, spreadsheets and files the agent always receives.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessions, computers, datasets, spreadsheets and files the agent always receives."
+          }
+        }
+      }
+    },
+    "Short and direct. Two sentences, always with the number and the file.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Short and direct. Two sentences, always with the number and the file."
+          }
+        }
+      }
+    },
+    "That photo is over 5 MB.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That photo is over 5 MB."
+          }
+        }
+      }
+    },
+    "The agent works in the session folder, without its own computer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The agent works in the session folder, without its own computer."
+          }
+        }
+      }
+    },
+    "They never go into the prompt and show as ••• in logs.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "They never go into the prompt and show as ••• in logs."
+          }
+        }
+      }
+    },
+    "This agent no longer exists.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This agent no longer exists."
+          }
+        }
+      }
+    },
+    "Upload Photo…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upload Photo…"
+          }
+        }
+      }
+    },
+    "Use a PNG, JPEG, HEIC or WebP photo.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use a PNG, JPEG, HEIC or WebP photo."
+          }
+        }
+      }
+    },
+    "Use a valid environment variable name.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use a valid environment variable name."
+          }
+        }
+      }
+    },
+    "Use the %@ agent: ": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use the %@ agent: "
+          }
+        }
+      }
+    },
+    "Used in its summaries and in the diary.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Used in its summaries and in the diary."
+          }
+        }
+      }
+    },
+    "Variables, only inside the computer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Variables, only inside the computer"
+          }
+        }
+      }
+    },
+    "Vault secret…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vault secret…"
+          }
+        }
+      }
+    },
+    "What the agent should do and how": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What the agent should do and how"
+          }
+        }
+      }
+    },
+    "What this agent does": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What this agent does"
+          }
+        }
+      }
+    },
+    "What to remember": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What to remember"
+          }
+        }
+      }
+    },
+    "With a computer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "With a computer"
+          }
+        }
+      }
+    },
+    "tdd, qa, diagnosing-bugs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tdd, qa, diagnosing-bugs"
+          }
+        }
+      }
+    },
+    "No agents yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No agents yet"
+          }
+        }
+      }
+    },
+    "Screen off": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen off"
+          }
+        }
+      }
+    },
+    "Screen on": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen on"
+          }
+        }
+      }
+    },
+    "Search items": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search items"
+          }
+        }
+      }
+    },
+    "Agents you created in Racky": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agents you created in Racky"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -73,6 +73,9 @@ public final class AppEnvironment {
     let insights: InsightsModel
     /// Library só leitura (03 §13) e a aba Context (03 §10.6): ativação aditiva por sessão, plugin gerado no lançamento.
     let library: LibraryController
+    /// Agentes do Racky em ~/Racky/agents (backlog 25): sidebar, página, criar.
+    let agents: AgentsController
+    private(set) var agentCreate: AgentCreateController!
     private(set) var context: ContextController!
     let activations: SessionActivationStore
     /// `Insert Skill or Agent…` (03 §8) e a palette (⌘J) onde ele mora.
@@ -129,6 +132,7 @@ public final class AppEnvironment {
         let activations = SessionActivationStore()
         self.activations = activations
         library = LibraryController(activations: activations)
+        agents = AgentsController(root: environment["RACKY_AGENTS_ROOT"].map { URL(fileURLWithPath: $0, isDirectory: true) })
         let flags = SliceFlags.fromEnvironment(environment)
         self.flags = flags
         self.automationEnabled = environment["RACKY_AUTOMATION"] == "1"
@@ -242,6 +246,8 @@ public final class AppEnvironment {
         wireAttention(environment: environment)
         wireComputers()
         wireLibrary()
+        agentCreate = AgentCreateController(agents: agents)
+        wireAgents()
         wireRightPanel()
         wireStatusBar()
         wireGitHub(slice2: slice2, environment: environment)
@@ -1028,6 +1034,7 @@ public final class AppEnvironment {
             }
             await rightPanel.attach(store: opened)
             await library.attach(store: opened)
+            await attachAgents(store: opened)
             await datasets.attach(store: opened)
             await dataHub?.attach(store: opened)
             await startCatalog(store: opened)

@@ -31,6 +31,13 @@ extension SidebarModel {
         /// Caminho de um projeto ou de uma sessão pelo ID.
         func path(of id: UUID) -> String? { project(id)?.rootPath ?? session(id)?.folderPath }
 
+        try registry.register(.sidebarToggleSection) { [unowned self] arg in
+            guard arg.kind == .select, let key = arg.value, ["agents", "projects", "sessions"].contains(key) else {
+                throw ActionError.failed(.sidebarToggleSection, message: "expected select(agents|projects|sessions)")
+            }
+            toggleSection(key)
+            return isCollapsed(section: key) ? "collapsed" : "expanded"
+        }
         try registry.register(.sessionSelect) { [unowned self] arg in
             // `select(<id>|agent)`: além de abrir a sessão, mostra o terminal do agente (com uma tab de dados na frente, só
             // selecionar a sessão não mudava nada na tela).

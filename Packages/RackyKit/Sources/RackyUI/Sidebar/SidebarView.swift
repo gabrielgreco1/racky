@@ -87,28 +87,34 @@ struct SidebarView: View {
     @ViewBuilder private func sessionsContent(_ projection: SidebarProjection) -> some View {
         switch projection.empty {
         case .workspace:
+            agentsSection
             emptyWorkspace(archived: projection.archivedHidden)
         default:
             needsYou
+            agentsSection
             Section {
-                if projection.empty == .searchNoResults {
-                    searchEmpty
-                } else if projection.empty == .filtersNoResults {
-                    filtersEmpty
-                }
-                ForEach(projection.projects) { project in
-                    projectBlock(project)
+                if !model.isCollapsed(section: "projects") {
+                    if projection.empty == .searchNoResults {
+                        searchEmpty
+                    } else if projection.empty == .filtersNoResults {
+                        filtersEmpty
+                    }
+                    ForEach(projection.projects) { project in
+                        projectBlock(project)
+                    }
                 }
             } header: {
                 projectsHeader
             }
             if projection.showSessionsSection {
                 Section {
-                    ForEach(projection.cleanPending) { row in
-                        PendingRowView(model: model, data: row).id(SidebarItemID.pending(row.id)).padding(.bottom, SidebarMetrics.cardSpacing)
-                    }
-                    ForEach(projection.cleanSessions) { card in
-                        cardView(card).id(SidebarItemID.session(card.id)).padding(.bottom, SidebarMetrics.cardSpacing)
+                    if !model.isCollapsed(section: "sessions") {
+                        ForEach(projection.cleanPending) { row in
+                            PendingRowView(model: model, data: row).id(SidebarItemID.pending(row.id)).padding(.bottom, SidebarMetrics.cardSpacing)
+                        }
+                        ForEach(projection.cleanSessions) { card in
+                            cardView(card).id(SidebarItemID.session(card.id)).padding(.bottom, SidebarMetrics.cardSpacing)
+                        }
                     }
                 } header: {
                     sessionsHeader
@@ -194,10 +200,57 @@ struct SidebarView: View {
         .frame(maxWidth: .infinity, minHeight: SidebarMetrics.agentRowHeight, alignment: .leading)
     }
 
+    // MARK: Agents (backlog 25 a)
+
+    @ViewBuilder private var agentsSection: some View {
+        if let agents = model.agents, agents.loaded {
+            Section {
+                if !model.isCollapsed(section: "agents") {
+                    if agents.agents.isEmpty {
+                        agentsEmpty
+                    } else {
+                        ForEach(agents.agents) { SidebarAgentRow(controller: agents, agent: $0) }
+                    }
+                }
+            } header: {
+                agentsHeader
+            }
+        }
+    }
+
+    private var agentsHeader: some View {
+        SectionHeader(
+            title: String(localized: "Agents", bundle: .module), tooltip: String(localized: "Agents you created in Racky", bundle: .module),
+            toggle: SectionToggle(key: "agents", collapsed: model.isCollapsed(section: "agents"), id: .sidebarAgentsToggle)
+        ) {
+            if let registry, registry.isOffered(.agentsNew) {
+                DSIconButton(
+                    .agentsNew, id: .sidebarAgentsNew, symbol: "plus", name: String(localized: "New Agent", bundle: .module), variant: .header,
+                    argument: .select("scratch"))
+            }
+        }
+        .a11y(.sidebarAgents, kind: "container")
+    }
+
+    private var agentsEmpty: some View {
+        HStack(spacing: DS.Space.s1_5) {
+            Text("No agents yet", bundle: .module).dsFont(DS.Font.small).foregroundStyle(DS.Color.textTertiary)
+            if let registry, registry.isOffered(.agentsNew) {
+                DSButton(.agentsNew, id: nil, "New Agent", variant: .link, size: .xs, argument: .select("scratch"))
+            }
+        }
+        .padding(.leading, SidebarMetrics.sectionPaddingH)
+        .frame(maxWidth: .infinity, minHeight: SidebarMetrics.agentRowHeight, alignment: .leading)
+        .a11y(.sidebarAgentsEmpty, kind: "container")
+    }
+
     // MARK: Cabeçalhos de seção (03 §2.4, §2.10)
 
     private var projectsHeader: some View {
-        SectionHeader(title: String(localized: "Projects", bundle: .module), tooltip: nil) {
+        SectionHeader(
+            title: String(localized: "Projects", bundle: .module), tooltip: nil,
+            toggle: SectionToggle(key: "projects", collapsed: model.isCollapsed(section: "projects"), id: .sidebarProjectsToggle)
+        ) {
             HeaderHoverGroup(pinned: model.filterMenuOpen || !model.filters.isDefault || model.sort != .recent) {
             if let registry, registry.isOffered(.sidebarSortFilter) {
                 DSIconButton(
@@ -227,7 +280,10 @@ struct SidebarView: View {
     }
 
     private var sessionsHeader: some View {
-        SectionHeader(title: String(localized: "Sessions", bundle: .module), tooltip: String(localized: "Sessions without a project or Git", bundle: .module)) {
+        SectionHeader(
+            title: String(localized: "Sessions", bundle: .module), tooltip: String(localized: "Sessions without a project or Git", bundle: .module),
+            toggle: SectionToggle(key: "sessions", collapsed: model.isCollapsed(section: "sessions"), id: .sidebarCleanSessionsToggle)
+        ) {
             if let registry, registry.isOffered(.sessionNewClean) {
                 DSIconButton(
                     .sessionNewClean, id: .sidebarCleanSessionsNew, symbol: "plus", name: String(localized: "New Clean Session", bundle: .module), variant: .header)
@@ -384,14 +440,22 @@ extension SidebarProjection {
 
 // MARK: Cabeçalho de seção
 
+struct SectionToggle {
+    let key: String
+    let collapsed: Bool
+    let id: A11yID
+}
+
 struct SectionHeader<Actions: View>: View {
     let title: String
     let tooltip: String?
+    let toggle: SectionToggle?
     let actions: Actions
 
-    init(title: String, tooltip: String?, @ViewBuilder actions: () -> Actions) {
+    init(title: String, tooltip: String?, toggle: SectionToggle? = nil, @ViewBuilder actions: () -> Actions) {
         self.title = title
         self.tooltip = tooltip
+        self.toggle = toggle
         self.actions = actions()
     }
 
@@ -399,11 +463,30 @@ struct SectionHeader<Actions: View>: View {
 
     var body: some View {
         HStack(spacing: DS.Space.s0_5) {
-            Text(verbatim: title)
-                .dsFont(DS.Font.sectionLabel)
-                .foregroundStyle(DS.Color.textTertiary)
+            if let toggle {
+                ActionButton(.sidebarToggleSection, id: toggle.id, argument: .select(toggle.key)) {
+                    HStack(spacing: DS.Space.s1) {
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: SidebarMetrics.chevron - 4, weight: .semibold))
+                            .rotationEffect(.degrees(toggle.collapsed ? -90 : 0))
+                            .frame(width: SidebarMetrics.chevron, height: SidebarMetrics.chevron)
+                        Text(verbatim: title)
+                    }
+                    .dsFont(DS.Font.sectionLabel)
+                    .foregroundStyle(DS.Color.textTertiary)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
                 .help(tooltip ?? "")
+                .accessibilityValue(Text(verbatim: toggle.collapsed ? "collapsed" : "expanded"))
                 .accessibilityAddTraits(.isHeader)
+            } else {
+                Text(verbatim: title)
+                    .dsFont(DS.Font.sectionLabel)
+                    .foregroundStyle(DS.Color.textTertiary)
+                    .help(tooltip ?? "")
+                    .accessibilityAddTraits(.isHeader)
+            }
             Spacer(minLength: DS.Space.s1)
             actions.environment(\.sectionHeaderHovering, hovering)
         }

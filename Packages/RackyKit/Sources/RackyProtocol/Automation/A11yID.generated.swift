@@ -522,6 +522,8 @@ extension A11yID {
     public static let dataExplorerToggle = A11yID(unchecked: "data.explorer.toggle")
     /// `data.explorer.resize`
     public static let dataExplorerResize = A11yID(unchecked: "data.explorer.resize")
+    /// `data.explorer.filter`
+    public static let dataExplorerFilter = A11yID(unchecked: "data.explorer.filter")
     /// `data.addConnection`
     public static let dataAddConnection = A11yID(unchecked: "data.addConnection")
     /// `data.location`
@@ -870,6 +872,100 @@ extension A11yID {
     public static let menuBarStopAll = A11yID(unchecked: "menuBar.stopAll")
     /// `menuBar.quitCompletely`
     public static let menuBarQuitCompletely = A11yID(unchecked: "menuBar.quitCompletely")
+    /// `sidebar.agents`
+    public static let sidebarAgents = A11yID(unchecked: "sidebar.agents")
+    /// `sidebar.agents.toggle`
+    public static let sidebarAgentsToggle = A11yID(unchecked: "sidebar.agents.toggle")
+    /// `sidebar.agents.new`
+    public static let sidebarAgentsNew = A11yID(unchecked: "sidebar.agents.new")
+    /// `sidebar.agents.empty`
+    public static let sidebarAgentsEmpty = A11yID(unchecked: "sidebar.agents.empty")
+    /// `sidebar.projects.toggle`
+    public static let sidebarProjectsToggle = A11yID(unchecked: "sidebar.projects.toggle")
+    /// `sidebar.cleanSessions.toggle`
+    public static let sidebarCleanSessionsToggle = A11yID(unchecked: "sidebar.cleanSessions.toggle")
+    /// `agents.page`
+    public static let agentsPage = A11yID(unchecked: "agents.page")
+    /// `agents.empty`
+    public static let agentsEmpty = A11yID(unchecked: "agents.empty")
+    /// `agents.avatar`
+    public static let agentsAvatar = A11yID(unchecked: "agents.avatar")
+    /// `agents.avatar.regenerate`
+    public static let agentsAvatarRegenerate = A11yID(unchecked: "agents.avatar.regenerate")
+    /// `agents.avatar.upload`
+    public static let agentsAvatarUpload = A11yID(unchecked: "agents.avatar.upload")
+    /// `agents.name`
+    public static let agentsName = A11yID(unchecked: "agents.name")
+    /// `agents.description`
+    public static let agentsDescription = A11yID(unchecked: "agents.description")
+    /// `agents.tone`
+    public static let agentsTone = A11yID(unchecked: "agents.tone")
+    /// `agents.instructions`
+    public static let agentsInstructions = A11yID(unchecked: "agents.instructions")
+    /// `agents.skills`
+    public static let agentsSkills = A11yID(unchecked: "agents.skills")
+    /// `agents.attachments`
+    public static let agentsAttachments = A11yID(unchecked: "agents.attachments")
+    /// `agents.attachment.add`
+    public static let agentsAttachmentAdd = A11yID(unchecked: "agents.attachment.add")
+    /// `agents.computer`
+    public static let agentsComputer = A11yID(unchecked: "agents.computer")
+    /// `agents.computer.screen`
+    public static let agentsComputerScreen = A11yID(unchecked: "agents.computer.screen")
+    /// `agents.computer.memory`
+    public static let agentsComputerMemory = A11yID(unchecked: "agents.computer.memory")
+    /// `agents.computer.country`
+    public static let agentsComputerCountry = A11yID(unchecked: "agents.computer.country")
+    /// `agents.computer.packages`
+    public static let agentsComputerPackages = A11yID(unchecked: "agents.computer.packages")
+    /// `agents.variables`
+    public static let agentsVariables = A11yID(unchecked: "agents.variables")
+    /// `agents.variable.add`
+    public static let agentsVariableAdd = A11yID(unchecked: "agents.variable.add")
+    /// `agents.variable.envName`
+    public static let agentsVariableEnvName = A11yID(unchecked: "agents.variable.envName")
+    /// `agents.variable.secret`
+    public static let agentsVariableSecret = A11yID(unchecked: "agents.variable.secret")
+    /// `agents.sites`
+    public static let agentsSites = A11yID(unchecked: "agents.sites")
+    /// `agents.site.add`
+    public static let agentsSiteAdd = A11yID(unchecked: "agents.site.add")
+    /// `agents.memory`
+    public static let agentsMemory = A11yID(unchecked: "agents.memory")
+    /// `agents.memory.search`
+    public static let agentsMemorySearch = A11yID(unchecked: "agents.memory.search")
+    /// `agents.memory.add`
+    public static let agentsMemoryAdd = A11yID(unchecked: "agents.memory.add")
+    /// `agents.memory.addBody`
+    public static let agentsMemoryAddBody = A11yID(unchecked: "agents.memory.addBody")
+    /// `agents.newSession`
+    public static let agentsNewSession = A11yID(unchecked: "agents.newSession")
+    /// `agents.delete`
+    public static let agentsDelete = A11yID(unchecked: "agents.delete")
+    /// `agents.create.page`
+    public static let agentsCreatePage = A11yID(unchecked: "agents.create.page")
+    /// `agents.create.chat`
+    public static let agentsCreateChat = A11yID(unchecked: "agents.create.chat")
+    /// `agents.create.input`
+    public static let agentsCreateInput = A11yID(unchecked: "agents.create.input")
+    /// `agents.create.send`
+    public static let agentsCreateSend = A11yID(unchecked: "agents.create.send")
+    /// `agents.create.attach`
+    public static let agentsCreateAttach = A11yID(unchecked: "agents.create.attach")
+    /// `agents.create.draft`
+    public static let agentsCreateDraft = A11yID(unchecked: "agents.create.draft")
+    /// `agents.create.name`
+    public static let agentsCreateName = A11yID(unchecked: "agents.create.name")
+    /// `agents.create.photo`
+    public static let agentsCreatePhoto = A11yID(unchecked: "agents.create.photo")
+    /// `agents.create.confirm`
+    public static let agentsCreateConfirm = A11yID(unchecked: "agents.create.confirm")
+    /// `agents.create.cancel`
+    public static let agentsCreateCancel = A11yID(unchecked: "agents.create.cancel")
+    /// `agents.create.error`
+    public static let agentsCreateError = A11yID(unchecked: "agents.create.error")
+    /// `agents.create.import`
+    public static let agentsCreateImport = A11yID(unchecked: "agents.create.import")
 
     /// `<region>.errorBoundary`
     public static func errorBoundary(_ region: String) -> A11yID {
@@ -2016,6 +2112,11 @@ extension A11yID {
         A11yID(unchecked: "data.explorer.section.\(A11yID.segment(section))")
     }
 
+    /// `data.explorer.status.<id>`
+    public static func dataExplorerStatus(_ id: String) -> A11yID {
+        A11yID(unchecked: "data.explorer.status.\(A11yID.segment(id))")
+    }
+
     /// `data.tab.<key>`
     public static func dataTab(_ key: String) -> A11yID {
         A11yID(unchecked: "data.tab.\(A11yID.segment(key))")
@@ -2144,6 +2245,76 @@ extension A11yID {
     /// `toast.<kind>.action`
     public static func toastAction(_ kind: String) -> A11yID {
         A11yID(unchecked: "toast.\(A11yID.segment(kind)).action")
+    }
+
+    /// `sidebar.agent.<id>`
+    public static func sidebarAgent(_ id: String) -> A11yID {
+        A11yID(unchecked: "sidebar.agent.\(A11yID.segment(id))")
+    }
+
+    /// `agents.attachment.<id>`
+    public static func agentsAttachment(_ id: String) -> A11yID {
+        A11yID(unchecked: "agents.attachment.\(A11yID.segment(id))")
+    }
+
+    /// `agents.attachment.<id>.remove`
+    public static func agentsAttachmentRemove(_ id: String) -> A11yID {
+        A11yID(unchecked: "agents.attachment.\(A11yID.segment(id)).remove")
+    }
+
+    /// `agents.variable.<name>`
+    public static func agentsVariable(_ name: String) -> A11yID {
+        A11yID(unchecked: "agents.variable.\(A11yID.segment(name))")
+    }
+
+    /// `agents.variable.<name>.remove`
+    public static func agentsVariableRemove(_ name: String) -> A11yID {
+        A11yID(unchecked: "agents.variable.\(A11yID.segment(name)).remove")
+    }
+
+    /// `agents.site.<host>`
+    public static func agentsSite(_ host: String) -> A11yID {
+        A11yID(unchecked: "agents.site.\(A11yID.rawSegment(host, loose: true))")
+    }
+
+    /// `agents.site.<host>.remove`
+    public static func agentsSiteRemove(_ host: String) -> A11yID {
+        A11yID(unchecked: "agents.site.\(A11yID.rawSegment(host, loose: true)).remove")
+    }
+
+    /// `agents.memory.entry.<id>`
+    public static func agentsMemoryEntry(_ id: String) -> A11yID {
+        A11yID(unchecked: "agents.memory.entry.\(A11yID.segment(id))")
+    }
+
+    /// `agents.memory.entry.<id>.body`
+    public static func agentsMemoryEntryBody(_ id: String) -> A11yID {
+        A11yID(unchecked: "agents.memory.entry.\(A11yID.segment(id)).body")
+    }
+
+    /// `agents.memory.entry.<id>.delete`
+    public static func agentsMemoryEntryDelete(_ id: String) -> A11yID {
+        A11yID(unchecked: "agents.memory.entry.\(A11yID.segment(id)).delete")
+    }
+
+    /// `agents.create.mode.<mode>`
+    public static func agentsCreateMode(_ mode: String) -> A11yID {
+        A11yID(unchecked: "agents.create.mode.\(A11yID.segment(mode))")
+    }
+
+    /// `agents.create.message.<index>`
+    public static func agentsCreateMessage(_ index: String) -> A11yID {
+        A11yID(unchecked: "agents.create.message.\(A11yID.segment(index))")
+    }
+
+    /// `agents.create.upload.<index>`
+    public static func agentsCreateUpload(_ index: String) -> A11yID {
+        A11yID(unchecked: "agents.create.upload.\(A11yID.segment(index))")
+    }
+
+    /// `agents.create.avatar.<index>`
+    public static func agentsCreateAvatar(_ index: String) -> A11yID {
+        A11yID(unchecked: "agents.create.avatar.\(A11yID.segment(index))")
     }
 }
 
@@ -2639,6 +2810,8 @@ extension A11yID {
         A11yIDSpec(pattern: "data.explorer.resize", surface: "Páginas"),
         A11yIDSpec(pattern: "data.explorer.node.<id>", surface: "Páginas"),
         A11yIDSpec(pattern: "data.explorer.section.<section>", surface: "Páginas"),
+        A11yIDSpec(pattern: "data.explorer.filter", surface: "Páginas"),
+        A11yIDSpec(pattern: "data.explorer.status.<id>", surface: "Páginas"),
         A11yIDSpec(pattern: "data.addConnection", surface: "Páginas"),
         A11yIDSpec(pattern: "data.tab.<key>", surface: "Páginas"),
         A11yIDSpec(pattern: "data.tab.<key>.close", surface: "Páginas"),
@@ -2839,5 +3012,66 @@ extension A11yID {
         A11yIDSpec(pattern: "menu.<group>.<actionId>", surface: "Menus do app"),
         A11yIDSpec(pattern: "toast.<kind>", surface: "Toasts"),
         A11yIDSpec(pattern: "toast.<kind>.action", surface: "Toasts"),
+        A11yIDSpec(pattern: "sidebar.agents", surface: "Agents"),
+        A11yIDSpec(pattern: "sidebar.agents.toggle", surface: "Agents"),
+        A11yIDSpec(pattern: "sidebar.agents.new", surface: "Agents"),
+        A11yIDSpec(pattern: "sidebar.agents.empty", surface: "Agents"),
+        A11yIDSpec(pattern: "sidebar.agent.<id>", surface: "Agents"),
+        A11yIDSpec(pattern: "sidebar.projects.toggle", surface: "Agents"),
+        A11yIDSpec(pattern: "sidebar.cleanSessions.toggle", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.page", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.empty", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.avatar", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.avatar.regenerate", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.avatar.upload", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.name", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.description", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.tone", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.instructions", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.skills", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.attachments", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.attachment.<id>", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.attachment.<id>.remove", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.attachment.add", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.computer", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.computer.screen", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.computer.memory", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.computer.country", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.computer.packages", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.variables", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.variable.<name>", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.variable.<name>.remove", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.variable.add", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.variable.envName", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.variable.secret", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.sites", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.site.<host>", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.site.<host>.remove", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.site.add", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.memory", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.memory.search", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.memory.add", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.memory.addBody", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.memory.entry.<id>", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.memory.entry.<id>.body", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.memory.entry.<id>.delete", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.newSession", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.delete", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.page", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.mode.<mode>", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.chat", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.message.<index>", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.input", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.send", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.attach", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.upload.<index>", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.draft", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.name", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.avatar.<index>", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.photo", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.confirm", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.cancel", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.error", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.create.import", surface: "Agents"),
     ]
 }

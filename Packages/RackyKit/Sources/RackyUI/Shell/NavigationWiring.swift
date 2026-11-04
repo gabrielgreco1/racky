@@ -5,7 +5,10 @@ import Foundation
 /// entre sessão, terminal, viewer de computador, Inbox e Computers.
 extension AppEnvironment {
     func wireNavigation() {
-        sidebar.onSelected = { [computers] _ in computers.closePage() }
+        sidebar.onSelected = { [computers, agents] _ in
+            agents.clearSelection()
+            computers.closePage()
+        }
         sidebar.onShowAgent = { [workspace] _ in
             guard let agent = workspace.terminalsInCurrentSession.first(where: { $0.provider.isAgent }) else { return }
             workspace.show(terminalID: agent.id)
@@ -27,6 +30,8 @@ extension AppEnvironment {
         case .computers: return .computers
         case .batch(let name): return .batch(name)
         case .library: return .library
+        case .agent(let name): return .agent(name)
+        case .agentCreate: return nil
         case .datasets: return .datasets
         case .dataset(let id): return .dataset(id)
         case .workspace: break
@@ -46,6 +51,7 @@ extension AppEnvironment {
         case .batch(let name): computers.model.batch(name) != nil
         case .inbox: attention != nil
         case .library: true
+        case .agent(let name): agents.agent(name) != nil
         case .datasets: true
         case .dataset(let id): datasets.summaries.contains { $0.dataset.id == id } || datasets.currentID == id
         }
@@ -104,6 +110,9 @@ extension AppEnvironment {
         case .library:
             sidebar.setInbox(open: false)
             computers.show(.library)
+        case .agent(let name):
+            sidebar.setInbox(open: false)
+            Task { try? await agents.open(name) }
         case .datasets:
             sidebar.setInbox(open: false)
             computers.show(.datasets)

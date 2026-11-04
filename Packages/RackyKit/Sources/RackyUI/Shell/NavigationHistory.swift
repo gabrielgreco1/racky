@@ -11,6 +11,7 @@ enum NavDestination: Equatable, Sendable {
     case library
     case datasets
     case dataset(String)
+    case agent(String)
 }
 
 /// Histórico de navegação (⌥⌘←/→ e os botões ←/→ da faixa de topo). Linear: navegar a partir do meio descarta o "futuro".

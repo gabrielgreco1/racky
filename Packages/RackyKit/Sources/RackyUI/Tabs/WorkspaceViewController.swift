@@ -346,6 +346,8 @@ final class WorkspaceViewController: NSViewController {
         case .computers: content = AnyView(ComputersPageView(controller: controller, settings: env.settings))
         case .batch(let id): content = AnyView(BatchPageView(controller: controller, batchID: id))
         case .library: content = AnyView(LibraryPageView(controller: env.library))
+        case .agent(let name): content = AnyView(AgentPageView(controller: env.agents, name: name))
+        case .agentCreate: content = AnyView(AgentCreatePageView(controller: env.agentCreate))
         case .datasets: content = AnyView(DataPageView(hub: env.dataHub, shell: env.shell))
         case .dataset(let id):
             // Dataset aberto fora da sessão: vira uma tab da área Data.

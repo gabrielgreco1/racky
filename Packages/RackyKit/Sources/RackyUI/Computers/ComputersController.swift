@@ -17,6 +17,10 @@ public enum CenterPage: Equatable, Sendable {
     /// Datasets (03 §12.5): a lista e, com o id, a tabela viva de um dataset.
     case datasets
     case dataset(String)
+    /// Página de um agente do Racky (backlog 25).
+    case agent(String)
+    /// Criar agente ou skill: conversa com o Claude ao lado do rascunho.
+    case agentCreate
 }
 
 extension CenterPage {
