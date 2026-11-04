@@ -51,6 +51,8 @@ public final class ComputersController {
     @ObservationIgnored public private(set) var hub = ComputerHub()
     @ObservationIgnored public private(set) var orchestrator: ComputerOrchestrator?
     public private(set) var page: CenterPage = .workspace
+    /// Um computador novo já com sessão e agente conhecidos: os logins salvos dos agentes do Racky entram nele (backlog 25 g).
+    @ObservationIgnored public var computerReady: (@Sendable (_ computer: String, _ session: UUID?) async -> Void)?
     public private(set) var panelOpen = false
     public private(set) var viewers: [String: ComputerViewerController] = [:]
     /// F28: o viewer só fecha depois da resposta do overlay `Hand back to <Agent>?`.
@@ -136,6 +138,7 @@ public final class ComputersController {
                     model.agentNames[computer.name] = agent
                     self?.viewers[computer.name]?.model.agentName = agent
                     self?.popOuts[computer.name]?.controller.model.agentName = agent
+                    await self?.computerReady?(computer.name, model.sessionIDs[computer.name])
                 }
             },
             onRemove: { [weak self] name in Task { @MainActor in self?.computerRemoved(name) } })

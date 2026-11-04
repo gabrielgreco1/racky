@@ -36,6 +36,20 @@ extension AppEnvironment {
     func attachAgents(store: RackyStore) async {
         let vault = SecretVault(store: store, keyring: VaultKeyring(backend: SystemKeychainBackend.system()))
         agents.loadSecretNames = { ((try? await vault.list()) ?? []).filter { $0.delivery == SecretDelivery.profileEnv.rawValue }.map(\.name).sorted() }
+        agents.captureCookies = { [computers] name, host in
+            guard let computer = await computers.hub.computer(named: name) else { throw ActionError.failed(.agentsSaveSite, message: String(localized: "That computer is not running.", bundle: .module)) }
+            return try await AgentSiteSessions.capture(from: computer.backend, host: host)
+        }
+        agents.storeCookies = { agent, host, cookies in try await AgentSiteSessions.save(vault: vault, agent: agent, host: host, cookies: cookies) }
+        agents.loadCookies = { agent, host in (try? await AgentSiteSessions.load(vault: vault, agent: agent, host: host)) ?? [] }
+        agents.restoreCookies = { [computers] name, cookies in
+            guard let computer = await computers.hub.computer(named: name) else { return }
+            try await AgentSiteSessions.restore(cookies, into: computer.backend)
+        }
+        agents.agentsInSession = { [activations] session in
+            await activations.refs(for: session).filter(RackyAgentLaunch.isRackyAgent).map(\.name)
+        }
+        computers.computerReady = { [agents] name, session in await agents.seedSites(computer: name, session: session) }
         await agents.reload()
         composer?.agentChoices = { [agents] in agents.agents.map(\.name) }
         composer?.addAgent = { [weak self] name, session in try? await self?.addAgent(name, toSession: session) }

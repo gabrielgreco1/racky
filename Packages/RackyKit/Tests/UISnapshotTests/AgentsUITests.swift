@@ -370,3 +370,52 @@ private nonisolated final class SeenPrompts: @unchecked Sendable { // SAFETY: gr
     var systems: [String] { lock.lock(); defer { lock.unlock() }; return s }
     var prompts: [String] { lock.lock(); defer { lock.unlock() }; return p }
 }
+
+@MainActor
+@Suite("Backlog 25 - Logged-in sites", .serialized, .offscreenAppKit)
+struct AgentSitesTests {
+    @Test func savingALoginStoresCookiesAndMarksTheSiteLoggedIn() async throws {
+        let f = try await AgentsFixture(); defer { f.remove() }
+        _ = try await f.registry.perform(.agentsOpen, .select("qa-engineer"))
+        _ = try await f.registry.perform(.agentsAddSite, .set("app.hubspot.com"))
+        var stored: [(String, String, Int)] = []
+        f.controller.captureCookies = { computer, host in
+            #expect(computer == "wi-milwaukee")
+            return [AgentSiteSessions.Cookie(name: "sid", value: "S", domain: ".hubspot.com", expires: Date().timeIntervalSince1970 + 3600)]
+        }
+        f.controller.storeCookies = { agent, host, cookies in
+            stored.append((agent, host, cookies.count))
+            return AgentSiteSessions.expiry(of: cookies)
+        }
+        await #expect(throws: ActionError.self) { _ = try await f.registry.perform(.agentsSaveSite, .set("nope.com|wi-milwaukee")) }
+        _ = try await f.registry.perform(.agentsSaveSite, .set("app.hubspot.com|wi-milwaukee"))
+        #expect(stored.count == 1 && stored[0] == ("qa-engineer", "app.hubspot.com", 1))
+        let site = try #require(try f.controller.store.load("qa-engineer").sites.first)
+        #expect(site.savedAt != nil && site.expiresAt != nil && !site.isExpired(at: Date()))
+        f.controller.captureCookies = { _, _ in [] }
+        await #expect(throws: ActionError.self) { _ = try await f.registry.perform(.agentsSaveSite, .set("app.hubspot.com|wi-milwaukee")) }
+    }
+
+    @Test func aNewComputerOfASessionGetsTheSessionsAgentsLoginsAndExpiredOnesLightTheAgent() async throws {
+        let f = try await AgentsFixture(); defer { f.remove() }
+        let session = UUID()
+        try f.controller.store.update({
+            var a = try f.controller.store.load("qa-engineer")
+            a.sites = [AgentSite(host: "github.com", secretName: "s1", savedAt: Date(), expiresAt: Date().addingTimeInterval(3600)),
+                       AgentSite(host: "app.hubspot.com", secretName: "s2", savedAt: Date(), expiresAt: Date().addingTimeInterval(3600)),
+                       AgentSite(host: "never.com", secretName: "s3")]
+            return a
+        }())
+        await f.controller.reload()
+        var restored: [(String, [String])] = []
+        f.controller.agentsInSession = { s in s == session ? ["qa-engineer", "ghost"] : [] }
+        f.controller.loadCookies = { _, host in host == "github.com" ? [AgentSiteSessions.Cookie(name: "g", value: "1", domain: "github.com")] : [] }
+        f.controller.restoreCookies = { computer, cookies in restored.append((computer, cookies.map(\.name))) }
+        await f.controller.seedSites(computer: "c1", session: UUID())
+        #expect(restored.isEmpty, "sessão sem esses agentes não recebe nada")
+        await f.controller.seedSites(computer: "c1", session: session)
+        #expect(restored.count == 1 && restored[0] == ("c1", ["g"]))
+        #expect(f.controller.needsLogin == ["qa-engineer"], "o login do hubspot venceu: o agente pede você")
+        #expect(try f.controller.store.load("qa-engineer").sites.first { $0.host == "never.com" }?.expiresAt == nil, "site nunca logado não é 'vencido'")
+    }
+}

@@ -41,6 +41,13 @@ final class AgentsController {
     @ObservationIgnored var startSession: @MainActor (_ agent: String) -> Void = { _ in }
     @ObservationIgnored var addToSession: @MainActor (_ agent: String, _ session: UUID?) async throws -> Void = { _, _ in }
     @ObservationIgnored var insertInComposer: @MainActor (_ text: String) -> Bool = { _ in false }
+    /// Cookies do site no navegador de um computador (depois do Take over), o cofre e o computador de destino; ligados pelo app.
+    @ObservationIgnored var captureCookies: @MainActor (_ computer: String, _ host: String) async throws -> [AgentSiteSessions.Cookie] = { _, _ in [] }
+    @ObservationIgnored var storeCookies: @MainActor (_ agent: String, _ host: String, _ cookies: [AgentSiteSessions.Cookie]) async throws -> Date? = { _, _, _ in nil }
+    @ObservationIgnored var loadCookies: @MainActor (_ agent: String, _ host: String) async -> [AgentSiteSessions.Cookie] = { _, _ in [] }
+    @ObservationIgnored var restoreCookies: @MainActor (_ computer: String, _ cookies: [AgentSiteSessions.Cookie]) async throws -> Void = { _, _ in }
+    /// Agentes do Racky ligados numa sessão (para carregar os sites deles no computador dela).
+    @ObservationIgnored var agentsInSession: @MainActor (_ session: UUID) async -> [String] = { _ in [] }
     @ObservationIgnored var openCreate: @MainActor (_ kind: AgentCreateKind, _ mode: AgentCreateMode) -> Void = { _, _ in }
 
     init(home: URL = FileManager.default.homeDirectoryForCurrentUser, root: URL? = nil) {
@@ -189,6 +196,42 @@ final class AgentsController {
         }
     }
 
+    /// Lê os cookies do site no navegador do computador e guarda no cofre: o login feito no Take over passa a valer para o agente.
+    func saveSite(_ name: String, host: String, computer: String) async throws {
+        guard agent(name)?.sites.contains(where: { $0.host == host }) == true else {
+            throw ActionError.failed(.agentsSaveSite, message: String(localized: "Add the site first.", bundle: .module))
+        }
+        let cookies = try await captureCookies(computer, host)
+        guard !cookies.isEmpty else {
+            throw ActionError.failed(.agentsSaveSite, message: String(localized: "No cookies for this site yet. Log in on the computer first.", bundle: .module))
+        }
+        let expiry = try await storeCookies(name, host, cookies)
+        try mutate(name) { a in
+            guard let i = a.sites.firstIndex(where: { $0.host == host }) else { return }
+            a.sites[i].savedAt = Date()
+            a.sites[i].expiresAt = expiry
+        }
+    }
+
+    /// Um computador novo de uma sessão: carrega nele os logins dos agentes do Racky ligados na sessão. Login vencido acende o
+    /// ponto azul do agente (precisa de você).
+    func seedSites(computer: String, session: UUID?) async {
+        guard let session else { return }
+        for name in await agentsInSession(session) {
+            guard let a = agent(name) else { continue }
+            for site in a.sites where site.savedAt != nil {
+                let cookies = await loadCookies(name, site.host)
+                if cookies.isEmpty {
+                    try? mutate(name) { x in
+                        if let i = x.sites.firstIndex(where: { $0.host == site.host }) { x.sites[i].expiresAt = Date(timeIntervalSince1970: 1) }
+                    }
+                } else {
+                    try? await restoreCookies(computer, cookies)
+                }
+            }
+        }
+    }
+
     func removeSite(_ name: String, host: String) throws { try mutate(name) { $0.sites.removeAll { $0.host == host } } }
 
     // MARK: Memória
@@ -236,6 +279,9 @@ final class AgentsController {
             id: "racky:\(a.name)", kind: .agent, name: a.name, summary: a.description.isEmpty ? nil : a.description, path: path, category: .racky,
             source: "racky", scope: "racky", clients: [.claude, .codex, .opencode], model: a.model, tools: a.tools, skills: a.skills)
     }
+
+    /// Computadores abertos agora (de onde dá para salvar um login).
+    var runningComputers: [AgentAttachable] { attachables().filter { $0.kind == .computer } }
 
     var libraryEntries: [LibraryEntry] { agents.map(libraryEntry) }
 

@@ -114,6 +114,12 @@ extension AgentsController {
             try addSite(try target(.press, .agentsAddSite), host: host)
             return host
         }
+        try registry.register(.agentsSaveSite, enablement: needsAgent) { [unowned self] arg in
+            let parts = try text(arg, .agentsSaveSite).split(separator: "|", maxSplits: 1).map(String.init)
+            guard parts.count == 2 else { throw ActionError.failed(.agentsSaveSite, message: "expected set(<host>|<computer>)") }
+            try await saveSite(try target(.press, .agentsSaveSite), host: parts[0], computer: parts[1])
+            return parts[0]
+        }
         try registry.register(.agentsRemoveSite, enablement: needsAgent) { [unowned self] arg in
             guard arg.kind == .select, let host = arg.value else { throw ActionError.failed(.agentsRemoveSite, message: "expected select(<host>)") }
             try removeSite(try target(.press, .agentsRemoveSite), host: host)

@@ -2302,6 +2302,11 @@ extension A11yID {
         A11yID(unchecked: "agents.site.\(A11yID.rawSegment(host, loose: true)).remove")
     }
 
+    /// `agents.site.<host>.save`
+    public static func agentsSiteSave(_ host: String) -> A11yID {
+        A11yID(unchecked: "agents.site.\(A11yID.rawSegment(host, loose: true)).save")
+    }
+
     /// `agents.memory.entry.<id>`
     public static func agentsMemoryEntry(_ id: String) -> A11yID {
         A11yID(unchecked: "agents.memory.entry.\(A11yID.segment(id))")
@@ -3070,6 +3075,7 @@ extension A11yID {
         A11yIDSpec(pattern: "agents.sites", surface: "Agents"),
         A11yIDSpec(pattern: "agents.site.<host>", surface: "Agents"),
         A11yIDSpec(pattern: "agents.site.<host>.remove", surface: "Agents"),
+        A11yIDSpec(pattern: "agents.site.<host>.save", surface: "Agents"),
         A11yIDSpec(pattern: "agents.site.add", surface: "Agents"),
         A11yIDSpec(pattern: "agents.memory", surface: "Agents"),
         A11yIDSpec(pattern: "agents.memory.search", surface: "Agents"),

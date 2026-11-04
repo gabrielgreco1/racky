@@ -1,3 +1,4 @@
+import RackyDocker
 import RackyStore
 import RackyPlatform
 import Foundation
@@ -196,5 +197,26 @@ import Testing
         #expect(open.files.map(\.name) == ["agents-opencode/agent/qa-engineer.md"])
         let none = try LaunchInjection(helperPath: "/h/racky").openCodeInjection(launchDirectory: launch)
         #expect(none.environment.isEmpty && none.files.isEmpty)
+    }
+}
+
+@Suite struct AgentSiteSessionsBackendTests {
+    @Test func capturesOnlyTheHostsCookiesFromTheBrowserAndRestoresThemWithTheRuntimeShape() async throws {
+        let backend = FakeBackend()
+        await backend.setRuntime("cookies", [
+            "cookies": [
+                ["name": "sid", "value": "S1", "domain": ".hubspot.com", "path": "/", "expires": 4_102_444_800.0, "secure": true, "httpOnly": true, "sameSite": "Lax"],
+                ["name": "other", "value": "X", "domain": "github.com", "path": "/", "expires": -1],
+            ]
+        ])
+        let captured = try await AgentSiteSessions.capture(from: backend, host: "app.hubspot.com")
+        #expect(captured.map(\.name) == ["sid"] && captured[0].httpOnly && captured[0].expires == 4_102_444_800)
+        try await AgentSiteSessions.restore(captured, into: backend)
+        try await AgentSiteSessions.restore([], into: backend)
+        let calls = await backend.runtimeCalls
+        #expect(calls.count == 2, "sem cookies não chama o runtime de novo")
+        #expect(calls[1].op == "cookies" && calls[1].args["action"]?.string == "set")
+        let sent = try #require(calls[1].args["cookies"]?.array?.first)
+        #expect(sent["name"]?.string == "sid" && sent["domain"]?.string == ".hubspot.com" && sent["sameSite"]?.string == "Lax")
     }
 }

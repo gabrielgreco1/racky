@@ -81,3 +81,33 @@ public enum AgentSiteSessions {
         return decode(value.text).filter { ($0.expires ?? .infinity) > now.timeIntervalSince1970 }
     }
 }
+
+// MARK: Computador (runtime `cookies`)
+
+extension AgentSiteSessions {
+    /// Cookies como o runtime do navegador os devolve (`{"cookies": [...]}`).
+    public static func cookies(fromRuntime json: JSON?) -> [Cookie] {
+        guard let array = json?["cookies"]?.array,
+              let objects = (try? JSONSerialization.jsonObject(with: JSON.array(array).data(pretty: false))) as? [[String: Any]] else { return [] }
+        return objects.compactMap(Cookie.init(json:))
+    }
+
+    /// Argumentos de `runtime("cookies")` para pôr os cookies no navegador do computador.
+    public static func runtimeSetArguments(_ cookies: [Cookie]) -> JSON {
+        let data = (try? JSONSerialization.data(withJSONObject: cookies.map(\.runtimeObject))) ?? Data("[]".utf8)
+        let list = (try? JSON.parse(data)) ?? .array([])
+        return .object(["action": .string("set"), "cookies": list])
+    }
+
+    /// Lê os cookies do site no navegador do computador (depois do Take over, com o login feito).
+    public static func capture(from backend: any ComputerBackend, host: String) async throws -> [Cookie] {
+        let out = try await backend.runtime("cookies", ["action": "get"], timeout: 15)
+        return cookies(forHost: host, in: cookies(fromRuntime: out))
+    }
+
+    /// Carrega os cookies guardados no navegador do computador, antes de o agente começar.
+    public static func restore(_ cookies: [Cookie], into backend: any ComputerBackend) async throws {
+        guard !cookies.isEmpty else { return }
+        _ = try await backend.runtime("cookies", runtimeSetArguments(cookies), timeout: 15)
+    }
+}

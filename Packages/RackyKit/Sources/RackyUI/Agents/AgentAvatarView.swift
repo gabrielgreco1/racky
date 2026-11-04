@@ -14,6 +14,7 @@ enum AgentMetrics {
     static let chatWidth: CGFloat = 440
     static let memoryBodyHeight: CGFloat = 56
     static let separator: CGFloat = 1
+    static let saveLoginWidth: CGFloat = 150
 }
 
 /// Rosto do agente: foto enviada ou o SVG gerado pelo nome (`AgentAvatarGenerator`), sempre em círculo.

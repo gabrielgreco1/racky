@@ -15217,6 +15217,61 @@
           }
         }
       }
+    },
+    "Add the site first.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add the site first."
+          }
+        }
+      }
+    },
+    "No cookies for this site yet. Log in on the computer first.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No cookies for this site yet. Log in on the computer first."
+          }
+        }
+      }
+    },
+    "Save login from…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save login from…"
+          }
+        }
+      }
+    },
+    "That computer is not running.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That computer is not running."
+          }
+        }
+      }
+    },
+    "Log in once with Take over on a computer, then choose Save login. Racky keeps the cookies encrypted in the vault and loads them into the agent's computers before it starts.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log in once with Take over on a computer, then choose Save login. Racky keeps the cookies encrypted in the vault and loads them into the agent's computers before it starts."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -240,12 +240,19 @@ struct AgentPageView: View {
                         } else {
                             Text("Not logged in yet", bundle: .module).dsFont(DS.Font.small).foregroundStyle(DS.Color.textTertiary)
                         }
+                        if controller.runningComputers.isEmpty == false {
+                            DSCombobox(
+                                id: .agentsSiteSave(site.host), selection: "",
+                                entries: controller.runningComputers.map { .item(DSMenuItem("\(site.host)|\($0.title)", $0.title)) }, action: .agentsSaveSite,
+                                placeholder: String(localized: "Save login from…", bundle: .module), height: DSMetrics.fieldHeightComposer)
+                                .frame(width: AgentMetrics.saveLoginWidth)
+                        }
                         DSIconButton(.agentsRemoveSite, id: .agentsSiteRemove(site.host), symbol: "xmark", name: String(localized: "Remove", bundle: .module), variant: .row, argument: .select(site.host))
                     }
                     .a11y(.agentsSite(site.host), kind: "row", label: site.host)
                 }
                 AgentSiteAdder()
-                Text("Log in once with Take over on the agent's computer. Racky keeps the cookies encrypted in the vault and loads them before the agent starts.", bundle: .module)
+                Text("Log in once with Take over on a computer, then choose Save login. Racky keeps the cookies encrypted in the vault and loads them into the agent's computers before it starts.", bundle: .module)
                     .dsFont(DS.Font.small).foregroundStyle(DS.Color.textTertiary)
             }
             .a11y(.agentsSites, kind: "container")

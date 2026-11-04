@@ -305,6 +305,7 @@ extension ActionID {
     public static let agentsRemoveVariable = ActionID(unchecked: "agents.removeVariable")
     public static let agentsAddSite = ActionID(unchecked: "agents.addSite")
     public static let agentsRemoveSite = ActionID(unchecked: "agents.removeSite")
+    public static let agentsSaveSite = ActionID(unchecked: "agents.saveSite")
     public static let agentsMemoryAdd = ActionID(unchecked: "agents.memoryAdd")
     public static let agentsMemoryEdit = ActionID(unchecked: "agents.memoryEdit")
     public static let agentsMemoryDelete = ActionID(unchecked: "agents.memoryDelete")
@@ -876,6 +877,7 @@ extension ActionID {
         ActionSpec(id: ActionID(unchecked: "agents.removeVariable"), label: "Agents: variáveis do cofre", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "agents.addSite"), label: "Agents: sites logados", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "agents.removeSite"), label: "Agents: sites logados", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "agents.saveSite"), label: "Agents: salvar o login de um site", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "agents.memoryAdd"), label: "Agents: memória", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "agents.memoryEdit"), label: "Agents: memória", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "agents.memoryDelete"), label: "Agents: memória", shortcut: "", slice: .slice1),

@@ -818,6 +818,7 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 - `agents.sites`
 - `agents.site.<host>`
 - `agents.site.<host>.remove`
+- `agents.site.<host>.save`
 - `agents.site.add`
 - `agents.memory`
 - `agents.memory.search`
@@ -1159,6 +1160,7 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 | `agents.removeVariable` | Agents: variáveis do cofre | — | slice1 |
 | `agents.addSite` | Agents: sites logados | — | slice1 |
 | `agents.removeSite` | Agents: sites logados | — | slice1 |
+| `agents.saveSite` | Agents: salvar o login de um site | — | slice1 |
 | `agents.memoryAdd` | Agents: memória | — | slice1 |
 | `agents.memoryEdit` | Agents: memória | — | slice1 |
 | `agents.memoryDelete` | Agents: memória | — | slice1 |
