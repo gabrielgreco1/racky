@@ -54,7 +54,7 @@ import Testing
         _ = try await registry.perform(.dataConnectStart, .select("prefect"))
         #expect(hub.connecting == .prefect)
         // Um tipo que ainda não conecta não abre formulário.
-        await #expect(throws: ActionError.self) { _ = try await registry.perform(.dataConnectStart, .select("mysql")) }
+        await #expect(throws: ActionError.self) { _ = try await registry.perform(.dataConnectStart, .select("bigQuery")) }
 
         let form = #"{"name":"RTI Prefect","url":"prefect.example.com","auth":"basic","user":"admin","secret":"s3cret"}"#
         _ = try await registry.perform(.dataConnectSave, .set(form))
