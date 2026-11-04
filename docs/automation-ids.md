@@ -780,6 +780,7 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 
 ### Agents
 
+- `overlay.composer.agents`
 - `sidebar.agents`
 - `sidebar.agents.toggle`
 - `sidebar.agents.new`

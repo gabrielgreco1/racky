@@ -51,6 +51,7 @@ struct ComposerView: View {
                     subagentComputers
                     if model.draft.subagentComputers.isOn { subagentHarness }
                 }
+                if model.draft.provider == .claude, !model.agentChoices().isEmpty { agentsField }
                 if model.draft.provider != .shell { dataDestination }
                 advanced
                 if let issue = model.boxIssue { errorBox(issue) }
@@ -156,6 +157,23 @@ struct ComposerView: View {
                 SubagentHarness.allCases.map { .init($0.rawValue, LocalizedStringKey($0.segmentTitle), logos: $0.logos, help: $0.explanation) },
                 selection: model.draft.subagentHarness.rawValue, action: .composerSetSubagentHarness, id: .overlayComposerSubagentHarness,
                 fillWidth: true, height: DSMetrics.segmentedHeightComposer)
+        }
+    }
+
+    /// Agentes do Racky que entram na sessão nova (também dá para soltar um agente arrastado aqui).
+    private var agentsField: some View {
+        field("Racky agents") {
+            VStack(alignment: .leading, spacing: DS.Space.s1_5) {
+                DSCombobox(
+                    id: .overlayComposerAgents, selection: "", entries: model.agentChoices().map { .item(DSMenuItem($0, $0, checked: model.agentNames.contains($0))) },
+                    action: .agentsInsertInPrompt, searchPlaceholder: String(localized: "Search agents…", bundle: .module),
+                    placeholder: model.agentNames.isEmpty ? String(localized: "None", bundle: .module) : model.agentNames.joined(separator: ", "))
+            }
+        }
+        .dropDestination(for: String.self) { items, _ in
+            guard let name = items.compactMap(AgentsController.agentName(fromDrag:)).first, model.agentChoices().contains(name) else { return false }
+            if !model.agentNames.contains(name) { model.toggleAgent(name) }
+            return true
         }
     }
 

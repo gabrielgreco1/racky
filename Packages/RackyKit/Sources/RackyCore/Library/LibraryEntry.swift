@@ -78,6 +78,8 @@ public struct LibraryEntry: Identifiable, Sendable, Equatable {
     /// Pasta do repositório de um item de projeto (`<repo>/.claude/…`).
     public var projectRoot: String?
     public var contentHash: String?
+    /// Caminhos das outras cópias do mesmo agente (`~/.codex`…) quando a Library junta por nome.
+    public var otherPaths: [String] = []
 
     public init(
         id: String, kind: LibraryKind, name: String, summary: String? = nil, path: String, category: LibraryCategory, source: String, scope: String,
@@ -210,6 +212,30 @@ public enum LibraryIndex {
             return item.name.lowercased().contains(needle) || (item.summary?.lowercased().contains(needle) ?? false)
                 || item.category.label.lowercased().contains(needle)
         }
+    }
+
+    /// Um agente por nome (backlog 25 a): o mesmo agente em `~/.claude`, `~/.codex`, `~/.config/opencode` ou no Racky vira uma linha só,
+    /// com os CLIs somados. Fica a cópia do Racky, depois a do Claude, depois a primeira. Itens de projeto, plugin e skills não se juntam.
+    public static func mergedByName(_ items: [LibraryEntry]) -> [LibraryEntry] {
+        func mergeable(_ e: LibraryEntry) -> Bool { e.kind == .agent && [.racky, .claude, .codex, .opencode, .agents].contains(e.category) }
+        func rank(_ e: LibraryEntry) -> Int { e.category == .racky ? 0 : e.category == .claude ? 1 : 2 }
+        var groups: [String: [LibraryEntry]] = [:]
+        for e in items where mergeable(e) { groups[e.name.lowercased(), default: []].append(e) }
+        var emitted = Set<String>()
+        var out: [LibraryEntry] = []
+        for e in items {
+            guard mergeable(e) else { out.append(e); continue }
+            let key = e.name.lowercased()
+            guard emitted.insert(key).inserted, let group = groups[key] else { continue }
+            guard group.count > 1 else { out.append(e); continue }
+            let ordered = group.sorted { rank($0) < rank($1) }
+            var primary = ordered[0]
+            primary.clients = LibraryClient.allCases.filter { c in group.contains { $0.clients.contains(c) } }
+            primary.otherPaths = ordered.dropFirst().map(\.path)
+            if primary.summary == nil { primary.summary = ordered.compactMap(\.summary).first }
+            out.append(primary)
+        }
+        return out
     }
 
     /// Contagem por fonte dentro de uma seção (a busca não conta: o número é do que existe no disco).

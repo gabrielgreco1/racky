@@ -17,6 +17,8 @@ extension AppEnvironment {
         agents.pickFile = { extensions in await AgentFilePicker.pick(extensions: extensions) }
         agents.openCreate = { [weak self] kind, mode in self?.showAgentCreate(kind: kind, mode: mode) }
         agents.attachables = { [weak self] in self?.attachableItems() ?? [] }
+        library.rackyAgents = { [agents] in agents.libraryEntries }
+        agents.addToSession = { [weak self] name, session in try await self?.addAgent(name, toSession: session) }
         sidebar.agents = agents
         do {
             try agents.register(in: registry)
@@ -28,6 +30,9 @@ extension AppEnvironment {
         let vault = SecretVault(store: store, keyring: VaultKeyring(backend: SystemKeychainBackend.system()))
         agents.loadSecretNames = { ((try? await vault.list()) ?? []).filter { $0.kind == SecretKind.envVar.rawValue }.map(\.name).sorted() }
         await agents.reload()
+        composer?.agentChoices = { [agents] in agents.agents.map(\.name) }
+        composer?.addAgent = { [weak self] name, session in try? await self?.addAgent(name, toSession: session) }
+        agents.insertInComposer = { [weak self] name in self?.composer?.toggleAgent(name) ?? false }
     }
 }
 
@@ -63,5 +68,22 @@ extension AppEnvironment {
         for c in computers.model.rows { out.append(AgentAttachable(kind: .computer, title: c.snapshot.name, reference: c.snapshot.name)) }
         for d in datasets.summaries { out.append(AgentAttachable(kind: .dataset, title: d.dataset.name, reference: d.dataset.id)) }
         return out
+    }
+}
+
+extension AppEnvironment {
+    /// Liga o agente numa sessão (a em foco ou a dada): vale no próximo lançamento, como `Enable in This Session` da Library.
+    func addAgent(_ name: String, toSession session: UUID?) async throws {
+        guard let target = session ?? sidebar.selectedSession else {
+            throw ActionError.failed(.agentsAddToSession, message: String(localized: "Select a session first.", bundle: .module))
+        }
+        guard let agent = agents.agent(name) else {
+            if library.items.contains(where: { $0.name == name && $0.works(with: .claude) && $0.scope == "user" }) {
+                throw ActionError.failed(.agentsAddToSession, message: String(localized: "This agent is global in Claude Code, it is already on.", bundle: .module))
+            }
+            throw ActionError.failed(.agentsAddToSession, message: String(localized: "No such agent.", bundle: .module))
+        }
+        _ = await activations.set(ActivationRef(agents.libraryEntry(agent)), on: true, session: target)
+        await library.refreshSession()
     }
 }

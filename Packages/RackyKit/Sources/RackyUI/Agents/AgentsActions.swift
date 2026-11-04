@@ -149,7 +149,7 @@ extension AgentsController {
         }
         try registry.register(.agentsInsertInPrompt) { [unowned self] arg in
             let name = try target(arg, .agentsInsertInPrompt)
-            guard insertInComposer(String(localized: "Use the \(name) agent: ", bundle: .module)) else {
+            guard insertInComposer(name) else {
                 throw ActionError.failed(.agentsInsertInPrompt, message: String(localized: "Open the new session composer first.", bundle: .module))
             }
             return name

@@ -35,6 +35,19 @@ final class ComposerModel {
 
     /// Lugares para onde os agentes podem gravar (área Data); ligado pelo app.
     @ObservationIgnored var dataDestinations: () -> [ComposerDataDestination] = { [] }
+    /// Agentes do Racky (backlog 25): os nomes que dá para somar à sessão nova e os escolhidos (ligam no lançamento).
+    @ObservationIgnored var agentChoices: () -> [String] = { [] }
+    var agentNames: [String] = []
+
+    /// Liga ou desliga um agente da sessão nova; ao ligar, o pedido começa dizendo para usá-lo.
+    func toggleAgent(_ name: String) {
+        if let i = agentNames.firstIndex(of: name) {
+            agentNames.remove(at: i)
+            return
+        }
+        agentNames.append(name)
+        if !draft.prompt.contains(name) { draft.prompt = String(localized: "Use the \(name) agent: ", bundle: .module) + draft.prompt }
+    }
 
     private(set) var defaultBranch: String?
     /// Sem `origin` (repo só local) a base é o branch local: o rótulo não pode prometer "origin/main".

@@ -95,7 +95,13 @@ struct LibraryListView: View {
         } else {
             ScrollView {
                 LazyVStack(spacing: DS.Space.s0_5) {
-                    ForEach(controller.visibleItems) { row($0) }
+                    ForEach(controller.visibleItems) { item in
+                        if item.kind == .agent {
+                            row(item).draggable(AgentsController.dragPayload(item.name))
+                        } else {
+                            row(item)
+                        }
+                    }
                 }
                 .padding(DS.Space.s2)
             }
@@ -346,6 +352,10 @@ struct LibraryItemDetail: View {
                     Text(verbatim: item.category.label).dsFont(DS.Font.small).foregroundStyle(DS.Color.textPrimary)
                     Text(verbatim: item.path).dsFont(DS.Font.monoMicro).foregroundStyle(DS.Color.textTertiary).lineLimit(2).truncationMode(.middle)
                         .textSelection(.enabled)
+                    ForEach(item.otherPaths, id: \.self) { other in
+                        Text(verbatim: other).dsFont(DS.Font.monoMicro).foregroundStyle(DS.Color.textTertiary).lineLimit(2).truncationMode(.middle)
+                            .textSelection(.enabled)
+                    }
                 }
             }
             MetaRow(label: "Works with") {

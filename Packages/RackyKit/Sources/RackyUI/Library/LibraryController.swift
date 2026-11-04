@@ -57,6 +57,8 @@ final class LibraryController {
     @ObservationIgnored var projectRoots: @MainActor () -> [URL] = { [] }
     @ObservationIgnored var currentSession: @MainActor () -> LibrarySessionTarget? = { nil }
     @ObservationIgnored var profiles: @MainActor () -> [LaunchProfile] = { [] }
+    /// Agentes criados no Racky (`~/Racky/agents`), como itens da Library.
+    @ObservationIgnored var rackyAgents: @MainActor () -> [LibraryEntry] = { [] }
     /// `Open in Editor` e `Reveal in Finder` (efeitos de sistema, trocáveis nos testes).
     @ObservationIgnored var openFile: @MainActor (URL) async throws -> Void = { _ in }
     @ObservationIgnored var reveal: @MainActor (URL) -> Void = { _ in }
@@ -96,7 +98,7 @@ final class LibraryController {
         isLoading = true
         defer { isLoading = false; loaded = true }
         let rows = await loadRows(projectRoots())
-        items = LibraryIndex.items(from: rows)
+        items = (LibraryIndex.items(from: rows) + rackyAgents()).sorted { ($0.name.lowercased(), $0.path) < ($1.name.lowercased(), $1.path) }
         if let selectedID, section.kind != nil, !items.contains(where: { $0.id == selectedID }) { select(nil) }
         await refreshSession()
         if selectedID == nil { select(firstVisible()?.id) }
@@ -118,7 +120,10 @@ final class LibraryController {
 
     var kind: LibraryKind? { section.kind }
     var allOfSection: [LibraryEntry] { kind.map { k in items.filter { $0.kind == k } } ?? [] }
-    var visibleItems: [LibraryEntry] { kind.map { LibraryIndex.filter(items, kind: $0, category: category, query: query) } ?? [] }
+    var visibleItems: [LibraryEntry] {
+        guard let kind else { return [] }
+        return LibraryIndex.mergedByName(LibraryIndex.filter(items, kind: kind, category: category, query: query))
+    }
     var counts: [LibraryCategory: Int] { kind.map { LibraryIndex.counts(items, kind: $0) } ?? [:] }
     var presentCategories: [LibraryCategory] { LibraryCategory.allCases.filter { (counts[$0] ?? 0) > 0 } }
     var selectedItem: LibraryEntry? { selectedID.flatMap { id in items.first { $0.id == id } } }

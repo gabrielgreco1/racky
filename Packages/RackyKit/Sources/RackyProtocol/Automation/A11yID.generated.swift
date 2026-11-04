@@ -872,6 +872,8 @@ extension A11yID {
     public static let menuBarStopAll = A11yID(unchecked: "menuBar.stopAll")
     /// `menuBar.quitCompletely`
     public static let menuBarQuitCompletely = A11yID(unchecked: "menuBar.quitCompletely")
+    /// `overlay.composer.agents`
+    public static let overlayComposerAgents = A11yID(unchecked: "overlay.composer.agents")
     /// `sidebar.agents`
     public static let sidebarAgents = A11yID(unchecked: "sidebar.agents")
     /// `sidebar.agents.toggle`
@@ -3012,6 +3014,7 @@ extension A11yID {
         A11yIDSpec(pattern: "menu.<group>.<actionId>", surface: "Menus do app"),
         A11yIDSpec(pattern: "toast.<kind>", surface: "Toasts"),
         A11yIDSpec(pattern: "toast.<kind>.action", surface: "Toasts"),
+        A11yIDSpec(pattern: "overlay.composer.agents", surface: "Agents"),
         A11yIDSpec(pattern: "sidebar.agents", surface: "Agents"),
         A11yIDSpec(pattern: "sidebar.agents.toggle", surface: "Agents"),
         A11yIDSpec(pattern: "sidebar.agents.new", surface: "Agents"),

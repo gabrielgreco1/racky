@@ -289,6 +289,12 @@ struct SessionCardView: View {
         .padding(.leading, SidebarMetrics.cardMarginLeading)
         .padding(.trailing, SidebarMetrics.cardMarginTrailing)
         .onHover { hovering = $0 }
+        // Um agente arrastado da barra ou da Library liga na sessão (vale no próximo lançamento).
+        .dropDestination(for: String.self) { items, _ in
+            guard let name = items.compactMap(AgentsController.agentName(fromDrag:)).first, let registry else { return false }
+            Task { await registry.performFromUI(.agentsAddToSession, .set("\(name)|\(data.id.uuidString)")) }
+            return true
+        }
         .animation(MotionPolicy.shared.animation(MotionTokens.Easing.ease, MotionTokens.Duration.hover), value: hovering)
         // Sessão limpa: o caminho real da pasta aparece no hover, porque renomear a sessão não renomeia a pasta (AC-1103).
         .dsTooltip(data.folderPath, enabled: data.kind == .clean && !renaming)

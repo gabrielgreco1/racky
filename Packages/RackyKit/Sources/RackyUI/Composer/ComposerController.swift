@@ -52,6 +52,17 @@ final class ComposerController {
     private(set) var model: ComposerModel?
     /// Lugares de "Save data to" (área Data).
     @ObservationIgnored var dataDestinations: () -> [ComposerDataDestination] = { [] }
+    @ObservationIgnored var agentChoices: () -> [String] = { [] }
+    /// Liga um agente do Racky na sessão que está nascendo (id conhecido antes do lançamento).
+    @ObservationIgnored var addAgent: (_ name: String, _ session: UUID) async -> Void = { _, _ in }
+
+    /// Escolhe (ou tira) um agente na tela aberta; `false` se o composer não está aberto.
+    @discardableResult
+    func toggleAgent(_ name: String) -> Bool {
+        guard let model, isOpen else { return false }
+        model.toggleAgent(name)
+        return true
+    }
     private var store: RackyStore?
     private var registry: ActionRegistry?
     private var saved = ComposerPersistedState()
@@ -84,6 +95,7 @@ final class ComposerController {
         let model = ComposerModel(sidebar: sidebar, settings: settings, initial: saved, preferredProject: project ?? current)
         if let whereChoice, model.whereOptions.contains(whereChoice) { model.setWhere(whereChoice) }
         model.dataDestinations = dataDestinations
+        model.agentChoices = agentChoices
         self.model = model
         return overlays.present(
             OverlaySpec(
@@ -113,6 +125,7 @@ final class ComposerController {
         guard let request = model.draft.request(context) else {
             throw ActionError.failed(.composerSubmit, message: model.issues.first?.message ?? "Fill in the required fields")
         }
+        for name in model.agentNames { await addAgent(name, request.sessionID) }
         let origin = elements.frame(of: .overlayComposerSubmit).map { [Double($0.midX), Double($0.midY)] }
         let pendingID = launcher.begin(request, projectID: model.draft.projectID, origin: origin)
         remember(model)

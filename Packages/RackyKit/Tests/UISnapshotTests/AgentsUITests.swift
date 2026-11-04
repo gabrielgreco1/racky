@@ -193,3 +193,45 @@ struct AgentsUITests {
         #expect(f.controller.needsLogin == ["qa-engineer"])
     }
 }
+
+@MainActor
+@Suite("Backlog 25 - Library merged by name", .serialized, .offscreenAppKit)
+struct AgentsLibraryTests {
+    @Test func theSameAgentInClaudeAndCodexIsOneRowAndRackyAgentsJoinIt() async throws {
+        let f = try await AgentsFixture(); defer { f.remove() }
+        let home = f.base.appendingPathComponent("home", isDirectory: true)
+        func write(_ rel: String, _ text: String) throws {
+            let url = home.appendingPathComponent(rel)
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try Data(text.utf8).write(to: url)
+        }
+        try write(".claude/agents/data-engineer.md", "---\nname: data-engineer\ndescription: Owns ingestion\n---\nBody\n")
+        try write(".codex/agents/data-engineer.toml", "name = \"data-engineer\"\ndescription = \"Owns ingestion\"\ndeveloper_instructions = \"\"\"\nBody\n\"\"\"\n")
+        try write(".claude/agents/only-claude.md", "---\ndescription: Claude only\n---\nBody\n")
+        let library = LibraryController()
+        library.loadRows = { roots in CatalogScanner.scan(CatalogRoots(home: home, projectRoots: roots)).items }
+        library.rackyAgents = { f.controller.libraryEntries }
+        await library.reload()
+        let names = library.visibleItems.map(\.name)
+        #expect(names.filter { $0 == "data-engineer" }.count == 1, "um agente por nome")
+        let merged = try #require(library.visibleItems.first { $0.name == "data-engineer" })
+        #expect(merged.category == .racky, "a cópia do Racky vence a das pastas dos CLIs")
+        #expect(merged.clients == [.claude, .codex, .opencode] && merged.otherPaths.count == 2)
+        let claudeOnly = try #require(library.visibleItems.first { $0.name == "only-claude" })
+        #expect(claudeOnly.clients == [.claude] && claudeOnly.otherPaths.isEmpty)
+        #expect(names.contains("qa-engineer") && names.contains("web-scraper"))
+    }
+
+    @Test func draggedRackyAgentBecomesAnActivationTheLaunchTurnsIntoAnAgentDefinition() async throws {
+        let f = try await AgentsFixture(); defer { f.remove() }
+        let entry = f.controller.libraryEntry(try #require(f.controller.agent("qa-engineer")))
+        #expect(entry.activation(sessionFolder: nil, added: []) == .off, "agente do Racky não é global: liga por sessão")
+        #expect(entry.activation(sessionFolder: nil, added: [entry.id]) == .thisSession)
+        let injection = try #require(SessionLibraryBuilder.build([ActivationRef(entry)]))
+        let def = try #require(injection.agents["qa-engineer"])
+        guard case .string(let prompt) = def["prompt"] else { Issue.record("no prompt"); return }
+        #expect(prompt == "You are qa-engineer.")
+        #expect(AgentsController.agentName(fromDrag: AgentsController.dragPayload("qa-engineer")) == "qa-engineer")
+        #expect(AgentsController.agentName(fromDrag: "something else") == nil)
+    }
+}

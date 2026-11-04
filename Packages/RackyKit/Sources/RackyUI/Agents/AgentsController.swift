@@ -227,6 +227,18 @@ final class AgentsController {
         return ids.compactMap { id in memoryEntries.first { $0.id == id } }
     }
 
+    // MARK: Library
+
+    /// O agente do Racky como item da Library: ligar na sessão usa `agent.md` (o lançamento gera o resto).
+    func libraryEntry(_ a: AgentDefinition) -> LibraryEntry {
+        let path = ((try? store.folder(for: a.name)) ?? store.root).appendingPathComponent("agent.md").path
+        return LibraryEntry(
+            id: "racky:\(a.name)", kind: .agent, name: a.name, summary: a.description.isEmpty ? nil : a.description, path: path, category: .racky,
+            source: "racky", scope: "racky", clients: [.claude, .codex, .opencode], model: a.model, tools: a.tools, skills: a.skills)
+    }
+
+    var libraryEntries: [LibraryEntry] { agents.map(libraryEntry) }
+
     // MARK: Drag
 
     static let dragPrefix = "racky-agent:"

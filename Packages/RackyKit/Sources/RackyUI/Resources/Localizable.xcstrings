@@ -14715,6 +14715,28 @@
           }
         }
       }
+    },
+    "This agent is global in Claude Code, it is already on.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This agent is global in Claude Code, it is already on."
+          }
+        }
+      }
+    },
+    "Racky agents": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Racky agents"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
