@@ -41,6 +41,23 @@ final class SidebarModel {
     private(set) var shownFinished: Set<UUID> = []
     /// v6: sessões com as tabelas sem subagente abertas.
     private(set) var shownLooseTables: Set<UUID> = []
+    /// Pastas de projeto e de sessão que não existem mais no disco (backlog 11): viram "Folder not found" com as saídas.
+    private(set) var missingFolders: Set<String> = []
+    @ObservationIgnored private var folderCheck: Task<Void, Never>?
+
+    /// Confere fora da main quais pastas sumiram. Roda a cada snapshot e quando o app volta ao primeiro plano.
+    func checkFolders() {
+        let paths = Set(snapshot.projects.filter { $0.archivedAt == nil }.map(\.rootPath)
+            + snapshot.sessions.filter { $0.archivedAt == nil && $0.lifecycle != .archived }.map(\.folderPath))
+        folderCheck?.cancel()
+        folderCheck = Task { [weak self] in
+            let missing = await Task.detached(priority: .utility) {
+                Set(paths.filter { !$0.isEmpty && !FileManager.default.fileExists(atPath: $0) })
+            }.value
+            guard !Task.isCancelled, let self, missing != self.missingFolders else { return }
+            self.missingFolders = missing
+        }
+    }
 
     static func subagentKey(terminal: UUID, child: String) -> String { "\(terminal.uuidString)/\(child)" }
     func toggleSubagent(terminal: UUID, child: String) {
@@ -128,7 +145,7 @@ final class SidebarModel {
             attention: attention?.center ?? AttentionCenter(), computers: computerRows, restartPending: restartPendingSessions,
             offersSubagentToggle: toggleSessions, collapsedChildren: collapsedChildren, agentComputers: helpInbox?.agentComputers ?? [:],
             workerComputers: helpInbox?.workerComputers ?? [:], finishedWorkers: helpInbox?.finishedWorkers ?? [], workerNames: workerNames,
-            gitStatus: gitStatus, pullRequests: pullRequests, editingNote: editingNote)
+            gitStatus: gitStatus, pullRequests: pullRequests, editingNote: editingNote, missingFolders: missingFolders)
     }
 
     private var workerNames: [UUID: String] {
@@ -216,6 +233,7 @@ final class SidebarModel {
     func apply(_ snap: StoreSnapshot) {
         snapshot = snap
         onSnapshot?(snap)
+        checkFolders()
         if let s = selectedSession, !snap.sessions.contains(where: { $0.id == s }) { selectedSession = nil }
         // Sessão arquivada escondida pelo filtro (ex.: a seleção salva ao relançar): a landing volta em vez de uma sessão que a
         // sidebar não mostra.

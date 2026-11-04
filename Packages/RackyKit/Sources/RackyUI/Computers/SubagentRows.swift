@@ -111,6 +111,20 @@ struct SubagentRowView: View {
                         .truncationMode(.tail)
                 }
                 Spacer(minLength: DS.Space.s1)
+                if let pr = child.pullRequest {
+                    // O PR que o subagente abriu: um clique abre no navegador.
+                    ActionButton(
+                        .subagentOpenPR, id: .sidebarSessionChildPr(sid, cid), argument: .select(pr.absoluteString),
+                        tooltip: String(localized: "Open the pull request on GitHub", bundle: .module)
+                    ) {
+                        Text(verbatim: SubagentInfo.pullRequestLabel(pr))
+                            .dsFont(DS.Font.sidebarMetaNumeric)
+                            .foregroundStyle(DS.Color.textSecondary)
+                            .fixedSize()
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
                 DSAgentIndicator(needsYou ? .needsInput : child.glyph, size: .sm)
                     .a11y(.sidebarSessionChildStatus(sid, cid), kind: "image", label: needsYou ? String(localized: "Needs You", bundle: .module) : child.stateLabel)
                 Text(verbatim: child.elapsedText(now: context.date))

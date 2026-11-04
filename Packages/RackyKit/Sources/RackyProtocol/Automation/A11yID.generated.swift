@@ -1141,6 +1141,11 @@ extension A11yID {
         A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).child.\(A11yID.segment(childId)).computer")
     }
 
+    /// `sidebar.session.<id>.child.<childId>.pr`
+    public static func sidebarSessionChildPr(_ id: String, _ childId: String) -> A11yID {
+        A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).child.\(A11yID.segment(childId)).pr")
+    }
+
     /// `sidebar.session.<id>.child.<childId>.dataset.<datasetId>`
     public static func sidebarSessionChildDataset(_ id: String, _ childId: String, _ datasetId: String) -> A11yID {
         A11yID(unchecked: "sidebar.session.\(A11yID.segment(id)).child.\(A11yID.segment(childId)).dataset.\(A11yID.segment(datasetId))")
@@ -1214,6 +1219,11 @@ extension A11yID {
     /// `pane.<id>.delivered.<datasetId>`
     public static func paneDeliveredWithIdDatasetId(_ id: String, _ datasetId: String) -> A11yID {
         A11yID(unchecked: "pane.\(A11yID.segment(id)).delivered.\(A11yID.segment(datasetId))")
+    }
+
+    /// `pane.<id>.delivered.diary`
+    public static func paneDeliveredDiary(_ id: String) -> A11yID {
+        A11yID(unchecked: "pane.\(A11yID.segment(id)).delivered.diary")
     }
 
     /// `pane.<id>.status`
@@ -2217,6 +2227,7 @@ extension A11yID {
         A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.handBack", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.toggle", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.computer", surface: "Sidebar"),
+        A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.pr", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.child.<childId>.dataset.<datasetId>", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.dataset.<datasetId>", surface: "Sidebar"),
         A11yIDSpec(pattern: "sidebar.session.<id>.tables", surface: "Sidebar"),
@@ -2244,6 +2255,7 @@ extension A11yID {
         A11yIDSpec(pattern: "pane.<id>.header", surface: "Panes"),
         A11yIDSpec(pattern: "pane.<id>.delivered", surface: "Panes"),
         A11yIDSpec(pattern: "pane.<id>.delivered.<datasetId>", surface: "Panes"),
+        A11yIDSpec(pattern: "pane.<id>.delivered.diary", surface: "Panes"),
         A11yIDSpec(pattern: "pane.<id>.status", surface: "Panes"),
         A11yIDSpec(pattern: "pane.<id>.splitRight", surface: "Panes"),
         A11yIDSpec(pattern: "pane.<id>.splitDown", surface: "Panes"),

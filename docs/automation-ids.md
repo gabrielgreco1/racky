@@ -99,6 +99,7 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 - `sidebar.session.<id>.child.<childId>.handBack`
 - `sidebar.session.<id>.child.<childId>.toggle`
 - `sidebar.session.<id>.child.<childId>.computer`
+- `sidebar.session.<id>.child.<childId>.pr`
 - `sidebar.session.<id>.child.<childId>.dataset.<datasetId>`
 - `sidebar.session.<id>.dataset.<datasetId>`
 - `sidebar.session.<id>.tables`
@@ -132,6 +133,7 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 - `pane.<id>.header`
 - `pane.<id>.delivered`
 - `pane.<id>.delivered.<datasetId>`
+- `pane.<id>.delivered.diary`
 - `pane.<id>.status`
 - `pane.<id>.splitRight`
 - `pane.<id>.splitDown`
@@ -817,6 +819,7 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 | `session.setSubagentHarness` | Subagents run as (card, header do pane) | — | slice3 |
 | `agent.toggleChildren` | Collapse / Expand Subagents (chevron da linha do agente) | — | slice3 |
 | `subagent.toggleDetails` | Show / Hide Subagent Details (setinha da linha do subagente) | — | slice1 |
+| `subagent.openPR` | Open Subagent PR ('#N' na linha do subagente) | — | slice1 |
 | `agent.toggleFinished` | Show / Hide Finished Subagents | — | slice1 |
 | `session.toggleTables` | Show / Hide Session Tables | — | slice1 |
 | `session.restartToApply` | Restart to apply | — | slice3 |
@@ -860,6 +863,9 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 | `item.openIn` | Open in… | — | slice1 |
 | `item.openInTarget` | Open in <app> (item do menu `Open in…`) | — | slice1 |
 | `session.locateFolder` | Locate Folder… | — | slice1 |
+| `session.recreateFolder` | Recreate Empty Folder | — | slice1 |
+| `project.cloneAgain` | Clone Again | — | slice1 |
+| `project.locateFolder` | Locate Project Folder… | — | slice1 |
 | `sidebar.revealCurrent` | Reveal Current Session | — | slice1 |
 | `session.nextNeedingAttention` | Next Needing Attention | ⇧⌘A | slice2 |
 | `session.previous` | Previous / Next Session, Select Session 1–9, Focus Session List | ⇧⌘↑ / ⇧⌘↓ / ⌘1…⌘9 / ⇧⌘0 | slice1 |
@@ -1171,6 +1177,7 @@ Gerado por `scripts/gen-automation-ids.py` a partir de `docs/rebuild/spec/03-scr
 | `settings.terminal.theme` | Theme | — | slice1 |
 | `settings.terminal.cursor` | Cursor | — | slice1 |
 | `settings.terminal.cursorBlink` | Cursor | — | slice1 |
+| `settings.terminal.clipboardWrite` | Let programs copy to the clipboard | — | slice1 |
 | `settings.notifications.needsInput` | Agent needs input | — | slice2 |
 | `settings.notifications.finished` | Agent finished | — | slice2 |
 | `settings.notifications.failed` | Agent failed | — | slice2 |

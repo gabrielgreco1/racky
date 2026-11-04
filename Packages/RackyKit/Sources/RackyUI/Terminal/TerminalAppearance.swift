@@ -15,12 +15,15 @@ public struct TerminalAppearance: Equatable {
     public var fontFamily: String
     public var cursor: AppSettings.CursorStyle
     public var cursorBlink: Bool
+    /// OSC 52 de escrita (Settings › Terminal). Desligado por padrão.
+    public var clipboardWrite: Bool
 
     public init(
         fontSize: CGFloat = DS.TerminalFont.defaultSize, padding: CGFloat = DS.TerminalFont.padding, scrollback: Int = 5000,
         optionAsMeta: OptionAsMeta = .auto, fontFamily: String = AppSettings.Terminal.defaultFont,
-        cursor: AppSettings.CursorStyle = .block, cursorBlink: Bool = true
+        cursor: AppSettings.CursorStyle = .block, cursorBlink: Bool = true, clipboardWrite: Bool = false
     ) {
+        self.clipboardWrite = clipboardWrite
         self.fontFamily = fontFamily
         self.cursor = cursor
         self.cursorBlink = cursorBlink
@@ -32,7 +35,8 @@ public struct TerminalAppearance: Equatable {
 
     /// Aparência a partir de Settings › Terminal: o que o usuário mudou vale para o terminal que abrir (e os abertos, ao reaplicar).
     public init(settings: AppSettings.Terminal) {
-        self.init(fontSize: CGFloat(settings.fontSize), fontFamily: settings.fontFamily, cursor: settings.cursor, cursorBlink: settings.cursorBlink)
+        self.init(fontSize: CGFloat(settings.fontSize), fontFamily: settings.fontFamily, cursor: settings.cursor, cursorBlink: settings.cursorBlink,
+            clipboardWrite: settings.clipboardWrite)
     }
 
     public static func clamp(_ size: CGFloat) -> CGFloat {

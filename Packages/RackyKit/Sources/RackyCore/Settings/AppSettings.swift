@@ -186,6 +186,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
         public var theme = Terminal.defaultTheme
         public var cursor = CursorStyle.block
         public var cursorBlink = true
+        /// OSC 52 de escrita (programas no terminal trocam a área de transferência). Desligado por padrão (auditoria 31/10).
+        public var clipboardWrite = false
 
         public init() {}
 
@@ -197,6 +199,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
             theme = try c.decodeIfPresent(String.self, forKey: .theme) ?? Terminal.defaultTheme
             cursor = try c.decodeIfPresent(CursorStyle.self, forKey: .cursor) ?? .block
             cursorBlink = try c.decodeIfPresent(Bool.self, forKey: .cursorBlink) ?? true
+            clipboardWrite = try c.decodeIfPresent(Bool.self, forKey: .clipboardWrite) ?? false
         }
     }
 }

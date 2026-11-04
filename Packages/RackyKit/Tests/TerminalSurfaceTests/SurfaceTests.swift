@@ -80,6 +80,11 @@ import Testing
         let payload = Data("hello clip".utf8).base64EncodedString()
 
         await feedOffMain(host.surface, "\u{1b}]52;c;\(payload)\u{07}")
+        try await Task.sleep(for: .milliseconds(150))
+        #expect(pasteboard.string(forType: .string) == nil, "desligado por padrão")
+
+        host.surface.osc52WriteEnabled = true
+        await feedOffMain(host.surface, "\u{1b}]52;c;\(payload)\u{07}")
         try await eventually("osc52 write") { pasteboard.string(forType: .string) == "hello clip" }
         #expect(written == 1)
 

@@ -40,6 +40,7 @@ public final class TerminalSurfaceView: TerminalView {
         super.init(frame: NSRect(x: 0, y: 0, width: 640, height: 400), font: appearance.font, options: options)
         terminalDelegate = surfaceDelegate
         surfaceDelegate.surface = self
+        surfaceDelegate.osc52WriteEnabled = appearance.clipboardWrite
         TerminalTheme.apply(to: self, appearance: appearance)
         linkReporting = .implicit
         linkHighlightMode = .hoverWithModifier
@@ -226,7 +227,7 @@ public final class TerminalSurfaceView: TerminalView {
         get { surfaceDelegate.onBell }
         set { surfaceDelegate.onBell = newValue }
     }
-    /// OSC 52 de escrita (programas escrevem no clipboard). Ligado por padrão (02 §3); o aviso é do chamador.
+    /// OSC 52 de escrita (programas escrevem no clipboard). Vem de Settings › Terminal, desligado por padrão; o aviso é do chamador.
     public var osc52WriteEnabled: Bool {
         get { surfaceDelegate.osc52WriteEnabled }
         set { surfaceDelegate.osc52WriteEnabled = newValue }

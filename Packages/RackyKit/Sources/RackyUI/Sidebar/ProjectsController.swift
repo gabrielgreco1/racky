@@ -9,6 +9,12 @@ import Foundation
 @MainActor
 protocol FolderPicking {
     func chooseFolder() async -> URL?
+    /// `Locate Folder…`: a pasta de um projeto ou sessão que sumiu.
+    func locateFolder(for name: String) async -> URL?
+}
+
+extension FolderPicking {
+    func locateFolder(for name: String) async -> URL? { await chooseFolder() }
 }
 
 /// Seletor nativo (03 §16.9: "Choose a Folder…"). Aceita repositório Git ou qualquer pasta.
@@ -23,6 +29,24 @@ struct OpenPanelFolderPicker: FolderPicking {
         panel.title = String(localized: "Add a Project", bundle: .module)
         panel.message = String(localized: "A Git repository or any folder on this Mac.", bundle: .module)
         panel.prompt = String(localized: "Add", bundle: .module)
+        let response: NSApplication.ModalResponse = await withCheckedContinuation { continuation in
+            if let window = NSApp.keyWindow {
+                panel.beginSheetModal(for: window) { continuation.resume(returning: $0) }
+            } else {
+                panel.begin { continuation.resume(returning: $0) }
+            }
+        }
+        return response == .OK ? panel.url : nil
+    }
+
+    func locateFolder(for name: String) async -> URL? {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.allowsMultipleSelection = false
+        panel.title = String(localized: "Find the Folder", bundle: .module)
+        panel.message = String(localized: "Where is the folder of \(name) now?", bundle: .module)
+        panel.prompt = String(localized: "Use This Folder", bundle: .module)
         let response: NSApplication.ModalResponse = await withCheckedContinuation { continuation in
             if let window = NSApp.keyWindow {
                 panel.beginSheetModal(for: window) { continuation.resume(returning: $0) }
@@ -190,6 +214,14 @@ final class ProjectsController {
             String(localized: "Git took too long to answer.", bundle: .module)
         case ProjectError.git(let g):
             String(describing: g)
+        case ProjectError.differentRepository:
+            String(localized: "That folder is a different repository.", bundle: .module)
+        case ProjectError.noRemote:
+            String(localized: "This project has no remote to clone from.", bundle: .module)
+        case ProjectError.cloneFailed(let text):
+            text
+        case ProjectError.folderStillThere:
+            String(localized: "The folder is there again.", bundle: .module)
         default:
             String(localized: "Something went wrong.", bundle: .module)
         }
@@ -208,6 +240,57 @@ final class ProjectsController {
             }
             guard let url = await picker.chooseFolder() else { return "cancelled" }
             return try await addProject(folder: url).id.uuidString
+        }
+
+        // Backlog 11: pasta do projeto ou da sessão que sumiu do disco.
+        try registry.register(.projectCloneAgain) { [unowned self] arg in
+            let id = try Self.uuid(arg, .projectCloneAgain)
+            let name = sidebar.project(id)?.name ?? ""
+            toasts.show(kind: .info, title: String(localized: "Cloning \(name) again…", bundle: .module))
+            do {
+                let project = try await requireService(.projectCloneAgain).cloneAgain(id: id)
+                sidebar.checkFolders()
+                toasts.show(kind: .success, title: String(localized: "\(project.name) is back.", bundle: .module))
+                return project.rootPath
+            } catch {
+                toasts.show(kind: .error, title: String(localized: "Couldn't clone \(name).", bundle: .module), detail: Self.describe(error))
+                throw error
+            }
+        }
+        try registry.register(.projectLocateFolder) { [unowned self] arg in
+            let (id, picked) = try await target(arg, .projectLocateFolder) { sidebar.project($0)?.name }
+            guard let url = picked else { return "cancelled" }
+            do {
+                let project = try await requireService(.projectLocateFolder).relocateProject(id: id, to: url)
+                sidebar.checkFolders()
+                return project.rootPath
+            } catch {
+                toasts.show(kind: .error, title: String(localized: "Couldn't use that folder.", bundle: .module), detail: Self.describe(error))
+                throw error
+            }
+        }
+        try registry.register(.sessionLocateFolder) { [unowned self] arg in
+            let (id, picked) = try await target(arg, .sessionLocateFolder) { sidebar.session($0)?.title }
+            guard let url = picked else { return "cancelled" }
+            do {
+                let session = try await requireService(.sessionLocateFolder).relocateSession(id: id, to: url)
+                sidebar.checkFolders()
+                return session.folderPath
+            } catch {
+                toasts.show(kind: .error, title: String(localized: "Couldn't use that folder.", bundle: .module), detail: Self.describe(error))
+                throw error
+            }
+        }
+        try registry.register(.sessionRecreateFolder) { [unowned self] arg in
+            let id = try Self.uuid(arg, .sessionRecreateFolder)
+            do {
+                let path = try await requireService(.sessionRecreateFolder).recreateSessionFolder(sessionID: id)
+                sidebar.checkFolders()
+                return path
+            } catch {
+                toasts.show(kind: .error, title: String(localized: "Couldn't recreate the folder.", bundle: .module), detail: Self.describe(error))
+                throw error
+            }
         }
 
         try registry.register(.projectRename) { [unowned self] arg in
@@ -259,6 +342,25 @@ final class ProjectsController {
             }
             return "\(await refreshGit(itemID: id))"
         }
+    }
+
+    private static func uuid(_ arg: ActionArgument, _ action: ActionID) throws -> UUID {
+        guard let raw = arg.value?.split(separator: "|", maxSplits: 1).first, let id = UUID(uuidString: String(raw)) else {
+            throw ActionError.failed(action, message: "expected select(<id>)")
+        }
+        return id
+    }
+
+    /// `select(<id>)` abre o seletor; `set(<id>|<pasta>)` (só automação) usa a pasta dada.
+    private func target(_ arg: ActionArgument, _ action: ActionID, name: (UUID) -> String?) async throws -> (UUID, URL?) {
+        let id = try Self.uuid(arg, action)
+        guard let label = name(id) else { throw ActionError.failed(action, message: "Not found") }
+        if arg.kind == .set {
+            let parts = (arg.value ?? "").split(separator: "|", maxSplits: 1).map(String.init)
+            guard automationEnabled, parts.count == 2 else { throw ActionError.failed(action, message: "Automation is off") }
+            return (id, URL(fileURLWithPath: parts[1], isDirectory: true))
+        }
+        return (id, await picker.locateFolder(for: label))
     }
 
     private func requireService(_ id: ActionID) throws -> ProjectService {

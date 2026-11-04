@@ -24,7 +24,14 @@ struct ProjectMenuItems {
             let id = project.uuidString
             let arg = ActionArgument.select(id)
             let hasGitHub = p.gitRemoteURL?.contains("github.com") == true
+            // Backlog 11: a pasta sumiu; as saídas vêm primeiro (Remove Project… continua no fim e não apaga nada).
+            let missing = model.missingFolders.contains(p.rootPath)
+                ? [
+                    (p.gitRemoteURL ?? "").isEmpty ? nil : MenuEntry(action: .projectCloneAgain, title: String(localized: "Clone Again", bundle: .module), argument: arg),
+                    MenuEntry(action: .projectLocateFolder, title: String(localized: "Locate Folder…", bundle: .module), argument: arg),
+                ].compactMap { $0 } : []
             return [
+                missing,
                 [
                     MenuEntry(action: .projectNewSession, title: String(localized: "New Session in \(p.name)…", bundle: .module), argument: arg),
                     MenuEntry(action: .projectNewSessionFromRef, title: String(localized: "New Session from Branch or PR…", bundle: .module), argument: arg),
@@ -62,10 +69,16 @@ struct SessionMenuItems {
             let arg = ActionArgument.select(id)
             let branch = model.worktree(of: s)?.branch
             let hasGit = s.kind == .worktree || s.kind == .checkout
+            let missing = model.missingFolders.contains(s.folderPath)
+                ? [MenuEntry(action: .sessionLocateFolder, title: String(localized: "Locate Folder…", bundle: .module), argument: arg)]
+                    + (s.kind == .clean || s.kind == .folder
+                        ? [MenuEntry(action: .sessionRecreateFolder, title: String(localized: "Recreate Empty Folder", bundle: .module), argument: arg)] : [])
+                : []
             let interrupted = model.snapshot.terminals.contains { t in
                 t.state == .interrupted && model.snapshot.tabs.contains { $0.id == t.tabID && $0.sessionID == s.id }
             }
             return [
+                missing,
                 [
                     MenuEntry(action: .sessionRename, title: String(localized: "Rename…", bundle: .module), argument: arg),
                     MenuEntry(action: .sessionEditNote, title: String(localized: "Edit Note…", bundle: .module), argument: arg),

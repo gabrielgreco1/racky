@@ -122,6 +122,8 @@ struct SubagentRowData: Identifiable, Equatable {
     var workerTerminalID: UUID?
     /// Tarefa do worker, ao lado do nome do agente ("Codex 1  books p1–4").
     var task: String?
+    /// PR que o subagente abriu (link no resumo final): vira "#N" na linha.
+    var pullRequest: URL?
 
     var glyph: DSIndicatorGlyph {
         switch phase {
@@ -233,6 +235,8 @@ struct ProjectSectionData: Identifiable, Equatable {
     var hiddenCount: Int
     var showMoreExpanded: Bool
     var hasNoSessions: Bool
+    /// A pasta do projeto sumiu do disco (backlog 11).
+    var folderMissing = false
 }
 
 enum SidebarEmptyState: Equatable {
@@ -291,6 +295,8 @@ struct SidebarInput {
     var gitStatus: [String: GitStatus] = [:]
     var pullRequests: [UUID: PullRequestChipModel] = [:]
     var editingNote: UUID?
+    /// Pastas que não existem mais (projetos e sessões).
+    var missingFolders: Set<String> = []
 }
 
 enum SidebarProjector {
@@ -518,7 +524,7 @@ enum SidebarProjector {
                         list.map {
                             SubagentRowData(
                                 id: $0.agentID, title: $0.title ?? input.agentComputers[$0.agentID] ?? $0.displayTitle, phase: $0.phase, startedAt: $0.startedAt, endedAt: $0.endedAt,
-                                subtitle: $0.subtitle, computer: input.agentComputers[$0.agentID])
+                                subtitle: $0.subtitle, computer: input.agentComputers[$0.agentID], pullRequest: $0.pullRequest)
                         }
                     } ?? []) + workers.filter { $0.launchSpec.workerParentTerminalID == t.id }.map { w in
                         workerRow(w, input: input)
@@ -530,7 +536,8 @@ enum SidebarProjector {
             if let b = branch, b.isEmpty || b == "HEAD" { badges.append(.detached) }
 
             let line2: SidebarLine2
-            if let b = branch, !b.isEmpty, s.kind != .folder, s.kind != .clean { line2 = .branch(b) }
+            if input.missingFolders.contains(s.folderPath) { line2 = .missingFolder }
+            else if let b = branch, !b.isEmpty, s.kind != .folder, s.kind != .clean { line2 = .branch(b) }
             else { line2 = .folder(abbreviate(path: s.folderPath, home: input.home)) }
 
             let notStarted = all.allSatisfy { $0.state == .notStarted }
@@ -602,7 +609,8 @@ enum SidebarProjector {
                 pending: pendingRows(p.id), sessions: visible, hiddenCount: cards.count - visible.count,
                 showMoreExpanded: showMoreOpen && cards.count > SidebarMetrics.sessionsBeforeShowMore,
                 // Só arquivadas (filtro desligado) contam como "sem sessões": o projeto oferece começar uma, não "nenhum resultado".
-                hasNoSessions: mine.allSatisfy { isArchived($0) && !input.filters.archived } && input.pending.allSatisfy { $0.projectID != p.id })
+                hasNoSessions: mine.allSatisfy { isArchived($0) && !input.filters.archived } && input.pending.allSatisfy { $0.projectID != p.id },
+                folderMissing: input.missingFolders.contains(p.rootPath))
             let recent = mine.map(activity).max() ?? p.createdAt
             projectSections.append((section, recent, p.sortIndex))
         }

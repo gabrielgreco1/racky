@@ -95,6 +95,7 @@ import Testing
         _ = try await r.registry.perform(.settingsTerminalFont, .select("Menlo"))
         _ = try await r.registry.perform(.settingsTerminalCursor, .select("bar"))
         _ = try await r.registry.perform(.settingsTerminalCursorBlink, .set("off"))
+        _ = try await r.registry.perform(.settingsTerminalClipboardWrite, .set("on"))
         #expect(r.model.settings.general.askBeforeQuit == false, "o controle reflete na hora, antes da gravação")
         await r.model.settle()
         let home = r.home
@@ -111,6 +112,7 @@ import Testing
         #expect(model.settings.terminal.fontFamily == "Menlo")
         #expect(model.settings.terminal.cursor == .bar)
         #expect(model.settings.terminal.cursorBlink == false)
+        #expect(model.settings.terminal.clipboardWrite == true)
         #expect(model.settings.general.cleanSessionFolder == "~/Racky/sessions", "o que não mudou fica no padrão")
         try await again.close()
         try? FileManager.default.removeItem(at: home)

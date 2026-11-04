@@ -2905,6 +2905,226 @@
         }
       }
     },
+    "Clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clipboard"
+          }
+        }
+      }
+    },
+    "Let programs copy to the clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let programs copy to the clipboard"
+          }
+        }
+      }
+    },
+    "Programs running in the terminal can replace what you copied. Off unless you need it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programs running in the terminal can replace what you copied. Off unless you need it."
+          }
+        }
+      }
+    },
+    "Diary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diary"
+          }
+        }
+      }
+    },
+    "Nothing written yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing written yet"
+          }
+        }
+      }
+    },
+    "Open the pull request on GitHub": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open the pull request on GitHub"
+          }
+        }
+      }
+    },
+    "Clone Again": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clone Again"
+          }
+        }
+      }
+    },
+    "Locate Folder…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Locate Folder…"
+          }
+        }
+      }
+    },
+    "Recreate Empty Folder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recreate Empty Folder"
+          }
+        }
+      }
+    },
+    "Find the Folder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Find the Folder"
+          }
+        }
+      }
+    },
+    "Where is the folder of %@ now?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Where is the folder of %@ now?"
+          }
+        }
+      }
+    },
+    "Use This Folder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use This Folder"
+          }
+        }
+      }
+    },
+    "That folder is a different repository.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That folder is a different repository."
+          }
+        }
+      }
+    },
+    "This project has no remote to clone from.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This project has no remote to clone from."
+          }
+        }
+      }
+    },
+    "The folder is there again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The folder is there again."
+          }
+        }
+      }
+    },
+    "Cloning %@ again…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cloning %@ again…"
+          }
+        }
+      }
+    },
+    "%@ is back.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is back."
+          }
+        }
+      }
+    },
+    "Couldn't clone %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't clone %@."
+          }
+        }
+      }
+    },
+    "Couldn't use that folder.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't use that folder."
+          }
+        }
+      }
+    },
+    "Couldn't recreate the folder.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't recreate the folder."
+          }
+        }
+      }
+    },
     "Block": {
       "extractionState": "manual",
       "localizations": {

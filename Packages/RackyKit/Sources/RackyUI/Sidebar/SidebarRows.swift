@@ -112,6 +112,15 @@ struct ProjectRowView: View {
                     .foregroundStyle(DS.Color.textSecondary)
                     .lineLimit(1)
                     .truncationMode(.tail)
+                if data.folderMissing {
+                    // A pasta sumiu (backlog 11): as saídas estão no menu (Clone Again, Locate Folder…, Remove Project…).
+                    HStack(spacing: DS.Space.s1) {
+                        Image(systemName: "exclamationmark.circle").font(.system(size: SidebarMetrics.line2Icon))
+                        Text("Folder not found", bundle: .module).dsFont(DS.Font.small).lineLimit(1)
+                    }
+                    .foregroundStyle(DS.Color.destructive)
+                    .fixedSize()
+                }
             }
             Spacer(minLength: DS.Space.s1)
             if !hovering, !renaming {

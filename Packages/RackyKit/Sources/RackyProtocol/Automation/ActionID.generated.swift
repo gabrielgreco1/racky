@@ -42,6 +42,7 @@ extension ActionID {
     public static let sessionSetSubagentHarness = ActionID(unchecked: "session.setSubagentHarness")
     public static let agentToggleChildren = ActionID(unchecked: "agent.toggleChildren")
     public static let subagentToggleDetails = ActionID(unchecked: "subagent.toggleDetails")
+    public static let subagentOpenPR = ActionID(unchecked: "subagent.openPR")
     public static let agentToggleFinished = ActionID(unchecked: "agent.toggleFinished")
     public static let sessionToggleTables = ActionID(unchecked: "session.toggleTables")
     public static let sessionRestartToApply = ActionID(unchecked: "session.restartToApply")
@@ -85,6 +86,9 @@ extension ActionID {
     public static let itemOpenIn = ActionID(unchecked: "item.openIn")
     public static let itemOpenInTarget = ActionID(unchecked: "item.openInTarget")
     public static let sessionLocateFolder = ActionID(unchecked: "session.locateFolder")
+    public static let sessionRecreateFolder = ActionID(unchecked: "session.recreateFolder")
+    public static let projectCloneAgain = ActionID(unchecked: "project.cloneAgain")
+    public static let projectLocateFolder = ActionID(unchecked: "project.locateFolder")
     public static let sidebarRevealCurrent = ActionID(unchecked: "sidebar.revealCurrent")
     public static let sessionNextNeedingAttention = ActionID(unchecked: "session.nextNeedingAttention")
     public static let sessionPrevious = ActionID(unchecked: "session.previous")
@@ -396,6 +400,7 @@ extension ActionID {
     public static let settingsTerminalTheme = ActionID(unchecked: "settings.terminal.theme")
     public static let settingsTerminalCursor = ActionID(unchecked: "settings.terminal.cursor")
     public static let settingsTerminalCursorBlink = ActionID(unchecked: "settings.terminal.cursorBlink")
+    public static let settingsTerminalClipboardWrite = ActionID(unchecked: "settings.terminal.clipboardWrite")
     public static let settingsNotificationsNeedsInput = ActionID(unchecked: "settings.notifications.needsInput")
     public static let settingsNotificationsFinished = ActionID(unchecked: "settings.notifications.finished")
     public static let settingsNotificationsFailed = ActionID(unchecked: "settings.notifications.failed")
@@ -579,6 +584,7 @@ extension ActionID {
         ActionSpec(id: ActionID(unchecked: "session.setSubagentHarness"), label: "Subagents run as (card, header do pane)", shortcut: "", slice: .slice3),
         ActionSpec(id: ActionID(unchecked: "agent.toggleChildren"), label: "Collapse / Expand Subagents (chevron da linha do agente)", shortcut: "", slice: .slice3),
         ActionSpec(id: ActionID(unchecked: "subagent.toggleDetails"), label: "Show / Hide Subagent Details (setinha da linha do subagente)", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "subagent.openPR"), label: "Open Subagent PR ('#N' na linha do subagente)", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "agent.toggleFinished"), label: "Show / Hide Finished Subagents", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "session.toggleTables"), label: "Show / Hide Session Tables", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "session.restartToApply"), label: "Restart to apply", shortcut: "", slice: .slice3),
@@ -622,6 +628,9 @@ extension ActionID {
         ActionSpec(id: ActionID(unchecked: "item.openIn"), label: "Open in…", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "item.openInTarget"), label: "Open in <app> (item do menu `Open in…`)", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "session.locateFolder"), label: "Locate Folder…", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "session.recreateFolder"), label: "Recreate Empty Folder", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "project.cloneAgain"), label: "Clone Again", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "project.locateFolder"), label: "Locate Project Folder…", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "sidebar.revealCurrent"), label: "Reveal Current Session", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "session.nextNeedingAttention"), label: "Next Needing Attention", shortcut: "⇧⌘A", slice: .slice2),
         ActionSpec(id: ActionID(unchecked: "session.previous"), label: "Previous / Next Session, Select Session 1–9, Focus Session List", shortcut: "⇧⌘↑ / ⇧⌘↓ / ⌘1…⌘9 / ⇧⌘0", slice: .slice1),
@@ -933,6 +942,7 @@ extension ActionID {
         ActionSpec(id: ActionID(unchecked: "settings.terminal.theme"), label: "Theme", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "settings.terminal.cursor"), label: "Cursor", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "settings.terminal.cursorBlink"), label: "Cursor", shortcut: "", slice: .slice1),
+        ActionSpec(id: ActionID(unchecked: "settings.terminal.clipboardWrite"), label: "Let programs copy to the clipboard", shortcut: "", slice: .slice1),
         ActionSpec(id: ActionID(unchecked: "settings.notifications.needsInput"), label: "Agent needs input", shortcut: "", slice: .slice2),
         ActionSpec(id: ActionID(unchecked: "settings.notifications.finished"), label: "Agent finished", shortcut: "", slice: .slice2),
         ActionSpec(id: ActionID(unchecked: "settings.notifications.failed"), label: "Agent failed", shortcut: "", slice: .slice2),

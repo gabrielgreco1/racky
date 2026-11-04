@@ -1,3 +1,4 @@
+import RackyCore
 import RackyProtocol
 import AppKit
 import Foundation
@@ -144,6 +145,13 @@ extension SidebarModel {
             }
             toggleSubagent(terminal: terminal, child: parts[1])
             return expandedSubagents.contains(Self.subagentKey(terminal: terminal, child: parts[1])) ? "expanded" : "collapsed"
+        }
+        try registry.register(.subagentOpenPR) { arg in
+            guard let url = SubagentInfo.pullRequest(in: arg.value), url.absoluteString == arg.value else {
+                throw ActionError.failed(.subagentOpenPR, message: "expected select(https://github.com/<owner>/<repo>/pull/<n>)")
+            }
+            NSWorkspace.shared.open(url)
+            return url.absoluteString
         }
         try registry.register(.agentToggleFinished) { [unowned self] arg in
             let id = try uuid(arg, .agentToggleFinished)

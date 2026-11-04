@@ -97,13 +97,14 @@ catalog_rule() {
     printf '%s\n' "$keys" | grep -qxF -- "$text" || bad+="$line"$'\n'
   done <<< "$lits"
   report strings "string de UI fora do String Catalog ($CATALOG_REL)" "${bad%$'\n'}"
-  # O Xcode gera um símbolo por chave e falha a build quando duas chaves só diferem na caixa ("Now"/"now"); o swift test não pega.
+  # O Xcode gera um símbolo por chave e falha a build quando duas chaves só diferem na caixa ou na pontuação ("Now"/"now", "Locate Folder"/"Locate Folder…"). Só contam chaves preenchidas e sem argumento (as outras não viram símbolo); o swift test não pega.
   local clash
   clash="$(python3 -c 'import json,sys,collections
 g=collections.defaultdict(list)
-for k in json.load(open(sys.argv[1])).get("strings",{}): g[k.lower()].append(k)
+for k, v in json.load(open(sys.argv[1])).get("strings",{}).items():
+    if v and "%" not in k: g["".join(c for c in k.lower() if c.isalnum())].append(k)
 print("\n".join(" / ".join(v) for v in g.values() if len(v)>1))' "$catalog")"
-  report strings "chaves do String Catalog que só diferem na caixa (o Xcode não compila)" "$clash"
+  report strings "chaves do String Catalog que só diferem na caixa ou na pontuação (o Xcode não compila)" "$clash"
 }
 
 run_rules() {

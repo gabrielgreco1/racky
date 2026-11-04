@@ -12,6 +12,7 @@ struct SubagentDeliveredColumn: View {
     let computers: ComputersController
     let datasets: DatasetsController
     @Environment(\.actionRegistry) private var registry
+    @State private var journal: [JournalLine] = []
 
     private var row: ComputerRow? { computers.model.rows.first { $0.id == computer } }
     private var tables: [DatasetSummary] { datasets.summaries.filter { $0.computer == computer } }
@@ -54,6 +55,7 @@ struct SubagentDeliveredColumn: View {
                         Divider().overlay(DS.Color.border)
                     }
                 }
+                diary(pid: pid)
             }
             .padding(DS.Space.s4)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -62,6 +64,42 @@ struct SubagentDeliveredColumn: View {
         .background(DS.Color.chrome)
         .overlay(alignment: .leading) { Rectangle().fill(DS.Color.border).frame(width: DSMetrics.hairline) }
         .a11y(.paneDelivered(pid), kind: "container", label: computer)
+        .task(id: computer) {
+            // O diário cresce enquanto o subagente trabalha: relê a cada 5 s enquanto a aba está aberta.
+            while !Task.isCancelled {
+                if let root = computers.runURL(forComputer: computer) {
+                    let lines = await Task.detached(priority: .utility) { JournalLine.read(run: root) }.value
+                    let shown = Array(lines.filter { !$0.system }.reversed())
+                    if shown != journal { journal = shown }
+                }
+                try? await Task.sleep(for: .seconds(5))
+            }
+        }
+    }
+
+    /// Tudo o que o subagente anotou no diário, o mais novo em cima.
+    @ViewBuilder
+    private func diary(pid: String) -> some View {
+        VStack(alignment: .leading, spacing: DS.Space.s3) {
+            label(String(localized: "Diary", bundle: .module))
+            if journal.isEmpty {
+                Text("Nothing written yet", bundle: .module).dsFont(DS.Font.small).foregroundStyle(DS.Color.textTertiary)
+            }
+            ForEach(journal) { line in
+                VStack(alignment: .leading, spacing: DS.Space.s0_5) {
+                    HStack(spacing: DS.Space.s1) {
+                        Text(verbatim: line.kind.capitalized).dsFont(DS.Font.microNumeric)
+                            .foregroundStyle(line.kind == "BLOCKED" ? DS.Color.textPrimary : DS.Color.textTertiary)
+                        if let at = line.at {
+                            Text(at, format: .dateTime.hour().minute()).dsFont(DS.Font.microNumeric).foregroundStyle(DS.Color.textQuaternary)
+                        }
+                    }
+                    Text(verbatim: line.text).dsFont(DS.Font.small).foregroundStyle(DS.Color.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true).textSelection(.enabled)
+                }
+            }
+        }
+        .a11y(.paneDeliveredDiary(pid), kind: "list", label: "Diary")
     }
 
     private func label(_ text: String) -> some View {

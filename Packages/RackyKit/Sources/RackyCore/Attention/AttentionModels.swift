@@ -78,13 +78,26 @@ public struct SubagentInfo: Sendable, Equatable, Identifiable {
     public var endedAt: Date?
     /// Última nota do diário ou ferramenta em uso.
     public var subtitle: String?
+    /// PR do GitHub que o subagente citou na última mensagem (o resumo final costuma trazer o link).
+    public var pullRequest: URL?
 
     public init(
-        agentID: String, agentType: String? = nil, title: String? = nil, phase: Phase, startedAt: Date, endedAt: Date? = nil, subtitle: String? = nil
+        agentID: String, agentType: String? = nil, title: String? = nil, phase: Phase, startedAt: Date, endedAt: Date? = nil, subtitle: String? = nil,
+        pullRequest: URL? = nil
     ) {
         self.agentID = agentID; self.agentType = agentType; self.title = title; self.phase = phase; self.startedAt = startedAt
-        self.endedAt = endedAt; self.subtitle = subtitle
+        self.endedAt = endedAt; self.subtitle = subtitle; self.pullRequest = pullRequest
     }
+
+    /// O último link `https://github.com/<dono>/<repo>/pull/<n>` do texto.
+    public static func pullRequest(in text: String?) -> URL? {
+        guard let text, text.contains("/pull/") else { return nil }
+        let pattern = #/https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/pull/[0-9]+/#
+        return text.matches(of: pattern).last.flatMap { URL(string: String($0.output)) }
+    }
+
+    /// `#123` de um link de PR.
+    public static func pullRequestLabel(_ url: URL) -> String { "#" + url.lastPathComponent }
 
     public var displayTitle: String { title ?? agentType ?? "Subagent" }
 }

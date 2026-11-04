@@ -40,6 +40,13 @@ struct TerminalSettingsView: View {
                         .accessibilityLabel(Text("Blink", bundle: .module))
                 }
             }
+            SettingsBlock(title: "Clipboard") {
+                SettingsRow(title: "Let programs copy to the clipboard", help: "Programs running in the terminal can replace what you copied. Off unless you need it.") {
+                    DSSwitch(
+                        isOn: terminal.clipboardWrite, action: .settingsTerminalClipboardWrite, id: .settings("terminal", "clipboardWrite"), "")
+                        .accessibilityLabel(Text("Let programs copy to the clipboard", bundle: .module))
+                }
+            }
             SettingsBlock(title: "Preview") {
                 TerminalPreview(settings: terminal)
                 Text("Applies to new terminals.", bundle: .module)

@@ -43,6 +43,13 @@ public enum ProjectError: Error, Sendable, Equatable {
     case notADirectory(String)
     case projectNotFound(UUID)
     case git(GitError)
+    /// A pasta escolhida é outro repositório (remote diferente do projeto).
+    case differentRepository(String)
+    /// Clonar de novo precisa do remote salvo.
+    case noRemote
+    case cloneFailed(String)
+    /// A pasta do projeto ainda existe: nada a recuperar.
+    case folderStillThere(String)
 }
 
 /// Projetos (T1-19): detecta pasta/repositório, grava no Store, sincroniza worktrees como sessões "não iniciadas"
@@ -228,5 +235,103 @@ public struct ProjectService: Sendable {
         }
         try await store.archiveProject(id: id, at: now)
         return count
+    }
+}
+
+// MARK: - Pasta que sumiu (backlog 11)
+
+extension ProjectService {
+    /// Mesmo repositório? Compara os remotes sem `.git`, barra final, esquema e caixa (`git@github.com:a/b` = `https://github.com/a/b`).
+    public static func sameRemote(_ a: String?, _ b: String?) -> Bool {
+        guard let a, let b else { return false }
+        func norm(_ s: String) -> String {
+            var t = s.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            if let scheme = t.range(of: "://") { t = String(t[scheme.upperBound...]) }
+            // `user@host:dono/repo` (ssh) ou `user@host/...`: tira o usuário e troca o `:` do ssh por `/`.
+            if let at = t.firstIndex(of: "@"), !t[..<at].contains("/") { t = String(t[t.index(after: at)...]) }
+            if let colon = t.firstIndex(of: ":"), !t[..<colon].contains("/") { t.replaceSubrange(colon...colon, with: "/") }
+            while t.hasSuffix("/") { t.removeLast() }
+            if t.hasSuffix(".git") { t.removeLast(4) }
+            return t
+        }
+        return norm(a) == norm(b)
+    }
+
+    /// `Locate Folder…`: a pasta do projeto mudou de lugar. Repositório Git só aceita o mesmo repositório (mesmo remote quando
+    /// o projeto tem um). Grava o caminho novo e realinha as worktrees.
+    @discardableResult
+    public func relocateProject(id: UUID, to folder: URL) async throws -> Project {
+        guard var project = try await store.project(id: id) else { throw ProjectError.projectNotFound(id) }
+        let candidate = try await inspect(folder: folder)
+        if project.kind == .git {
+            guard candidate.kind == .git else { throw ProjectError.differentRepository(candidate.rootPath) }
+            if project.gitRemoteURL != nil, !Self.sameRemote(project.gitRemoteURL, candidate.remoteURL) {
+                throw ProjectError.differentRepository(candidate.rootPath)
+            }
+        }
+        project.rootPath = candidate.rootPath
+        project.archivedAt = nil
+        try await store.save(project)
+        if project.kind == .git { try await syncWorktrees(projectID: id) }
+        return project
+    }
+
+    /// `Clone Again`: clona o remote salvo de volta no caminho de sempre e realinha as worktrees.
+    @discardableResult
+    public func cloneAgain(id: UUID, runner: any GitCloneRunning = GitCloneProcessRunner()) async throws -> Project {
+        guard let project = try await store.project(id: id) else { throw ProjectError.projectNotFound(id) }
+        guard let remote = project.gitRemoteURL, !remote.isEmpty else { throw ProjectError.noRemote }
+        let fm = FileManager.default
+        guard !fm.fileExists(atPath: project.rootPath) else { throw ProjectError.folderStillThere(project.rootPath) }
+        let destination = URL(fileURLWithPath: project.rootPath)
+        do { try fm.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true) } catch {
+            throw ProjectError.cloneFailed("Couldn't create \(destination.deletingLastPathComponent().path).")
+        }
+        let result: GitCommandResult
+        do {
+            result = try await runner.clone(arguments: ["clone", "--", remote, destination.path], environment: ["GIT_TERMINAL_PROMPT": "0"]) { _ in }
+        } catch let error as GitError { throw ProjectError.git(error) }
+        guard result.exitCode == 0 else {
+            let text = result.stderr.trimmingCharacters(in: .whitespacesAndNewlines)
+            throw ProjectError.cloneFailed(text.isEmpty ? "git clone failed." : text)
+        }
+        try await syncWorktrees(projectID: id)
+        return project
+    }
+
+    /// Sessão sem Git (pasta nova ou escolhida) cuja pasta sumiu: recria a pasta vazia no mesmo caminho.
+    public func recreateSessionFolder(sessionID: UUID) async throws -> String {
+        guard let session = try await store.session(id: sessionID) else { throw ProjectError.projectNotFound(sessionID) }
+        guard session.kind == .clean || session.kind == .folder else { throw ProjectError.differentRepository(session.folderPath) }
+        guard !FileManager.default.fileExists(atPath: session.folderPath) else { throw ProjectError.folderStillThere(session.folderPath) }
+        do {
+            try FileManager.default.createDirectory(atPath: session.folderPath, withIntermediateDirectories: true)
+        } catch { throw ProjectError.notADirectory(session.folderPath) }
+        return session.folderPath
+    }
+
+    /// `Locate Folder…` da sessão: a pasta nova passa a ser a da sessão. Worktree/checkout: tem de ser do mesmo repositório.
+    @discardableResult
+    public func relocateSession(id: UUID, to folder: URL) async throws -> Session {
+        guard var session = try await store.session(id: id) else { throw ProjectError.projectNotFound(id) }
+        let dir = folder.canonicalPath
+        var isDirectory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: dir.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+            throw ProjectError.notADirectory(dir.path)
+        }
+        if session.kind == .worktree || session.kind == .checkout, let projectID = session.projectID,
+           let project = try await store.project(id: projectID), project.gitRemoteURL != nil {
+            let remote = (try? await git.detectRepository(at: dir)) == nil ? nil : (try? await git.remoteURL(in: dir)) ?? nil
+            guard Self.sameRemote(project.gitRemoteURL, remote) else { throw ProjectError.differentRepository(dir.path) }
+        }
+        let old = session.folderPath
+        session.folderPath = dir.path
+        try await store.save(session)
+        if let projectID = session.projectID,
+           var worktree = try await store.worktrees(projectID: projectID).first(where: { $0.id == session.worktreeID || $0.path == old }) {
+            worktree.path = dir.path
+            try await store.save(worktree)
+        }
+        return session
     }
 }

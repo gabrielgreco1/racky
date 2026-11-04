@@ -95,7 +95,8 @@ public struct ActivityState: Sendable, Equatable {
             if c.phase == .done { phase = .done } else if pending[c.agentID] != nil { phase = .needsInput } else { phase = .running }
             return SubagentInfo(
                 agentID: c.agentID, agentType: c.agentType, title: c.title, phase: phase, startedAt: date(c.startedAtNs),
-                endedAt: c.endedAtNs.map(date), subtitle: c.subtitle ?? c.lastMessage.map { String($0.prefix(120)) })
+                endedAt: c.endedAtNs.map(date), subtitle: c.subtitle ?? c.lastMessage.map { String($0.prefix(120)) },
+                pullRequest: SubagentInfo.pullRequest(in: c.lastMessage))
         }
     }
 

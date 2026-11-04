@@ -405,5 +405,9 @@ extension SettingsModel {
             change("Cursor blink") { $0.terminal.cursorBlink = flag(arg, current: $0.terminal.cursorBlink) }
             return settings.terminal.cursorBlink ? "on" : "off"
         }
+        try registry.register(.settingsTerminalClipboardWrite) { [unowned self] arg in
+            change("Clipboard from programs") { $0.terminal.clipboardWrite = flag(arg, current: $0.terminal.clipboardWrite) }
+            return settings.terminal.clipboardWrite ? "on" : "off"
+        }
     }
 }
