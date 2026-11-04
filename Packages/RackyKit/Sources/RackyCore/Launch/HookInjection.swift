@@ -86,6 +86,8 @@ public struct LaunchInjection: Sendable, Equatable {
     public var codexOrchestration: CodexOrchestration?
     /// OpenCode: MCP do pai e dos workers, agentes e instruções (Subagent computers).
     public var openCodeOrchestration: OpenCodeOrchestration?
+    /// Codex e OpenCode: agentes do Racky ligados na sessão (`-c agents.<n>.config_file` no Codex, `OPENCODE_CONFIG_DIR` no OpenCode).
+    public var rackyAgents: [RackyGeneratedAgent] = []
 
     public init(
         helperPath: String, codexHookHashes: [HookEventName: String] = [:], claudeMCPConfig: Data? = nil, claudePluginFiles: [LaunchFile] = [],
@@ -142,6 +144,14 @@ extension LaunchInjection {
             injected += rendered.arguments
             files += rendered.files
         }
+        let dir = launchDirectory.standardizedFileURL.path
+        for agent in rackyAgents where AgentDefinition.isValidName(agent.name) {
+            files.append(LaunchFile(name: "agents-codex/agents/\(agent.name).toml", contents: agent.codexTOML))
+            injected += [
+                "-c", "agents.\(agent.name).description=\(CodexAdapter.tomlString(agent.description.isEmpty ? agent.name : agent.description))",
+                "-c", "agents.\(agent.name).config_file=\(CodexAdapter.tomlString("\(dir)/agents-codex/agents/\(agent.name).toml"))",
+            ]
+        }
         if let worker = codexWorker {
             injected += ["-c", "mcp_servers.\(OrchestrationText.codexWorkerServerName)=\(CodexOrchestration.serverTable(helperPath: helperPath, child: worker.child, capability: worker.capability))"]
         }
@@ -150,9 +160,17 @@ extension LaunchInjection {
 
     /// OpenCode: `OPENCODE_CONFIG_CONTENT` com a config inline e o arquivo de instruções. Sem Subagent computers não injeta nada.
     func openCodeInjection(launchDirectory: URL) throws -> (environment: [String: String], files: [LaunchFile]) {
+        var agentFiles: [LaunchFile] = []
+        var agentEnvironment: [String: String] = [:]
+        let valid = rackyAgents.filter { AgentDefinition.isValidName($0.name) }
+        if !valid.isEmpty {
+            agentFiles = valid.map { LaunchFile(name: "agents-opencode/agent/\($0.name).md", contents: $0.openCodeMarkdown) }
+            agentEnvironment["OPENCODE_CONFIG_DIR"] = "\(launchDirectory.standardizedFileURL.path)/agents-opencode"
+        }
         if let worker = openCodeWorker { return (try OpenCodeOrchestration.renderWorker(helperPath: helperPath, worker: worker), []) }
-        guard let orchestration = openCodeOrchestration else { return ([:], []) }
-        return try orchestration.render(launchDirectory: launchDirectory)
+        guard let orchestration = openCodeOrchestration else { return (agentEnvironment, agentFiles) }
+        let rendered = try orchestration.render(launchDirectory: launchDirectory)
+        return (rendered.environment.merging(agentEnvironment) { _, new in new }, rendered.files + agentFiles)
     }
 }
 

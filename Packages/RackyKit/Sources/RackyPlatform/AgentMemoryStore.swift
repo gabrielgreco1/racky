@@ -214,3 +214,40 @@ public actor AgentMemoryStore {
         }
     }
 }
+
+/// Compressão "estilo caveman" das entradas de memória: tira artigos, enchimento e cortesia, mas deixa URLs, código (entre crases)
+/// e números exatamente como estavam. Determinística: o Claude pode escrever a entrada já curta e isto só tira o que sobrou.
+public enum AgentMemoryText {
+    static let filler: Set<String> = [
+        "a", "an", "the", "just", "really", "very", "basically", "actually", "simply", "please", "that", "which", "so", "also", "quite",
+        "um", "uma", "o", "os", "as", "de", "do", "da", "que", "então", "tipo", "basicamente", "realmente", "apenas", "muito",
+    ]
+
+    public static func compress(_ text: String) -> String {
+        var protected: [String] = []
+        func stash(_ pattern: String, in s: String) -> String {
+            guard let rx = try? NSRegularExpression(pattern: pattern) else { return s }
+            var out = s
+            for m in rx.matches(in: s, range: NSRange(s.startIndex..., in: s)).reversed() {
+                guard let r = Range(m.range, in: out) else { continue }
+                protected.append(String(out[r]))
+                out.replaceSubrange(r, with: "\u{1}\(protected.count - 1)\u{2}")
+            }
+            return out
+        }
+        var s = stash("```[\\s\\S]*?```", in: text)
+        s = stash("`[^`\\n]+`", in: s)
+        s = stash("https?://[^\\s)]+", in: s)
+        var lines: [String] = []
+        for line in s.components(separatedBy: "\n") {
+            let words = line.split(separator: " ", omittingEmptySubsequences: true).filter { word in
+                let bare = word.trimmingCharacters(in: .punctuationCharacters).lowercased()
+                return !filler.contains(bare) || word.contains("\u{1}")
+            }
+            lines.append(words.joined(separator: " "))
+        }
+        var out = lines.joined(separator: "\n").replacingOccurrences(of: "[ \\t]+", with: " ", options: .regularExpression).trimmingCharacters(in: .whitespacesAndNewlines)
+        for (i, original) in protected.enumerated().reversed() { out = out.replacingOccurrences(of: "\u{1}\(i)\u{2}", with: original) }
+        return out
+    }
+}

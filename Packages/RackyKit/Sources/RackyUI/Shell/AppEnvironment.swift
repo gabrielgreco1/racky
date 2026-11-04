@@ -193,6 +193,8 @@ public final class AppEnvironment {
         let loginProvider = LoginShellEnvProvider(
             config: LoginShellEnvConfig(runDirectory: storeRoot.appendingPathComponent("run", isDirectory: true)))
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1.0 (dev)"
+        let agentStore = agents.store
+        let agentHelper = slice2 ? Self.helperPath(environment) : nil
         let runtime = TerminalRuntime(
             configuration: TerminalRuntime.Configuration(
                 daemonHome: storeRoot, daemonExecutable: environment["RACKY_DAEMON"].map { URL(fileURLWithPath: $0) },
@@ -206,7 +208,7 @@ public final class AppEnvironment {
                     let refs = await activations.refs(for: session)
                     await activations.noteLaunched(session: session, ids: Set(refs.map(\.id)))
                     guard !refs.isEmpty else { return nil }
-                    return await BlockingIOBridge.run { SessionLibraryBuilder.build(refs) }
+                    return await RackyAgentLaunch.build(refs: refs, agentStore: agentStore, helperPath: agentHelper)
                 },
                 prepareOrchestration: { info in
                     guard let orchestrator = holder.value else { return nil }

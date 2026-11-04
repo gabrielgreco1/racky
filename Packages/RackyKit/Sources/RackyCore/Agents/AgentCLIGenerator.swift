@@ -12,7 +12,7 @@ public enum AgentCLIGenerator {
     /// Prompt final: instruções, jeito de falar, anexos fixos e o índice curto da memória. Valores de variáveis nunca entram aqui
     /// (só os nomes, para o agente saber o que existe no computador).
     public static func prompt(
-        for agent: AgentDefinition, attachments: AgentAttachmentManifest = AgentAttachmentManifest(), memoryIndex: String = "",
+        for agent: AgentDefinition, attachments: AgentAttachmentManifest = AgentAttachmentManifest(), memoryIndex: String = "", memoryHelper: String? = nil,
         fileExists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }
     ) -> String {
         var parts = [agent.instructions.trimmingCharacters(in: .whitespacesAndNewlines)]
@@ -24,7 +24,16 @@ public enum AgentCLIGenerator {
             parts.append("Environment variables set in your computer (values are not shown): " + agent.variables.map(\.envName).sorted().joined(separator: ", "))
         }
         let mem = memoryIndex.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !mem.isEmpty {
+        if let helper = memoryHelper {
+            let cmd = "\(HookCommandLine.shellQuote(helper)) memory"
+            let n = HookCommandLine.shellQuote(agent.name)
+            parts.append("""
+                Your memory, kept between tasks. Index (newest first):
+                \(mem.isEmpty ? "(empty)" : mem)
+                memory_search: run `\(cmd) search --agent \(n) "<words>"`. memory_read: run `\(cmd) read --agent \(n) <id>`.
+                When the task is done, save ONE short entry for the next task (decisions, gotchas, paths; terse, no filler, URLs and code unchanged): `\(cmd) add --agent \(n) --title "<few words>" --body "<what to remember>"`.
+                """)
+        } else if !mem.isEmpty {
             parts.append("Memory index (use memory_search and memory_read for details):\n\(mem)")
         }
         return parts.filter { !$0.isEmpty }.joined(separator: "\n\n")
@@ -32,9 +41,9 @@ public enum AgentCLIGenerator {
 
     public static func generate(
         _ agent: AgentDefinition, for client: LibraryClient, attachments: AgentAttachmentManifest = AgentAttachmentManifest(), memoryIndex: String = "",
-        fileExists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }
+        memoryHelper: String? = nil, fileExists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }
     ) -> AgentLaunchArtifacts {
-        let body = prompt(for: agent, attachments: attachments, memoryIndex: memoryIndex, fileExists: fileExists)
+        let body = prompt(for: agent, attachments: attachments, memoryIndex: memoryIndex, memoryHelper: memoryHelper, fileExists: fileExists)
         let safe = agent.name
         switch client {
         case .claude:

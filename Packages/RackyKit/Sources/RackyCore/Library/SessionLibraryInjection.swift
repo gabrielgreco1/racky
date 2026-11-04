@@ -15,8 +15,10 @@ public struct SessionLibraryInjection: Sendable, Equatable {
     public var skillNames: [String]
     /// Itens que não deu para ler (sumiram ou ilegíveis): o lançamento segue sem eles.
     public var skipped: [String]
+    /// Agentes do Racky ligados na sessão, já gerados para Codex e OpenCode (o Claude os leva em `agents`).
+    public var rackyAgents: [RackyGeneratedAgent] = []
 
-    public var isEmpty: Bool { pluginFiles.isEmpty && agents.isEmpty }
+    public var isEmpty: Bool { pluginFiles.isEmpty && agents.isEmpty && rackyAgents.isEmpty }
 
     /// `--agents` do lançamento com os agentes da sessão somados aos que já vieram (os que já existem vencem).
     public func mergedAgentsJSON(into base: Data?) -> Data? {

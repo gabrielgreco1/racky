@@ -288,8 +288,14 @@ public actor LaunchCoordinator {
                 let capabilities = await configuration.capabilities(job.spec.provider, executable)
                 var injection = configuration.injection(job.spec.provider)
                 // Itens da Library ligados só nesta sessão (Claude): plugin `plugin-session/` e agentes em `--agents`.
-                if job.spec.provider == .claude, injection != nil, let session = job.sessionID, let library = configuration.sessionLibrary {
-                    injection?.claudeSessionLibrary = await library(session)
+                if injection != nil, let session = job.sessionID, let library = configuration.sessionLibrary {
+                    let loaded = await library(session)
+                    if job.spec.provider == .claude {
+                        injection?.claudeSessionLibrary = loaded
+                    } else if job.spec.provider == .codex || job.spec.provider == .opencode {
+                        // Agentes do Racky ligados na sessão: Codex e OpenCode os recebem gerados no diretório do lançamento.
+                        injection?.rackyAgents = loaded?.rackyAgents ?? []
+                    }
                 }
                 // Claude parte da injeção de hooks; Codex e OpenCode só levam a de orquestração (hooks do Codex precisam de trust sondado).
                 if let worker = job.workerOf {
